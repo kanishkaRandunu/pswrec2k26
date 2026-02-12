@@ -10,7 +10,7 @@
 #PBS -j oe
 #PBS -N bert4rec_beauty_a100_ce
 
-# BERT4Rec on Amazon Beauty (benchmark). Submit from repo root: qsub pbs/beauty/bert4rec_beauty_a100_ce.pbs
+# BERT4Rec (RecBole) on Amazon Beauty. Submit from repo root: qsub pbs/beauty/bert4rec_beauty_a100_ce.pbs
 
 set -e
 cd "$PBS_O_WORKDIR"
@@ -31,3 +31,4 @@ LIVE_LOG="bert4rec_beauty_live_${PBS_JOBID}.log"
 python -u RecBole/run_recbole.py -m BERT4Rec -d amazon-beauty --config_files configs/beauty/beauty_BERT4Rec.yaml 2>&1 | tee "${LIVE_LOG}"
 
 echo "Job completed."
+

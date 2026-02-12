@@ -1,0 +1,486 @@
+=== hostname ===
+gadi-dgx-a100-0002.gadi.nci.org.au
+=== PBS_JOBID ===
+160775550.gadi-pbs
+command line args [-m LightSANs -d amazon-beauty --config_files configs/beauty/beauty_LightSANs.yaml] will not be used in RecBole
+12 Feb 23:09    INFO  ['RecBole/run_recbole.py', '-m', 'LightSANs', '-d', 'amazon-beauty', '--config_files', 'configs/beauty/beauty_LightSANs.yaml']
+12 Feb 23:09    INFO  
+General Hyper Parameters:
+gpu_id = 0
+use_gpu = True
+seed = 2026
+state = INFO
+reproducibility = True
+data_path = /scratch/up63/kd6504/recbole_datasets/amazon-beauty
+checkpoint_dir = outputs/lightsans_beauty
+show_progress = False
+save_dataset = False
+dataset_save_path = None
+save_dataloaders = False
+dataloaders_save_path = None
+log_wandb = False
+
+Training Hyper Parameters:
+epochs = 200
+train_batch_size = 128
+learner = adam
+learning_rate = 0.001
+train_neg_sample_args = {'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}
+eval_step = 1
+stopping_step = 10
+clip_grad_norm = None
+weight_decay = 0.0
+loss_decimal_place = 4
+
+Evaluation Hyper Parameters:
+eval_args = {'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}
+repeatable = True
+metrics = ['Hit', 'NDCG', 'MRR']
+topk = [1, 5, 10, 20]
+valid_metric = NDCG@10
+valid_metric_bigger = True
+eval_batch_size = 4096
+metric_decimal_place = 4
+
+Dataset Hyper Parameters:
+field_separator = 	
+seq_separator =  
+USER_ID_FIELD = user_id
+ITEM_ID_FIELD = item_id
+RATING_FIELD = rating
+TIME_FIELD = timestamp
+seq_len = None
+LABEL_FIELD = label
+threshold = None
+NEG_PREFIX = neg_
+load_col = {'inter': ['user_id', 'item_id', 'rating', 'timestamp']}
+unload_col = None
+unused_col = {'inter': ['rating']}
+additional_feat_suffix = None
+rm_dup_inter = None
+val_interval = None
+filter_inter_by_user_or_item = True
+user_inter_num_interval = [5,inf)
+item_inter_num_interval = [5,inf)
+alias_of_user_id = None
+alias_of_item_id = None
+alias_of_entity_id = None
+alias_of_relation_id = None
+preload_weight = None
+normalize_field = None
+normalize_all = None
+ITEM_LIST_LENGTH_FIELD = item_length
+LIST_SUFFIX = _list
+MAX_ITEM_LIST_LENGTH = 50
+POSITION_FIELD = position_id
+HEAD_ENTITY_ID_FIELD = head_id
+TAIL_ENTITY_ID_FIELD = tail_id
+RELATION_ID_FIELD = relation_id
+ENTITY_ID_FIELD = entity_id
+benchmark_filename = None
+
+Other Hyper Parameters: 
+worker = 0
+wandb_project = recbole
+shuffle = True
+require_pow = False
+enable_amp = False
+enable_scaler = False
+transform = None
+k_interests = 5
+n_layers = 2
+n_heads = 2
+hidden_size = 64
+inner_size = 256
+hidden_dropout_prob = 0.5
+attn_dropout_prob = 0.5
+hidden_act = gelu
+layer_norm_eps = 1e-12
+initializer_range = 0.02
+loss_type = CE
+numerical_features = []
+discretization = None
+kg_reverse_r = False
+entity_kg_num_interval = [0,inf)
+relation_kg_num_interval = [0,inf)
+MODEL_TYPE = ModelType.SEQUENTIAL
+MODEL_INPUT_TYPE = InputType.POINTWISE
+eval_type = EvaluatorType.RANKING
+single_spec = True
+local_rank = 0
+device = cuda
+valid_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+test_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+
+
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:648: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=0, inplace=True)
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:650: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=feat[field].mean(), inplace=True)
+12 Feb 23:09    INFO  amazon-beauty
+The number of users: 22364
+Average actions of users: 8.876358270357287
+The number of items: 12102
+Average actions of items: 16.403768283612923
+The number of inters: 198502
+The sparsity of the dataset: 99.92665707018277%
+Remain Fields: ['user_id', 'item_id', 'rating', 'timestamp']
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:2202: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:203.)
+  new_data[k] = torch.LongTensor(value)
+12 Feb 23:09    INFO  [Training]: train_batch_size = [128] train_neg_sample_args: [{'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}]
+12 Feb 23:09    INFO  [Evaluation]: eval_batch_size = [4096] eval_args: [{'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}]
+12 Feb 23:09    INFO  LightSANs(
+  (item_embedding): Embedding(12102, 64, padding_idx=0)
+  (position_embedding): Embedding(50, 64)
+  (trm_encoder): LightTransformerEncoder(
+    (layer): ModuleList(
+      (0-1): 2 x LightTransformerLayer(
+        (multi_head_attention): LightMultiHeadAttention(
+          (query): Linear(in_features=64, out_features=64, bias=True)
+          (key): Linear(in_features=64, out_features=64, bias=True)
+          (value): Linear(in_features=64, out_features=64, bias=True)
+          (attpooling_key): ItemToInterestAggregation()
+          (attpooling_value): ItemToInterestAggregation()
+          (pos_q_linear): Linear(in_features=64, out_features=64, bias=True)
+          (pos_k_linear): Linear(in_features=64, out_features=64, bias=True)
+          (pos_ln): LayerNorm((64,), eps=1e-12, elementwise_affine=True)
+          (attn_dropout): Dropout(p=0.5, inplace=False)
+          (dense): Linear(in_features=64, out_features=64, bias=True)
+          (LayerNorm): LayerNorm((64,), eps=1e-12, elementwise_affine=True)
+          (out_dropout): Dropout(p=0.5, inplace=False)
+        )
+        (feed_forward): FeedForward(
+          (dense_1): Linear(in_features=64, out_features=256, bias=True)
+          (dense_2): Linear(in_features=256, out_features=64, bias=True)
+          (LayerNorm): LayerNorm((64,), eps=1e-12, elementwise_affine=True)
+          (dropout): Dropout(p=0.5, inplace=False)
+        )
+      )
+    )
+  )
+  (LayerNorm): LayerNorm((64,), eps=1e-12, elementwise_affine=True)
+  (dropout): Dropout(p=0.5, inplace=False)
+  (loss_fct): CrossEntropyLoss()
+)
+Trainable parameters: 896000
+12 Feb 23:09    INFO  FLOPs: 5785664.0
+/home/572/kd6504/TRACT/RecBole/recbole/trainer/trainer.py:235: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = amp.GradScaler(enabled=self.enable_scaler)
+12 Feb 23:10    INFO  epoch 0 training [time: 69.59s, train loss: 8837.5938]
+12 Feb 23:10    INFO  epoch 0 evaluating [time: 0.63s, valid_score: 0.021300]
+12 Feb 23:10    INFO  valid result: 
+hit@1 : 0.0069    hit@5 : 0.0254    hit@10 : 0.0414    hit@20 : 0.0664    ndcg@1 : 0.0069    ndcg@5 : 0.0162    ndcg@10 : 0.0213    ndcg@20 : 0.0276    mrr@1 : 0.0069    mrr@5 : 0.0132    mrr@10 : 0.0153    mrr@20 : 0.017
+12 Feb 23:10    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:12    INFO  epoch 1 training [time: 71.72s, train loss: 8135.4360]
+12 Feb 23:12    INFO  epoch 1 evaluating [time: 0.30s, valid_score: 0.033200]
+12 Feb 23:12    INFO  valid result: 
+hit@1 : 0.0112    hit@5 : 0.0412    hit@10 : 0.063    hit@20 : 0.0932    ndcg@1 : 0.0112    ndcg@5 : 0.0262    ndcg@10 : 0.0332    ndcg@20 : 0.0408    mrr@1 : 0.0112    mrr@5 : 0.0213    mrr@10 : 0.0242    mrr@20 : 0.0262
+12 Feb 23:12    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:13    INFO  epoch 2 training [time: 71.97s, train loss: 7818.1077]
+12 Feb 23:13    INFO  epoch 2 evaluating [time: 0.30s, valid_score: 0.038900]
+12 Feb 23:13    INFO  valid result: 
+hit@1 : 0.0123    hit@5 : 0.0493    hit@10 : 0.0755    hit@20 : 0.1105    ndcg@1 : 0.0123    ndcg@5 : 0.0305    ndcg@10 : 0.0389    ndcg@20 : 0.0477    mrr@1 : 0.0123    mrr@5 : 0.0243    mrr@10 : 0.0278    mrr@20 : 0.0302
+12 Feb 23:13    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:14    INFO  epoch 3 training [time: 70.86s, train loss: 7568.7734]
+12 Feb 23:14    INFO  epoch 3 evaluating [time: 0.29s, valid_score: 0.043100]
+12 Feb 23:14    INFO  valid result: 
+hit@1 : 0.0112    hit@5 : 0.0549    hit@10 : 0.086    hit@20 : 0.1249    ndcg@1 : 0.0112    ndcg@5 : 0.033    ndcg@10 : 0.0431    ndcg@20 : 0.0528    mrr@1 : 0.0112    mrr@5 : 0.0259    mrr@10 : 0.03    mrr@20 : 0.0327
+12 Feb 23:14    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:15    INFO  epoch 4 training [time: 70.14s, train loss: 7369.4945]
+12 Feb 23:15    INFO  epoch 4 evaluating [time: 0.29s, valid_score: 0.047300]
+12 Feb 23:15    INFO  valid result: 
+hit@1 : 0.0109    hit@5 : 0.0622    hit@10 : 0.094    hit@20 : 0.1346    ndcg@1 : 0.0109    ndcg@5 : 0.037    ndcg@10 : 0.0473    ndcg@20 : 0.0575    mrr@1 : 0.0109    mrr@5 : 0.0288    mrr@10 : 0.033    mrr@20 : 0.0357
+12 Feb 23:15    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:16    INFO  epoch 5 training [time: 69.86s, train loss: 7206.5921]
+12 Feb 23:16    INFO  epoch 5 evaluating [time: 0.28s, valid_score: 0.048400]
+12 Feb 23:16    INFO  valid result: 
+hit@1 : 0.0118    hit@5 : 0.0649    hit@10 : 0.0951    hit@20 : 0.1367    ndcg@1 : 0.0118    ndcg@5 : 0.0387    ndcg@10 : 0.0484    ndcg@20 : 0.0589    mrr@1 : 0.0118    mrr@5 : 0.0301    mrr@10 : 0.0341    mrr@20 : 0.0369
+12 Feb 23:16    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:17    INFO  epoch 6 training [time: 69.83s, train loss: 7082.2458]
+12 Feb 23:17    INFO  epoch 6 evaluating [time: 0.28s, valid_score: 0.049100]
+12 Feb 23:17    INFO  valid result: 
+hit@1 : 0.0111    hit@5 : 0.0659    hit@10 : 0.0982    hit@20 : 0.1393    ndcg@1 : 0.0111    ndcg@5 : 0.0388    ndcg@10 : 0.0491    ndcg@20 : 0.0595    mrr@1 : 0.0111    mrr@5 : 0.0299    mrr@10 : 0.0341    mrr@20 : 0.0369
+12 Feb 23:17    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:19    INFO  epoch 7 training [time: 69.52s, train loss: 6981.8746]
+12 Feb 23:19    INFO  epoch 7 evaluating [time: 0.29s, valid_score: 0.050500]
+12 Feb 23:19    INFO  valid result: 
+hit@1 : 0.0104    hit@5 : 0.0663    hit@10 : 0.1016    hit@20 : 0.1439    ndcg@1 : 0.0104    ndcg@5 : 0.0391    ndcg@10 : 0.0505    ndcg@20 : 0.0612    mrr@1 : 0.0104    mrr@5 : 0.0302    mrr@10 : 0.0348    mrr@20 : 0.0377
+12 Feb 23:19    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:20    INFO  epoch 8 training [time: 68.88s, train loss: 6905.8000]
+12 Feb 23:20    INFO  epoch 8 evaluating [time: 0.28s, valid_score: 0.050200]
+12 Feb 23:20    INFO  valid result: 
+hit@1 : 0.0097    hit@5 : 0.0663    hit@10 : 0.1017    hit@20 : 0.1435    ndcg@1 : 0.0097    ndcg@5 : 0.0387    ndcg@10 : 0.0502    ndcg@20 : 0.0607    mrr@1 : 0.0097    mrr@5 : 0.0297    mrr@10 : 0.0344    mrr@20 : 0.0372
+12 Feb 23:21    INFO  epoch 9 training [time: 68.65s, train loss: 6838.3283]
+12 Feb 23:21    INFO  epoch 9 evaluating [time: 0.28s, valid_score: 0.050200]
+12 Feb 23:21    INFO  valid result: 
+hit@1 : 0.0089    hit@5 : 0.0654    hit@10 : 0.1027    hit@20 : 0.1438    ndcg@1 : 0.0089    ndcg@5 : 0.0381    ndcg@10 : 0.0502    ndcg@20 : 0.0606    mrr@1 : 0.0089    mrr@5 : 0.0292    mrr@10 : 0.0341    mrr@20 : 0.0369
+12 Feb 23:22    INFO  epoch 10 training [time: 68.54s, train loss: 6784.2362]
+12 Feb 23:22    INFO  epoch 10 evaluating [time: 0.28s, valid_score: 0.050700]
+12 Feb 23:22    INFO  valid result: 
+hit@1 : 0.0098    hit@5 : 0.0679    hit@10 : 0.102    hit@20 : 0.1434    ndcg@1 : 0.0098    ndcg@5 : 0.0397    ndcg@10 : 0.0507    ndcg@20 : 0.0611    mrr@1 : 0.0098    mrr@5 : 0.0304    mrr@10 : 0.035    mrr@20 : 0.0378
+12 Feb 23:22    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:23    INFO  epoch 11 training [time: 68.27s, train loss: 6741.3728]
+12 Feb 23:23    INFO  epoch 11 evaluating [time: 0.28s, valid_score: 0.051300]
+12 Feb 23:23    INFO  valid result: 
+hit@1 : 0.0113    hit@5 : 0.0681    hit@10 : 0.1023    hit@20 : 0.1461    ndcg@1 : 0.0113    ndcg@5 : 0.0402    ndcg@10 : 0.0513    ndcg@20 : 0.0623    mrr@1 : 0.0113    mrr@5 : 0.0311    mrr@10 : 0.0356    mrr@20 : 0.0387
+12 Feb 23:23    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:24    INFO  epoch 12 training [time: 68.22s, train loss: 6702.9160]
+12 Feb 23:24    INFO  epoch 12 evaluating [time: 0.27s, valid_score: 0.051500]
+12 Feb 23:24    INFO  valid result: 
+hit@1 : 0.0106    hit@5 : 0.0682    hit@10 : 0.1042    hit@20 : 0.1453    ndcg@1 : 0.0106    ndcg@5 : 0.0399    ndcg@10 : 0.0515    ndcg@20 : 0.0619    mrr@1 : 0.0106    mrr@5 : 0.0306    mrr@10 : 0.0354    mrr@20 : 0.0382
+12 Feb 23:24    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:26    INFO  epoch 13 training [time: 68.36s, train loss: 6666.5273]
+12 Feb 23:26    INFO  epoch 13 evaluating [time: 0.29s, valid_score: 0.051500]
+12 Feb 23:26    INFO  valid result: 
+hit@1 : 0.0103    hit@5 : 0.0679    hit@10 : 0.1038    hit@20 : 0.1489    ndcg@1 : 0.0103    ndcg@5 : 0.0399    ndcg@10 : 0.0515    ndcg@20 : 0.0628    mrr@1 : 0.0103    mrr@5 : 0.0306    mrr@10 : 0.0354    mrr@20 : 0.0385
+12 Feb 23:26    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:27    INFO  epoch 14 training [time: 68.51s, train loss: 6639.7755]
+12 Feb 23:27    INFO  epoch 14 evaluating [time: 0.28s, valid_score: 0.052100]
+12 Feb 23:27    INFO  valid result: 
+hit@1 : 0.0096    hit@5 : 0.0683    hit@10 : 0.1063    hit@20 : 0.1486    ndcg@1 : 0.0096    ndcg@5 : 0.0398    ndcg@10 : 0.0521    ndcg@20 : 0.0627    mrr@1 : 0.0096    mrr@5 : 0.0304    mrr@10 : 0.0355    mrr@20 : 0.0384
+12 Feb 23:27    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:28    INFO  epoch 15 training [time: 68.60s, train loss: 6612.3939]
+12 Feb 23:28    INFO  epoch 15 evaluating [time: 0.29s, valid_score: 0.051400]
+12 Feb 23:28    INFO  valid result: 
+hit@1 : 0.0098    hit@5 : 0.0685    hit@10 : 0.1046    hit@20 : 0.147    ndcg@1 : 0.0098    ndcg@5 : 0.0397    ndcg@10 : 0.0514    ndcg@20 : 0.062    mrr@1 : 0.0098    mrr@5 : 0.0303    mrr@10 : 0.0351    mrr@20 : 0.038
+12 Feb 23:29    INFO  epoch 16 training [time: 68.12s, train loss: 6585.6036]
+12 Feb 23:29    INFO  epoch 16 evaluating [time: 0.29s, valid_score: 0.051800]
+12 Feb 23:29    INFO  valid result: 
+hit@1 : 0.0094    hit@5 : 0.0699    hit@10 : 0.1053    hit@20 : 0.1491    ndcg@1 : 0.0094    ndcg@5 : 0.0404    ndcg@10 : 0.0518    ndcg@20 : 0.0628    mrr@1 : 0.0094    mrr@5 : 0.0306    mrr@10 : 0.0353    mrr@20 : 0.0383
+12 Feb 23:30    INFO  epoch 17 training [time: 68.19s, train loss: 6567.6570]
+12 Feb 23:30    INFO  epoch 17 evaluating [time: 0.28s, valid_score: 0.051800]
+12 Feb 23:30    INFO  valid result: 
+hit@1 : 0.0112    hit@5 : 0.0684    hit@10 : 0.1047    hit@20 : 0.1487    ndcg@1 : 0.0112    ndcg@5 : 0.0401    ndcg@10 : 0.0518    ndcg@20 : 0.0628    mrr@1 : 0.0112    mrr@5 : 0.0309    mrr@10 : 0.0356    mrr@20 : 0.0386
+12 Feb 23:31    INFO  epoch 18 training [time: 68.11s, train loss: 6545.8440]
+12 Feb 23:31    INFO  epoch 18 evaluating [time: 0.28s, valid_score: 0.052800]
+12 Feb 23:31    INFO  valid result: 
+hit@1 : 0.0127    hit@5 : 0.0695    hit@10 : 0.104    hit@20 : 0.1488    ndcg@1 : 0.0127    ndcg@5 : 0.0417    ndcg@10 : 0.0528    ndcg@20 : 0.064    mrr@1 : 0.0127    mrr@5 : 0.0325    mrr@10 : 0.0371    mrr@20 : 0.0401
+12 Feb 23:31    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:32    INFO  epoch 19 training [time: 68.16s, train loss: 6521.5695]
+12 Feb 23:32    INFO  epoch 19 evaluating [time: 0.29s, valid_score: 0.051700]
+12 Feb 23:32    INFO  valid result: 
+hit@1 : 0.0106    hit@5 : 0.0685    hit@10 : 0.1036    hit@20 : 0.1498    ndcg@1 : 0.0106    ndcg@5 : 0.0404    ndcg@10 : 0.0517    ndcg@20 : 0.0633    mrr@1 : 0.0106    mrr@5 : 0.0311    mrr@10 : 0.0357    mrr@20 : 0.0389
+12 Feb 23:34    INFO  epoch 20 training [time: 68.17s, train loss: 6509.0581]
+12 Feb 23:34    INFO  epoch 20 evaluating [time: 0.28s, valid_score: 0.052900]
+12 Feb 23:34    INFO  valid result: 
+hit@1 : 0.0112    hit@5 : 0.0705    hit@10 : 0.1058    hit@20 : 0.1495    ndcg@1 : 0.0112    ndcg@5 : 0.0415    ndcg@10 : 0.0529    ndcg@20 : 0.0638    mrr@1 : 0.0112    mrr@5 : 0.0319    mrr@10 : 0.0366    mrr@20 : 0.0396
+12 Feb 23:34    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:35    INFO  epoch 21 training [time: 68.12s, train loss: 6490.9357]
+12 Feb 23:35    INFO  epoch 21 evaluating [time: 0.28s, valid_score: 0.053300]
+12 Feb 23:35    INFO  valid result: 
+hit@1 : 0.0111    hit@5 : 0.0708    hit@10 : 0.1069    hit@20 : 0.1499    ndcg@1 : 0.0111    ndcg@5 : 0.0417    ndcg@10 : 0.0533    ndcg@20 : 0.0641    mrr@1 : 0.0111    mrr@5 : 0.0321    mrr@10 : 0.0368    mrr@20 : 0.0398
+12 Feb 23:35    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:36    INFO  epoch 22 training [time: 68.09s, train loss: 6474.8936]
+12 Feb 23:36    INFO  epoch 22 evaluating [time: 0.28s, valid_score: 0.053200]
+12 Feb 23:36    INFO  valid result: 
+hit@1 : 0.0106    hit@5 : 0.0705    hit@10 : 0.1083    hit@20 : 0.151    ndcg@1 : 0.0106    ndcg@5 : 0.0411    ndcg@10 : 0.0532    ndcg@20 : 0.064    mrr@1 : 0.0106    mrr@5 : 0.0315    mrr@10 : 0.0364    mrr@20 : 0.0394
+12 Feb 23:37    INFO  epoch 23 training [time: 68.15s, train loss: 6463.2584]
+12 Feb 23:37    INFO  epoch 23 evaluating [time: 0.28s, valid_score: 0.052100]
+12 Feb 23:37    INFO  valid result: 
+hit@1 : 0.011    hit@5 : 0.07    hit@10 : 0.1039    hit@20 : 0.151    ndcg@1 : 0.011    ndcg@5 : 0.0412    ndcg@10 : 0.0521    ndcg@20 : 0.064    mrr@1 : 0.011    mrr@5 : 0.0317    mrr@10 : 0.0362    mrr@20 : 0.0395
+12 Feb 23:38    INFO  epoch 24 training [time: 68.20s, train loss: 6447.8557]
+12 Feb 23:38    INFO  epoch 24 evaluating [time: 0.28s, valid_score: 0.054000]
+12 Feb 23:38    INFO  valid result: 
+hit@1 : 0.0114    hit@5 : 0.0716    hit@10 : 0.1078    hit@20 : 0.1513    ndcg@1 : 0.0114    ndcg@5 : 0.0424    ndcg@10 : 0.054    ndcg@20 : 0.065    mrr@1 : 0.0114    mrr@5 : 0.0327    mrr@10 : 0.0375    mrr@20 : 0.0405
+12 Feb 23:38    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:39    INFO  epoch 25 training [time: 68.18s, train loss: 6434.6721]
+12 Feb 23:39    INFO  epoch 25 evaluating [time: 0.28s, valid_score: 0.053000]
+12 Feb 23:39    INFO  valid result: 
+hit@1 : 0.0111    hit@5 : 0.0695    hit@10 : 0.1061    hit@20 : 0.1511    ndcg@1 : 0.0111    ndcg@5 : 0.0412    ndcg@10 : 0.053    ndcg@20 : 0.0643    mrr@1 : 0.0111    mrr@5 : 0.0319    mrr@10 : 0.0367    mrr@20 : 0.0398
+12 Feb 23:40    INFO  epoch 26 training [time: 68.10s, train loss: 6411.4404]
+12 Feb 23:40    INFO  epoch 26 evaluating [time: 0.29s, valid_score: 0.053300]
+12 Feb 23:40    INFO  valid result: 
+hit@1 : 0.0116    hit@5 : 0.0717    hit@10 : 0.1048    hit@20 : 0.1502    ndcg@1 : 0.0116    ndcg@5 : 0.0426    ndcg@10 : 0.0533    ndcg@20 : 0.0648    mrr@1 : 0.0116    mrr@5 : 0.033    mrr@10 : 0.0374    mrr@20 : 0.0406
+12 Feb 23:42    INFO  epoch 27 training [time: 68.04s, train loss: 6406.7504]
+12 Feb 23:42    INFO  epoch 27 evaluating [time: 0.28s, valid_score: 0.053700]
+12 Feb 23:42    INFO  valid result: 
+hit@1 : 0.0124    hit@5 : 0.0724    hit@10 : 0.1057    hit@20 : 0.1509    ndcg@1 : 0.0124    ndcg@5 : 0.043    ndcg@10 : 0.0537    ndcg@20 : 0.0651    mrr@1 : 0.0124    mrr@5 : 0.0334    mrr@10 : 0.0378    mrr@20 : 0.0409
+12 Feb 23:43    INFO  epoch 28 training [time: 67.96s, train loss: 6398.1280]
+12 Feb 23:43    INFO  epoch 28 evaluating [time: 0.28s, valid_score: 0.053900]
+12 Feb 23:43    INFO  valid result: 
+hit@1 : 0.0129    hit@5 : 0.0717    hit@10 : 0.1051    hit@20 : 0.1494    ndcg@1 : 0.0129    ndcg@5 : 0.0432    ndcg@10 : 0.0539    ndcg@20 : 0.0651    mrr@1 : 0.0129    mrr@5 : 0.0338    mrr@10 : 0.0382    mrr@20 : 0.0413
+12 Feb 23:44    INFO  epoch 29 training [time: 67.96s, train loss: 6383.0519]
+12 Feb 23:44    INFO  epoch 29 evaluating [time: 0.29s, valid_score: 0.052300]
+12 Feb 23:44    INFO  valid result: 
+hit@1 : 0.0114    hit@5 : 0.0699    hit@10 : 0.1039    hit@20 : 0.1495    ndcg@1 : 0.0114    ndcg@5 : 0.0414    ndcg@10 : 0.0523    ndcg@20 : 0.0638    mrr@1 : 0.0114    mrr@5 : 0.032    mrr@10 : 0.0365    mrr@20 : 0.0396
+12 Feb 23:45    INFO  epoch 30 training [time: 68.02s, train loss: 6373.6805]
+12 Feb 23:45    INFO  epoch 30 evaluating [time: 0.28s, valid_score: 0.053800]
+12 Feb 23:45    INFO  valid result: 
+hit@1 : 0.0126    hit@5 : 0.0716    hit@10 : 0.1059    hit@20 : 0.1512    ndcg@1 : 0.0126    ndcg@5 : 0.0427    ndcg@10 : 0.0538    ndcg@20 : 0.0652    mrr@1 : 0.0126    mrr@5 : 0.0332    mrr@10 : 0.0378    mrr@20 : 0.0409
+12 Feb 23:46    INFO  epoch 31 training [time: 68.06s, train loss: 6360.7570]
+12 Feb 23:46    INFO  epoch 31 evaluating [time: 0.29s, valid_score: 0.053300]
+12 Feb 23:46    INFO  valid result: 
+hit@1 : 0.0117    hit@5 : 0.0707    hit@10 : 0.1061    hit@20 : 0.1505    ndcg@1 : 0.0117    ndcg@5 : 0.0419    ndcg@10 : 0.0533    ndcg@20 : 0.0645    mrr@1 : 0.0117    mrr@5 : 0.0324    mrr@10 : 0.0371    mrr@20 : 0.0402
+12 Feb 23:47    INFO  epoch 32 training [time: 67.99s, train loss: 6352.0979]
+12 Feb 23:47    INFO  epoch 32 evaluating [time: 0.27s, valid_score: 0.054500]
+12 Feb 23:47    INFO  valid result: 
+hit@1 : 0.0125    hit@5 : 0.073    hit@10 : 0.1073    hit@20 : 0.1514    ndcg@1 : 0.0125    ndcg@5 : 0.0435    ndcg@10 : 0.0545    ndcg@20 : 0.0657    mrr@1 : 0.0125    mrr@5 : 0.0338    mrr@10 : 0.0383    mrr@20 : 0.0414
+12 Feb 23:47    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:48    INFO  epoch 33 training [time: 67.99s, train loss: 6341.0146]
+12 Feb 23:48    INFO  epoch 33 evaluating [time: 0.28s, valid_score: 0.054200]
+12 Feb 23:48    INFO  valid result: 
+hit@1 : 0.0128    hit@5 : 0.0707    hit@10 : 0.1073    hit@20 : 0.1516    ndcg@1 : 0.0128    ndcg@5 : 0.0424    ndcg@10 : 0.0542    ndcg@20 : 0.0654    mrr@1 : 0.0128    mrr@5 : 0.0331    mrr@10 : 0.038    mrr@20 : 0.041
+12 Feb 23:49    INFO  epoch 34 training [time: 67.91s, train loss: 6334.5427]
+12 Feb 23:49    INFO  epoch 34 evaluating [time: 0.28s, valid_score: 0.052900]
+12 Feb 23:49    INFO  valid result: 
+hit@1 : 0.0117    hit@5 : 0.0695    hit@10 : 0.1049    hit@20 : 0.1506    ndcg@1 : 0.0117    ndcg@5 : 0.0415    ndcg@10 : 0.0529    ndcg@20 : 0.0645    mrr@1 : 0.0117    mrr@5 : 0.0323    mrr@10 : 0.037    mrr@20 : 0.0401
+12 Feb 23:51    INFO  epoch 35 training [time: 68.01s, train loss: 6328.6817]
+12 Feb 23:51    INFO  epoch 35 evaluating [time: 0.28s, valid_score: 0.054000]
+12 Feb 23:51    INFO  valid result: 
+hit@1 : 0.0125    hit@5 : 0.0712    hit@10 : 0.1061    hit@20 : 0.1515    ndcg@1 : 0.0125    ndcg@5 : 0.0427    ndcg@10 : 0.054    ndcg@20 : 0.0654    mrr@1 : 0.0125    mrr@5 : 0.0333    mrr@10 : 0.038    mrr@20 : 0.0411
+12 Feb 23:52    INFO  epoch 36 training [time: 67.97s, train loss: 6318.5595]
+12 Feb 23:52    INFO  epoch 36 evaluating [time: 0.28s, valid_score: 0.053700]
+12 Feb 23:52    INFO  valid result: 
+hit@1 : 0.0127    hit@5 : 0.0711    hit@10 : 0.1053    hit@20 : 0.1521    ndcg@1 : 0.0127    ndcg@5 : 0.0427    ndcg@10 : 0.0537    ndcg@20 : 0.0655    mrr@1 : 0.0127    mrr@5 : 0.0333    mrr@10 : 0.0378    mrr@20 : 0.041
+12 Feb 23:53    INFO  epoch 37 training [time: 67.96s, train loss: 6313.0607]
+12 Feb 23:53    INFO  epoch 37 evaluating [time: 0.28s, valid_score: 0.053100]
+12 Feb 23:53    INFO  valid result: 
+hit@1 : 0.0118    hit@5 : 0.0697    hit@10 : 0.1066    hit@20 : 0.1515    ndcg@1 : 0.0118    ndcg@5 : 0.0412    ndcg@10 : 0.0531    ndcg@20 : 0.0644    mrr@1 : 0.0118    mrr@5 : 0.0319    mrr@10 : 0.0367    mrr@20 : 0.0398
+12 Feb 23:54    INFO  epoch 38 training [time: 67.99s, train loss: 6299.2610]
+12 Feb 23:54    INFO  epoch 38 evaluating [time: 0.28s, valid_score: 0.053600]
+12 Feb 23:54    INFO  valid result: 
+hit@1 : 0.0121    hit@5 : 0.0711    hit@10 : 0.1055    hit@20 : 0.1504    ndcg@1 : 0.0121    ndcg@5 : 0.0425    ndcg@10 : 0.0536    ndcg@20 : 0.0649    mrr@1 : 0.0121    mrr@5 : 0.0331    mrr@10 : 0.0376    mrr@20 : 0.0407
+12 Feb 23:55    INFO  epoch 39 training [time: 67.99s, train loss: 6295.8818]
+12 Feb 23:55    INFO  epoch 39 evaluating [time: 0.29s, valid_score: 0.054500]
+12 Feb 23:55    INFO  valid result: 
+hit@1 : 0.0131    hit@5 : 0.0702    hit@10 : 0.1076    hit@20 : 0.1527    ndcg@1 : 0.0131    ndcg@5 : 0.0425    ndcg@10 : 0.0545    ndcg@20 : 0.0658    mrr@1 : 0.0131    mrr@5 : 0.0334    mrr@10 : 0.0383    mrr@20 : 0.0413
+12 Feb 23:55    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+12 Feb 23:56    INFO  epoch 40 training [time: 68.05s, train loss: 6288.1119]
+12 Feb 23:56    INFO  epoch 40 evaluating [time: 0.28s, valid_score: 0.053100]
+12 Feb 23:56    INFO  valid result: 
+hit@1 : 0.0121    hit@5 : 0.0703    hit@10 : 0.105    hit@20 : 0.1516    ndcg@1 : 0.0121    ndcg@5 : 0.0419    ndcg@10 : 0.0531    ndcg@20 : 0.0649    mrr@1 : 0.0121    mrr@5 : 0.0326    mrr@10 : 0.0372    mrr@20 : 0.0404
+12 Feb 23:57    INFO  epoch 41 training [time: 68.80s, train loss: 6274.4817]
+12 Feb 23:57    INFO  epoch 41 evaluating [time: 0.29s, valid_score: 0.053300]
+12 Feb 23:57    INFO  valid result: 
+hit@1 : 0.013    hit@5 : 0.0698    hit@10 : 0.1047    hit@20 : 0.1505    ndcg@1 : 0.013    ndcg@5 : 0.0421    ndcg@10 : 0.0533    ndcg@20 : 0.0649    mrr@1 : 0.013    mrr@5 : 0.033    mrr@10 : 0.0376    mrr@20 : 0.0407
+12 Feb 23:59    INFO  epoch 42 training [time: 69.34s, train loss: 6276.6974]
+12 Feb 23:59    INFO  epoch 42 evaluating [time: 0.28s, valid_score: 0.054700]
+12 Feb 23:59    INFO  valid result: 
+hit@1 : 0.0138    hit@5 : 0.0712    hit@10 : 0.1074    hit@20 : 0.1523    ndcg@1 : 0.0138    ndcg@5 : 0.043    ndcg@10 : 0.0547    ndcg@20 : 0.066    mrr@1 : 0.0138    mrr@5 : 0.0338    mrr@10 : 0.0385    mrr@20 : 0.0416
+12 Feb 23:59    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+13 Feb 00:00    INFO  epoch 43 training [time: 69.31s, train loss: 6266.6627]
+13 Feb 00:00    INFO  epoch 43 evaluating [time: 0.28s, valid_score: 0.053700]
+13 Feb 00:00    INFO  valid result: 
+hit@1 : 0.0131    hit@5 : 0.0697    hit@10 : 0.1062    hit@20 : 0.1509    ndcg@1 : 0.0131    ndcg@5 : 0.0419    ndcg@10 : 0.0537    ndcg@20 : 0.065    mrr@1 : 0.0131    mrr@5 : 0.0327    mrr@10 : 0.0376    mrr@20 : 0.0407
+13 Feb 00:01    INFO  epoch 44 training [time: 69.37s, train loss: 6261.3716]
+13 Feb 00:01    INFO  epoch 44 evaluating [time: 0.28s, valid_score: 0.054300]
+13 Feb 00:01    INFO  valid result: 
+hit@1 : 0.0126    hit@5 : 0.0715    hit@10 : 0.1071    hit@20 : 0.1539    ndcg@1 : 0.0126    ndcg@5 : 0.0428    ndcg@10 : 0.0543    ndcg@20 : 0.066    mrr@1 : 0.0126    mrr@5 : 0.0334    mrr@10 : 0.0381    mrr@20 : 0.0412
+13 Feb 00:02    INFO  epoch 45 training [time: 69.42s, train loss: 6254.1425]
+13 Feb 00:02    INFO  epoch 45 evaluating [time: 0.29s, valid_score: 0.054700]
+13 Feb 00:02    INFO  valid result: 
+hit@1 : 0.0145    hit@5 : 0.0717    hit@10 : 0.1068    hit@20 : 0.1528    ndcg@1 : 0.0145    ndcg@5 : 0.0434    ndcg@10 : 0.0547    ndcg@20 : 0.0662    mrr@1 : 0.0145    mrr@5 : 0.0341    mrr@10 : 0.0387    mrr@20 : 0.0418
+13 Feb 00:02    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+13 Feb 00:03    INFO  epoch 46 training [time: 69.46s, train loss: 6245.8437]
+13 Feb 00:03    INFO  epoch 46 evaluating [time: 0.27s, valid_score: 0.054100]
+13 Feb 00:03    INFO  valid result: 
+hit@1 : 0.0138    hit@5 : 0.0712    hit@10 : 0.1059    hit@20 : 0.1506    ndcg@1 : 0.0138    ndcg@5 : 0.0429    ndcg@10 : 0.0541    ndcg@20 : 0.0654    mrr@1 : 0.0138    mrr@5 : 0.0336    mrr@10 : 0.0382    mrr@20 : 0.0413
+13 Feb 00:04    INFO  epoch 47 training [time: 69.43s, train loss: 6242.2882]
+13 Feb 00:04    INFO  epoch 47 evaluating [time: 0.28s, valid_score: 0.054400]
+13 Feb 00:04    INFO  valid result: 
+hit@1 : 0.0134    hit@5 : 0.0721    hit@10 : 0.1062    hit@20 : 0.1517    ndcg@1 : 0.0134    ndcg@5 : 0.0434    ndcg@10 : 0.0544    ndcg@20 : 0.0659    mrr@1 : 0.0134    mrr@5 : 0.034    mrr@10 : 0.0385    mrr@20 : 0.0416
+13 Feb 00:06    INFO  epoch 48 training [time: 69.36s, train loss: 6233.0862]
+13 Feb 00:06    INFO  epoch 48 evaluating [time: 0.28s, valid_score: 0.054400]
+13 Feb 00:06    INFO  valid result: 
+hit@1 : 0.0126    hit@5 : 0.0726    hit@10 : 0.1072    hit@20 : 0.1519    ndcg@1 : 0.0126    ndcg@5 : 0.0433    ndcg@10 : 0.0544    ndcg@20 : 0.0656    mrr@1 : 0.0126    mrr@5 : 0.0337    mrr@10 : 0.0382    mrr@20 : 0.0412
+13 Feb 00:07    INFO  epoch 49 training [time: 69.26s, train loss: 6231.1104]
+13 Feb 00:07    INFO  epoch 49 evaluating [time: 0.29s, valid_score: 0.054100]
+13 Feb 00:07    INFO  valid result: 
+hit@1 : 0.0134    hit@5 : 0.0716    hit@10 : 0.1058    hit@20 : 0.151    ndcg@1 : 0.0134    ndcg@5 : 0.0431    ndcg@10 : 0.0541    ndcg@20 : 0.0655    mrr@1 : 0.0134    mrr@5 : 0.0338    mrr@10 : 0.0383    mrr@20 : 0.0414
+13 Feb 00:08    INFO  epoch 50 training [time: 69.36s, train loss: 6227.2594]
+13 Feb 00:08    INFO  epoch 50 evaluating [time: 0.27s, valid_score: 0.055300]
+13 Feb 00:08    INFO  valid result: 
+hit@1 : 0.0135    hit@5 : 0.0733    hit@10 : 0.1087    hit@20 : 0.1535    ndcg@1 : 0.0135    ndcg@5 : 0.044    ndcg@10 : 0.0553    ndcg@20 : 0.0666    mrr@1 : 0.0135    mrr@5 : 0.0343    mrr@10 : 0.039    mrr@20 : 0.042
+13 Feb 00:08    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+13 Feb 00:09    INFO  epoch 51 training [time: 69.28s, train loss: 6218.0569]
+13 Feb 00:09    INFO  epoch 51 evaluating [time: 0.29s, valid_score: 0.054000]
+13 Feb 00:09    INFO  valid result: 
+hit@1 : 0.0135    hit@5 : 0.0706    hit@10 : 0.1061    hit@20 : 0.1508    ndcg@1 : 0.0135    ndcg@5 : 0.0425    ndcg@10 : 0.054    ndcg@20 : 0.0652    mrr@1 : 0.0135    mrr@5 : 0.0333    mrr@10 : 0.038    mrr@20 : 0.0411
+13 Feb 00:10    INFO  epoch 52 training [time: 69.27s, train loss: 6214.0756]
+13 Feb 00:10    INFO  epoch 52 evaluating [time: 0.29s, valid_score: 0.055400]
+13 Feb 00:10    INFO  valid result: 
+hit@1 : 0.0135    hit@5 : 0.073    hit@10 : 0.1086    hit@20 : 0.1523    ndcg@1 : 0.0135    ndcg@5 : 0.044    ndcg@10 : 0.0554    ndcg@20 : 0.0664    mrr@1 : 0.0135    mrr@5 : 0.0344    mrr@10 : 0.0391    mrr@20 : 0.0421
+13 Feb 00:10    INFO  Saving current: outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+13 Feb 00:11    INFO  epoch 53 training [time: 69.50s, train loss: 6205.9885]
+13 Feb 00:11    INFO  epoch 53 evaluating [time: 0.28s, valid_score: 0.054600]
+13 Feb 00:11    INFO  valid result: 
+hit@1 : 0.0141    hit@5 : 0.0718    hit@10 : 0.1063    hit@20 : 0.1535    ndcg@1 : 0.0141    ndcg@5 : 0.0435    ndcg@10 : 0.0546    ndcg@20 : 0.0664    mrr@1 : 0.0141    mrr@5 : 0.0342    mrr@10 : 0.0387    mrr@20 : 0.042
+13 Feb 00:13    INFO  epoch 54 training [time: 69.35s, train loss: 6203.7452]
+13 Feb 00:13    INFO  epoch 54 evaluating [time: 0.28s, valid_score: 0.054100]
+13 Feb 00:13    INFO  valid result: 
+hit@1 : 0.0135    hit@5 : 0.0707    hit@10 : 0.1058    hit@20 : 0.1507    ndcg@1 : 0.0135    ndcg@5 : 0.0428    ndcg@10 : 0.0541    ndcg@20 : 0.0655    mrr@1 : 0.0135    mrr@5 : 0.0336    mrr@10 : 0.0383    mrr@20 : 0.0414
+13 Feb 00:14    INFO  epoch 55 training [time: 69.40s, train loss: 6199.9672]
+13 Feb 00:14    INFO  epoch 55 evaluating [time: 0.28s, valid_score: 0.054800]
+13 Feb 00:14    INFO  valid result: 
+hit@1 : 0.0144    hit@5 : 0.0712    hit@10 : 0.1065    hit@20 : 0.1537    ndcg@1 : 0.0144    ndcg@5 : 0.0434    ndcg@10 : 0.0548    ndcg@20 : 0.0667    mrr@1 : 0.0144    mrr@5 : 0.0343    mrr@10 : 0.039    mrr@20 : 0.0422
+13 Feb 00:15    INFO  epoch 56 training [time: 69.37s, train loss: 6190.2759]
+13 Feb 00:15    INFO  epoch 56 evaluating [time: 0.29s, valid_score: 0.053900]
+13 Feb 00:15    INFO  valid result: 
+hit@1 : 0.0141    hit@5 : 0.0696    hit@10 : 0.1054    hit@20 : 0.1515    ndcg@1 : 0.0141    ndcg@5 : 0.0424    ndcg@10 : 0.0539    ndcg@20 : 0.0655    mrr@1 : 0.0141    mrr@5 : 0.0335    mrr@10 : 0.0382    mrr@20 : 0.0414
+13 Feb 00:16    INFO  epoch 57 training [time: 69.33s, train loss: 6189.6874]
+13 Feb 00:16    INFO  epoch 57 evaluating [time: 0.29s, valid_score: 0.054700]
+13 Feb 00:16    INFO  valid result: 
+hit@1 : 0.0133    hit@5 : 0.0724    hit@10 : 0.1072    hit@20 : 0.1516    ndcg@1 : 0.0133    ndcg@5 : 0.0435    ndcg@10 : 0.0547    ndcg@20 : 0.0659    mrr@1 : 0.0133    mrr@5 : 0.0341    mrr@10 : 0.0386    mrr@20 : 0.0417
+13 Feb 00:17    INFO  epoch 58 training [time: 69.32s, train loss: 6182.4128]
+13 Feb 00:17    INFO  epoch 58 evaluating [time: 0.27s, valid_score: 0.054400]
+13 Feb 00:17    INFO  valid result: 
+hit@1 : 0.0142    hit@5 : 0.0702    hit@10 : 0.1056    hit@20 : 0.149    ndcg@1 : 0.0142    ndcg@5 : 0.043    ndcg@10 : 0.0544    ndcg@20 : 0.0653    mrr@1 : 0.0142    mrr@5 : 0.034    mrr@10 : 0.0387    mrr@20 : 0.0417
+13 Feb 00:18    INFO  epoch 59 training [time: 69.28s, train loss: 6178.5682]
+13 Feb 00:18    INFO  epoch 59 evaluating [time: 0.28s, valid_score: 0.054200]
+13 Feb 00:18    INFO  valid result: 
+hit@1 : 0.0144    hit@5 : 0.0701    hit@10 : 0.106    hit@20 : 0.1502    ndcg@1 : 0.0144    ndcg@5 : 0.0426    ndcg@10 : 0.0542    ndcg@20 : 0.0653    mrr@1 : 0.0144    mrr@5 : 0.0337    mrr@10 : 0.0384    mrr@20 : 0.0414
+13 Feb 00:20    INFO  epoch 60 training [time: 69.34s, train loss: 6174.9190]
+13 Feb 00:20    INFO  epoch 60 evaluating [time: 0.28s, valid_score: 0.054100]
+13 Feb 00:20    INFO  valid result: 
+hit@1 : 0.0134    hit@5 : 0.0709    hit@10 : 0.1059    hit@20 : 0.1496    ndcg@1 : 0.0134    ndcg@5 : 0.0428    ndcg@10 : 0.0541    ndcg@20 : 0.0651    mrr@1 : 0.0134    mrr@5 : 0.0336    mrr@10 : 0.0382    mrr@20 : 0.0412
+13 Feb 00:21    INFO  epoch 61 training [time: 69.44s, train loss: 6168.1768]
+13 Feb 00:21    INFO  epoch 61 evaluating [time: 0.29s, valid_score: 0.054700]
+13 Feb 00:21    INFO  valid result: 
+hit@1 : 0.014    hit@5 : 0.0713    hit@10 : 0.1067    hit@20 : 0.1503    ndcg@1 : 0.014    ndcg@5 : 0.0433    ndcg@10 : 0.0547    ndcg@20 : 0.0656    mrr@1 : 0.014    mrr@5 : 0.034    mrr@10 : 0.0387    mrr@20 : 0.0417
+13 Feb 00:22    INFO  epoch 62 training [time: 69.42s, train loss: 6167.9603]
+13 Feb 00:22    INFO  epoch 62 evaluating [time: 0.29s, valid_score: 0.054700]
+13 Feb 00:22    INFO  valid result: 
+hit@1 : 0.0135    hit@5 : 0.0722    hit@10 : 0.1075    hit@20 : 0.1516    ndcg@1 : 0.0135    ndcg@5 : 0.0433    ndcg@10 : 0.0547    ndcg@20 : 0.0658    mrr@1 : 0.0135    mrr@5 : 0.0339    mrr@10 : 0.0386    mrr@20 : 0.0415
+13 Feb 00:23    INFO  epoch 63 training [time: 69.42s, train loss: 6167.1946]
+13 Feb 00:23    INFO  epoch 63 evaluating [time: 0.27s, valid_score: 0.054500]
+13 Feb 00:23    INFO  valid result: 
+hit@1 : 0.0138    hit@5 : 0.0715    hit@10 : 0.107    hit@20 : 0.1513    ndcg@1 : 0.0138    ndcg@5 : 0.0431    ndcg@10 : 0.0545    ndcg@20 : 0.0657    mrr@1 : 0.0138    mrr@5 : 0.0338    mrr@10 : 0.0385    mrr@20 : 0.0415
+13 Feb 00:23    INFO  Finished training, best eval result in epoch 52
+13 Feb 00:23    INFO  Loading model structure and parameters from outputs/lightsans_beauty/LightSANs-Feb-12-2026_23-09-30.pth
+13 Feb 00:23    INFO  The running environment of this training is as follows:
++-------------+------------------+
+| Environment |      Usage       |
++=============+==================+
+| CPU         |      2.00 %      |
++-------------+------------------+
+| GPU         |  2.03 G/79.44 G  |
++-------------+------------------+
+| Memory      | 1.54 G/2015.66 G |
++-------------+------------------+
+13 Feb 00:23    INFO  best valid : OrderedDict([('hit@1', 0.0135), ('hit@5', 0.073), ('hit@10', 0.1086), ('hit@20', 0.1523), ('ndcg@1', 0.0135), ('ndcg@5', 0.044), ('ndcg@10', 0.0554), ('ndcg@20', 0.0664), ('mrr@1', 0.0135), ('mrr@5', 0.0344), ('mrr@10', 0.0391), ('mrr@20', 0.0421)])
+13 Feb 00:23    INFO  test result: OrderedDict([('hit@1', 0.012), ('hit@5', 0.0572), ('hit@10', 0.0861), ('hit@20', 0.1227), ('ndcg@1', 0.012), ('ndcg@5', 0.035), ('ndcg@10', 0.0444), ('ndcg@20', 0.0536), ('mrr@1', 0.012), ('mrr@5', 0.0278), ('mrr@10', 0.0316), ('mrr@20', 0.0341)])
+Job completed.
+
+======================================================================================
+                  Resource Usage on 2026-02-13 00:23:37:
+   Job Id:             160775550.gadi-pbs
+   Project:            up63
+   Exit Status:        0
+   Service Units:      89.82
+   NCPUs Requested:    16                  CPU Time Used: 01:14:24        
+   Memory Requested:   16.0GB                Memory Used: 1.75GB          
+   NGPUs Requested:    1                 GPU Utilisation: 15%             
+                                         GPU Memory Used: 2.53GB          
+   Walltime Requested: 04:00:00            Walltime Used: 01:14:51        
+   JobFS Requested:    100.0MB                JobFS Used: 5.03KB          
+======================================================================================
