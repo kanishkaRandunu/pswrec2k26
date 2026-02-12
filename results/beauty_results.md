@@ -33,3 +33,9 @@
 | MRR@20 | 0.0277 | 0.0316 | 0.0328* | 0.0294 | 0.0321 | **0.0336** | +2.4%       |
 
 **Bold** = best, * = second best.
+
+## Training curves
+
+![Validation NDCG@10 vs. epoch](figures/beauty-eval.png)
+
+![Training loss vs. epoch](figures/beauty-loss.png)

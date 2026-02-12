@@ -1,7 +1,0 @@
-dataset,model,n_runs,best_valid_epoch_mean,best_valid_epoch_std,ndcg@10_mean,ndcg@10_std,hit@10_mean,hit@10_std
-amazon-beauty,BERT4Rec,1,33.0000,,0.0211,,0.0404,
-amazon-beauty,FEARec,1,38.0000,,0.0433,,0.0854,
-amazon-beauty,GRU4Rec,1,10.0000,,0.0342,,0.0623,
-amazon-beauty,SASRec,1,32.0000,,0.0421,,0.0842,
-amazon-beauty,pswrecv4h,1,52.0000,,0.0428,,0.0853,
-amazon-beauty,wearec,1,52.0000,,0.0445,,0.0873,
