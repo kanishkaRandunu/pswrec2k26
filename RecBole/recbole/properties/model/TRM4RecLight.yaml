@@ -1,0 +1,17 @@
+# TRM4RecLight model defaults (LightSANs-style low-rank attention in TRM blocks)
+# Same recursion and readout as TRM4Rec; uses item-to-interest aggregation per block
+
+# TRM4RecLight-specific
+trm_steps: 4
+trm_blocks_per_step: 1
+k_interests: 5
+expansion: 4.0
+rope_theta: 10000.0
+rms_norm_eps: 1e-5
+check_item_id_range: false
+
+# Model structure
+hidden_size: 64
+n_heads: 2
+initializer_range: 0.02
+loss_type: 'CE'

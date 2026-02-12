@@ -1,0 +1,91 @@
+# Sub-repos / external codebases (embedded .git → use submodule or ignore)
+# SASRec/
+TinyRecursiveModels/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+virtualenv/
+.venv_hopper/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Temp & cache
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+tmp/
+temp/
+.cache/
+
+# IDE & editors
+.idea/
+.vscode/
+.cursor/
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Logs & debug (track gadi-pbs live logs and log/ outputs for runs)
+*.log
+!*.gadi-pbs.log
+logs/
+wandb/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+
+# RecBole / training outputs (large checkpoints, datasets, dataloaders)
+outputs_saved*/
+outputs_to_rem/
+saved/
+*-dataloader.pth
+
+# cluster artefacts (pbs scripts and outputs/ tracked for reproducibility)
+dataset/
+# *.o[0-9]*
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini

@@ -1,0 +1,23 @@
+n_layers: 2                     # (int) Number of transformer layers in encoder.
+n_heads: 2                      # (int) Number of attention heads.
+hidden_size: 64                 # (int) Hidden state / embedding size.
+inner_size: 512                 # (int) Inner hidden size in feed-forward layer.
+hidden_dropout_prob: 0.3        # (float) Dropout probability (hidden).
+attn_dropout_prob: 0.2          # (float) Dropout probability (attention).
+hidden_act: 'gelu'              # (str) Activation in feed-forward layer.
+layer_norm_eps: 1e-12           # (float) LayerNorm epsilon.
+initializer_range: 0.02         # (float) Std for normal initialization.
+loss_type: 'CE'                 # (str) Loss function. Range in ['BPR', 'CE'].
+
+# Local phase filterbank (time–frequency prism).
+n_bands: 4                      # (int) Number of local spectral bands.
+band_kernel_sizes: [3, 7, 15, 31]   # (list[int]) Kernel sizes for each band.
+band_dilations: [1, 1, 2, 4]        # (list[int]) Dilation for each band.
+
+# Phase-synchrony bias.
+phase_bias_scale: 0.2           # (float) Initial scale for per-head phase bias.
+
+# Phase smoothness regularizer.
+phase_aux: True                 # (bool) Enable phase smoothness penalty.
+phase_aux_weight: 0.01          # (float) Weight of phase smoothness loss term.
+

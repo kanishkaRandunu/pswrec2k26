@@ -1,0 +1,17 @@
+# TRM4RecFullBP model defaults (TRM blocks, RoPE, full backprop in all steps)
+# Same building blocks as TRM4Rec; no gradient-saving trick
+
+# TRM4RecFullBP-specific
+trm_steps: 4
+trm_blocks_per_step: 1
+expansion: 4.0
+rope_theta: 10000.0
+rms_norm_eps: 1e-5
+# Set to true to assert item ids in [0, n_items-1] and log once
+check_item_id_range: false
+
+# Model structure (TRM block uses expansion; inner_size unused in vanilla)
+hidden_size: 64
+n_heads: 2
+initializer_range: 0.02
+loss_type: 'CE'

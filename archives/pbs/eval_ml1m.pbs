@@ -1,0 +1,43 @@
+#!/bin/bash
+#PBS -P up63
+#PBS -q gpuvolta
+#PBS -l ncpus=12
+#PBS -l mem=16GB
+#PBS -l ngpus=1
+#PBS -l walltime=00:30:00
+#PBS -l storage=scratch/up63+gdata/up63
+#PBS -l wd
+#PBS -j oe
+#PBS -N eval_ml1m_v100
+
+# Eval-only on V100: load checkpoint and run test set evaluation (no training).
+# Same data/eval as training; only the model/checkpoint changes via the YAML.
+#
+# Submit (default: configs/ml-1m_eval_SASRec.yaml):
+#   qsub pbs/eval_ml1m.pbs
+#
+# Submit with a different eval config (e.g. another model):
+#   qsub -v CONFIG=configs/ml-1m_eval_SASRec.yaml pbs/eval_ml1m.pbs
+#
+# Live progress: tail -f eval_live_<JOBID>.log
+
+set -e
+cd "$PBS_O_WORKDIR"
+
+CONFIG="${CONFIG:-configs/ml-1m_eval_SASRec.yaml}"
+echo "=== hostname ==="
+hostname
+echo "=== PBS_JOBID ==="
+echo "$PBS_JOBID"
+echo "=== eval config ==="
+echo "$CONFIG"
+
+module purge
+module load cuda/12.9.0
+source /scratch/up63/kd6504/venvs/hopper-cu124/bin/activate
+
+# Live log (follow with: tail -f eval_live_<JOBID>.log)
+LIVE_LOG="eval_live_${PBS_JOBID}.log"
+python -u scripts/evaluate_checkpoint.py --config_files "$CONFIG" --show_progress 2>&1 | tee "${LIVE_LOG}"
+
+echo "Job completed."

@@ -1,0 +1,16 @@
+# RLI-TRM: Recursive Latent Interest TRM
+# L-to-K interest bottleneck, recursive bidirectional reasoning on K slots
+
+k_interests: 16
+trm_steps: 4
+trm_blocks_per_step: 1
+expansion: 4.0
+rms_norm_eps: 1e-5
+check_item_id_range: false
+
+hidden_size: 64
+n_heads: 2
+initializer_range: 0.05
+use_history_skip: false
+step_drop_rate: 0.0
+loss_type: 'CE'

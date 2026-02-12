@@ -1,0 +1,4 @@
+trm_steps choice [2,4]
+trm_blocks_per_step choice [1]
+learning_rate choice [0.0005,0.001,0.002]
+weight_decay choice [0.0,1e-4]

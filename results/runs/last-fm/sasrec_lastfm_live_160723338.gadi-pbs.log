@@ -1,0 +1,365 @@
+command line args [-m SASRec -d lastfm --config_files configs/lastfm/lastfm_SASRec.yaml] will not be used in RecBole
+12 Feb 12:40    INFO  ['RecBole/run_recbole.py', '-m', 'SASRec', '-d', 'lastfm', '--config_files', 'configs/lastfm/lastfm_SASRec.yaml']
+12 Feb 12:40    INFO  
+General Hyper Parameters:
+gpu_id = 0
+use_gpu = True
+seed = 2026
+state = INFO
+reproducibility = True
+data_path = /scratch/up63/kd6504/recbole_datasets/lastfm
+checkpoint_dir = outputs/sasrec_lastfm
+show_progress = False
+save_dataset = False
+dataset_save_path = None
+save_dataloaders = False
+dataloaders_save_path = None
+log_wandb = False
+
+Training Hyper Parameters:
+epochs = 200
+train_batch_size = 128
+learner = adam
+learning_rate = 0.001
+train_neg_sample_args = {'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}
+eval_step = 1
+stopping_step = 10
+clip_grad_norm = None
+weight_decay = 0.0
+loss_decimal_place = 4
+
+Evaluation Hyper Parameters:
+eval_args = {'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}
+repeatable = True
+metrics = ['Hit', 'NDCG', 'MRR']
+topk = [1, 5, 10, 20]
+valid_metric = NDCG@10
+valid_metric_bigger = True
+eval_batch_size = 4096
+metric_decimal_place = 4
+
+Dataset Hyper Parameters:
+field_separator = 	
+seq_separator =  
+USER_ID_FIELD = user_id
+ITEM_ID_FIELD = artist_id
+RATING_FIELD = rating
+TIME_FIELD = timestamp
+seq_len = None
+LABEL_FIELD = label
+threshold = None
+NEG_PREFIX = neg_
+load_col = {'inter': ['user_id', 'artist_id', 'timestamp']}
+unload_col = None
+unused_col = None
+additional_feat_suffix = None
+rm_dup_inter = None
+val_interval = None
+filter_inter_by_user_or_item = True
+user_inter_num_interval = [5,inf)
+item_inter_num_interval = [5,inf)
+alias_of_user_id = None
+alias_of_item_id = None
+alias_of_entity_id = None
+alias_of_relation_id = None
+preload_weight = None
+normalize_field = None
+normalize_all = None
+ITEM_LIST_LENGTH_FIELD = item_length
+LIST_SUFFIX = _list
+MAX_ITEM_LIST_LENGTH = 50
+POSITION_FIELD = position_id
+HEAD_ENTITY_ID_FIELD = head_id
+TAIL_ENTITY_ID_FIELD = tail_id
+RELATION_ID_FIELD = relation_id
+ENTITY_ID_FIELD = entity_id
+benchmark_filename = None
+
+Other Hyper Parameters: 
+worker = 0
+wandb_project = recbole
+shuffle = True
+require_pow = False
+enable_amp = False
+enable_scaler = False
+transform = None
+n_layers = 2
+n_heads = 2
+hidden_size = 64
+inner_size = 256
+hidden_dropout_prob = 0.5
+attn_dropout_prob = 0.5
+hidden_act = gelu
+layer_norm_eps = 1e-12
+initializer_range = 0.02
+loss_type = CE
+numerical_features = []
+discretization = None
+kg_reverse_r = False
+entity_kg_num_interval = [0,inf)
+relation_kg_num_interval = [0,inf)
+MODEL_TYPE = ModelType.SEQUENTIAL
+MODEL_INPUT_TYPE = InputType.POINTWISE
+eval_type = EvaluatorType.RANKING
+single_spec = True
+local_rank = 0
+device = cuda
+valid_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+test_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+
+
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:648: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=0, inplace=True)
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:650: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=feat[field].mean(), inplace=True)
+12 Feb 12:40    INFO  lastfm
+The number of users: 1091
+Average actions of users: 48.21192660550459
+The number of items: 3647
+Average actions of items: 14.413329676357652
+The number of inters: 52551
+The sparsity of the dataset: 98.67925045182346%
+Remain Fields: ['user_id', 'artist_id', 'timestamp']
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:2202: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:203.)
+  new_data[k] = torch.LongTensor(value)
+12 Feb 12:40    INFO  [Training]: train_batch_size = [128] train_neg_sample_args: [{'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}]
+12 Feb 12:40    INFO  [Evaluation]: eval_batch_size = [4096] eval_args: [{'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}]
+12 Feb 12:40    INFO  SASRec(
+  (item_embedding): Embedding(3647, 64, padding_idx=0)
+  (position_embedding): Embedding(50, 64)
+  (trm_encoder): TransformerEncoder(
+    (layer): ModuleList(
+      (0-1): 2 x TransformerLayer(
+        (multi_head_attention): MultiHeadAttention(
+          (query): Linear(in_features=64, out_features=64, bias=True)
+          (key): Linear(in_features=64, out_features=64, bias=True)
+          (value): Linear(in_features=64, out_features=64, bias=True)
+          (softmax): Softmax(dim=-1)
+          (attn_dropout): Dropout(p=0.5, inplace=False)
+          (dense): Linear(in_features=64, out_features=64, bias=True)
+          (LayerNorm): LayerNorm((64,), eps=1e-12, elementwise_affine=True)
+          (out_dropout): Dropout(p=0.5, inplace=False)
+        )
+        (feed_forward): FeedForward(
+          (dense_1): Linear(in_features=64, out_features=256, bias=True)
+          (dense_2): Linear(in_features=256, out_features=64, bias=True)
+          (LayerNorm): LayerNorm((64,), eps=1e-12, elementwise_affine=True)
+          (dropout): Dropout(p=0.5, inplace=False)
+        )
+      )
+    )
+  )
+  (LayerNorm): LayerNorm((64,), eps=1e-12, elementwise_affine=True)
+  (dropout): Dropout(p=0.5, inplace=False)
+  (loss_fct): CrossEntropyLoss()
+)
+Trainable parameters: 336704
+12 Feb 12:40    INFO  FLOPs: 4983464.0
+/home/572/kd6504/TRACT/RecBole/recbole/trainer/trainer.py:235: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = amp.GradScaler(enabled=self.enable_scaler)
+12 Feb 12:41    INFO  epoch 0 training [time: 14.47s, train loss: 2996.0899]
+12 Feb 12:41    INFO  epoch 0 evaluating [time: 0.06s, valid_score: 0.015500]
+12 Feb 12:41    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.0156    hit@10 : 0.0294    hit@20 : 0.0468    ndcg@1 : 0.0064    ndcg@5 : 0.0112    ndcg@10 : 0.0155    ndcg@20 : 0.0199    mrr@1 : 0.0064    mrr@5 : 0.0097    mrr@10 : 0.0115    mrr@20 : 0.0126
+12 Feb 12:41    INFO  Saving current: outputs/sasrec_lastfm/SASRec-Feb-12-2026_12-40-45.pth
+12 Feb 12:41    INFO  epoch 1 training [time: 14.31s, train loss: 2762.2298]
+12 Feb 12:41    INFO  epoch 1 evaluating [time: 0.01s, valid_score: 0.028800]
+12 Feb 12:41    INFO  valid result: 
+hit@1 : 0.0119    hit@5 : 0.033    hit@10 : 0.0523    hit@20 : 0.078    ndcg@1 : 0.0119    ndcg@5 : 0.0228    ndcg@10 : 0.0288    ndcg@20 : 0.0354    mrr@1 : 0.0119    mrr@5 : 0.0195    mrr@10 : 0.0218    mrr@20 : 0.0236
+12 Feb 12:41    INFO  Saving current: outputs/sasrec_lastfm/SASRec-Feb-12-2026_12-40-45.pth
+12 Feb 12:41    INFO  epoch 2 training [time: 14.36s, train loss: 2583.1077]
+12 Feb 12:41    INFO  epoch 2 evaluating [time: 0.01s, valid_score: 0.034100]
+12 Feb 12:41    INFO  valid result: 
+hit@1 : 0.0128    hit@5 : 0.0376    hit@10 : 0.0642    hit@20 : 0.1009    ndcg@1 : 0.0128    ndcg@5 : 0.0257    ndcg@10 : 0.0341    ndcg@20 : 0.0434    mrr@1 : 0.0128    mrr@5 : 0.0217    mrr@10 : 0.0251    mrr@20 : 0.0277
+12 Feb 12:41    INFO  Saving current: outputs/sasrec_lastfm/SASRec-Feb-12-2026_12-40-45.pth
+12 Feb 12:41    INFO  epoch 3 training [time: 14.46s, train loss: 2448.0652]
+12 Feb 12:41    INFO  epoch 3 evaluating [time: 0.01s, valid_score: 0.031800]
+12 Feb 12:41    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.0394    hit@10 : 0.0679    hit@20 : 0.1055    ndcg@1 : 0.0064    ndcg@5 : 0.0227    ndcg@10 : 0.0318    ndcg@20 : 0.0412    mrr@1 : 0.0064    mrr@5 : 0.0173    mrr@10 : 0.021    mrr@20 : 0.0235
+12 Feb 12:41    INFO  epoch 4 training [time: 14.34s, train loss: 2357.1772]
+12 Feb 12:41    INFO  epoch 4 evaluating [time: 0.01s, valid_score: 0.031200]
+12 Feb 12:41    INFO  valid result: 
+hit@1 : 0.0046    hit@5 : 0.0413    hit@10 : 0.0688    hit@20 : 0.1046    ndcg@1 : 0.0046    ndcg@5 : 0.0223    ndcg@10 : 0.0312    ndcg@20 : 0.0405    mrr@1 : 0.0046    mrr@5 : 0.0161    mrr@10 : 0.0198    mrr@20 : 0.0225
+12 Feb 12:42    INFO  epoch 5 training [time: 14.37s, train loss: 2297.2860]
+12 Feb 12:42    INFO  epoch 5 evaluating [time: 0.01s, valid_score: 0.033900]
+12 Feb 12:42    INFO  valid result: 
+hit@1 : 0.0073    hit@5 : 0.0404    hit@10 : 0.0734    hit@20 : 0.1128    ndcg@1 : 0.0073    ndcg@5 : 0.0235    ndcg@10 : 0.0339    ndcg@20 : 0.0438    mrr@1 : 0.0073    mrr@5 : 0.0181    mrr@10 : 0.0222    mrr@20 : 0.0249
+12 Feb 12:42    INFO  epoch 6 training [time: 14.34s, train loss: 2254.5267]
+12 Feb 12:42    INFO  epoch 6 evaluating [time: 0.01s, valid_score: 0.033500]
+12 Feb 12:42    INFO  valid result: 
+hit@1 : 0.0018    hit@5 : 0.0404    hit@10 : 0.0734    hit@20 : 0.1147    ndcg@1 : 0.0018    ndcg@5 : 0.0227    ndcg@10 : 0.0335    ndcg@20 : 0.0439    mrr@1 : 0.0018    mrr@5 : 0.0168    mrr@10 : 0.0213    mrr@20 : 0.0241
+12 Feb 12:42    INFO  epoch 7 training [time: 14.03s, train loss: 2220.0395]
+12 Feb 12:42    INFO  epoch 7 evaluating [time: 0.01s, valid_score: 0.033400]
+12 Feb 12:42    INFO  valid result: 
+hit@1 : 0.0037    hit@5 : 0.044    hit@10 : 0.0752    hit@20 : 0.1156    ndcg@1 : 0.0037    ndcg@5 : 0.0233    ndcg@10 : 0.0334    ndcg@20 : 0.0436    mrr@1 : 0.0037    mrr@5 : 0.0167    mrr@10 : 0.0208    mrr@20 : 0.0236
+12 Feb 12:42    INFO  epoch 8 training [time: 14.07s, train loss: 2195.8417]
+12 Feb 12:42    INFO  epoch 8 evaluating [time: 0.01s, valid_score: 0.034300]
+12 Feb 12:42    INFO  valid result: 
+hit@1 : 0.0046    hit@5 : 0.044    hit@10 : 0.0734    hit@20 : 0.1211    ndcg@1 : 0.0046    ndcg@5 : 0.0247    ndcg@10 : 0.0343    ndcg@20 : 0.0462    mrr@1 : 0.0046    mrr@5 : 0.0184    mrr@10 : 0.0224    mrr@20 : 0.0256
+12 Feb 12:42    INFO  Saving current: outputs/sasrec_lastfm/SASRec-Feb-12-2026_12-40-45.pth
+12 Feb 12:43    INFO  epoch 9 training [time: 13.97s, train loss: 2176.9085]
+12 Feb 12:43    INFO  epoch 9 evaluating [time: 0.01s, valid_score: 0.030800]
+12 Feb 12:43    INFO  valid result: 
+hit@1 : 0.0046    hit@5 : 0.0376    hit@10 : 0.0651    hit@20 : 0.1156    ndcg@1 : 0.0046    ndcg@5 : 0.0218    ndcg@10 : 0.0308    ndcg@20 : 0.0436    mrr@1 : 0.0046    mrr@5 : 0.0166    mrr@10 : 0.0204    mrr@20 : 0.0238
+12 Feb 12:43    INFO  epoch 10 training [time: 13.97s, train loss: 2156.7289]
+12 Feb 12:43    INFO  epoch 10 evaluating [time: 0.01s, valid_score: 0.035400]
+12 Feb 12:43    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.044    hit@10 : 0.0752    hit@20 : 0.1083    ndcg@1 : 0.0064    ndcg@5 : 0.0254    ndcg@10 : 0.0354    ndcg@20 : 0.0436    mrr@1 : 0.0064    mrr@5 : 0.0193    mrr@10 : 0.0234    mrr@20 : 0.0256
+12 Feb 12:43    INFO  Saving current: outputs/sasrec_lastfm/SASRec-Feb-12-2026_12-40-45.pth
+12 Feb 12:43    INFO  epoch 11 training [time: 13.97s, train loss: 2141.5922]
+12 Feb 12:43    INFO  epoch 11 evaluating [time: 0.01s, valid_score: 0.035200]
+12 Feb 12:43    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.0468    hit@10 : 0.0716    hit@20 : 0.1193    ndcg@1 : 0.0064    ndcg@5 : 0.027    ndcg@10 : 0.0352    ndcg@20 : 0.0471    mrr@1 : 0.0064    mrr@5 : 0.0205    mrr@10 : 0.024    mrr@20 : 0.0272
+12 Feb 12:43    INFO  epoch 12 training [time: 13.99s, train loss: 2129.7531]
+12 Feb 12:43    INFO  epoch 12 evaluating [time: 0.01s, valid_score: 0.034300]
+12 Feb 12:43    INFO  valid result: 
+hit@1 : 0.0028    hit@5 : 0.045    hit@10 : 0.0771    hit@20 : 0.1248    ndcg@1 : 0.0028    ndcg@5 : 0.0239    ndcg@10 : 0.0343    ndcg@20 : 0.0463    mrr@1 : 0.0028    mrr@5 : 0.017    mrr@10 : 0.0213    mrr@20 : 0.0246
+12 Feb 12:44    INFO  epoch 13 training [time: 13.97s, train loss: 2121.5096]
+12 Feb 12:44    INFO  epoch 13 evaluating [time: 0.01s, valid_score: 0.036000]
+12 Feb 12:44    INFO  valid result: 
+hit@1 : 0.0037    hit@5 : 0.0486    hit@10 : 0.078    hit@20 : 0.1174    ndcg@1 : 0.0037    ndcg@5 : 0.0266    ndcg@10 : 0.036    ndcg@20 : 0.0458    mrr@1 : 0.0037    mrr@5 : 0.0193    mrr@10 : 0.0231    mrr@20 : 0.0258
+12 Feb 12:44    INFO  Saving current: outputs/sasrec_lastfm/SASRec-Feb-12-2026_12-40-45.pth
+12 Feb 12:44    INFO  epoch 14 training [time: 13.98s, train loss: 2111.1087]
+12 Feb 12:44    INFO  epoch 14 evaluating [time: 0.01s, valid_score: 0.037000]
+12 Feb 12:44    INFO  valid result: 
+hit@1 : 0.0046    hit@5 : 0.0486    hit@10 : 0.0771    hit@20 : 0.1239    ndcg@1 : 0.0046    ndcg@5 : 0.0278    ndcg@10 : 0.037    ndcg@20 : 0.0488    mrr@1 : 0.0046    mrr@5 : 0.021    mrr@10 : 0.0247    mrr@20 : 0.0279
+12 Feb 12:44    INFO  Saving current: outputs/sasrec_lastfm/SASRec-Feb-12-2026_12-40-45.pth
+12 Feb 12:44    INFO  epoch 15 training [time: 13.98s, train loss: 2097.8755]
+12 Feb 12:44    INFO  epoch 15 evaluating [time: 0.01s, valid_score: 0.036100]
+12 Feb 12:44    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.0477    hit@10 : 0.0725    hit@20 : 0.1202    ndcg@1 : 0.0064    ndcg@5 : 0.028    ndcg@10 : 0.0361    ndcg@20 : 0.0483    mrr@1 : 0.0064    mrr@5 : 0.0215    mrr@10 : 0.0248    mrr@20 : 0.0282
+12 Feb 12:44    INFO  epoch 16 training [time: 13.98s, train loss: 2089.5190]
+12 Feb 12:44    INFO  epoch 16 evaluating [time: 0.01s, valid_score: 0.035500]
+12 Feb 12:44    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.0477    hit@10 : 0.0743    hit@20 : 0.1193    ndcg@1 : 0.0064    ndcg@5 : 0.0268    ndcg@10 : 0.0355    ndcg@20 : 0.0468    mrr@1 : 0.0064    mrr@5 : 0.0201    mrr@10 : 0.0237    mrr@20 : 0.0267
+12 Feb 12:45    INFO  epoch 17 training [time: 13.97s, train loss: 2083.8021]
+12 Feb 12:45    INFO  epoch 17 evaluating [time: 0.01s, valid_score: 0.036300]
+12 Feb 12:45    INFO  valid result: 
+hit@1 : 0.0055    hit@5 : 0.0468    hit@10 : 0.0771    hit@20 : 0.1202    ndcg@1 : 0.0055    ndcg@5 : 0.0266    ndcg@10 : 0.0363    ndcg@20 : 0.0469    mrr@1 : 0.0055    mrr@5 : 0.0199    mrr@10 : 0.0238    mrr@20 : 0.0266
+12 Feb 12:45    INFO  epoch 18 training [time: 13.99s, train loss: 2076.0580]
+12 Feb 12:45    INFO  epoch 18 evaluating [time: 0.01s, valid_score: 0.033900]
+12 Feb 12:45    INFO  valid result: 
+hit@1 : 0.0028    hit@5 : 0.0514    hit@10 : 0.0752    hit@20 : 0.1239    ndcg@1 : 0.0028    ndcg@5 : 0.0263    ndcg@10 : 0.0339    ndcg@20 : 0.0461    mrr@1 : 0.0028    mrr@5 : 0.0182    mrr@10 : 0.0213    mrr@20 : 0.0245
+12 Feb 12:45    INFO  epoch 19 training [time: 13.98s, train loss: 2069.8572]
+12 Feb 12:45    INFO  epoch 19 evaluating [time: 0.01s, valid_score: 0.036700]
+12 Feb 12:45    INFO  valid result: 
+hit@1 : 0.0037    hit@5 : 0.0541    hit@10 : 0.0771    hit@20 : 0.1257    ndcg@1 : 0.0037    ndcg@5 : 0.0293    ndcg@10 : 0.0367    ndcg@20 : 0.0491    mrr@1 : 0.0037    mrr@5 : 0.0212    mrr@10 : 0.0243    mrr@20 : 0.0277
+12 Feb 12:45    INFO  epoch 20 training [time: 14.07s, train loss: 2069.3815]
+12 Feb 12:45    INFO  epoch 20 evaluating [time: 0.01s, valid_score: 0.040000]
+12 Feb 12:45    INFO  valid result: 
+hit@1 : 0.0046    hit@5 : 0.0578    hit@10 : 0.0844    hit@20 : 0.1303    ndcg@1 : 0.0046    ndcg@5 : 0.0314    ndcg@10 : 0.04    ndcg@20 : 0.0515    mrr@1 : 0.0046    mrr@5 : 0.0227    mrr@10 : 0.0263    mrr@20 : 0.0293
+12 Feb 12:45    INFO  Saving current: outputs/sasrec_lastfm/SASRec-Feb-12-2026_12-40-45.pth
+12 Feb 12:45    INFO  epoch 21 training [time: 14.06s, train loss: 2056.0075]
+12 Feb 12:45    INFO  epoch 21 evaluating [time: 0.01s, valid_score: 0.037700]
+12 Feb 12:45    INFO  valid result: 
+hit@1 : 0.0083    hit@5 : 0.055    hit@10 : 0.0752    hit@20 : 0.1275    ndcg@1 : 0.0083    ndcg@5 : 0.0311    ndcg@10 : 0.0377    ndcg@20 : 0.051    mrr@1 : 0.0083    mrr@5 : 0.0234    mrr@10 : 0.0261    mrr@20 : 0.0298
+12 Feb 12:46    INFO  epoch 22 training [time: 14.05s, train loss: 2053.0356]
+12 Feb 12:46    INFO  epoch 22 evaluating [time: 0.01s, valid_score: 0.035800]
+12 Feb 12:46    INFO  valid result: 
+hit@1 : 0.0046    hit@5 : 0.0532    hit@10 : 0.0771    hit@20 : 0.1257    ndcg@1 : 0.0046    ndcg@5 : 0.0283    ndcg@10 : 0.0358    ndcg@20 : 0.048    mrr@1 : 0.0046    mrr@5 : 0.0202    mrr@10 : 0.0232    mrr@20 : 0.0265
+12 Feb 12:46    INFO  epoch 23 training [time: 14.08s, train loss: 2048.3670]
+12 Feb 12:46    INFO  epoch 23 evaluating [time: 0.01s, valid_score: 0.034800]
+12 Feb 12:46    INFO  valid result: 
+hit@1 : 0.0046    hit@5 : 0.0468    hit@10 : 0.0734    hit@20 : 0.1165    ndcg@1 : 0.0046    ndcg@5 : 0.0262    ndcg@10 : 0.0348    ndcg@20 : 0.0458    mrr@1 : 0.0046    mrr@5 : 0.0194    mrr@10 : 0.023    mrr@20 : 0.026
+12 Feb 12:46    INFO  epoch 24 training [time: 14.09s, train loss: 2047.2646]
+12 Feb 12:46    INFO  epoch 24 evaluating [time: 0.01s, valid_score: 0.039600]
+12 Feb 12:46    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.0505    hit@10 : 0.0844    hit@20 : 0.1266    ndcg@1 : 0.0064    ndcg@5 : 0.0286    ndcg@10 : 0.0396    ndcg@20 : 0.0501    mrr@1 : 0.0064    mrr@5 : 0.0215    mrr@10 : 0.026    mrr@20 : 0.0288
+12 Feb 12:46    INFO  epoch 25 training [time: 14.07s, train loss: 2039.8287]
+12 Feb 12:46    INFO  epoch 25 evaluating [time: 0.01s, valid_score: 0.037600]
+12 Feb 12:46    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.044    hit@10 : 0.0798    hit@20 : 0.1303    ndcg@1 : 0.0064    ndcg@5 : 0.026    ndcg@10 : 0.0376    ndcg@20 : 0.05    mrr@1 : 0.0064    mrr@5 : 0.0201    mrr@10 : 0.0248    mrr@20 : 0.0281
+12 Feb 12:47    INFO  epoch 26 training [time: 14.14s, train loss: 2035.0783]
+12 Feb 12:47    INFO  epoch 26 evaluating [time: 0.01s, valid_score: 0.037500]
+12 Feb 12:47    INFO  valid result: 
+hit@1 : 0.0073    hit@5 : 0.0505    hit@10 : 0.0771    hit@20 : 0.1284    ndcg@1 : 0.0073    ndcg@5 : 0.029    ndcg@10 : 0.0375    ndcg@20 : 0.0504    mrr@1 : 0.0073    mrr@5 : 0.022    mrr@10 : 0.0254    mrr@20 : 0.0289
+12 Feb 12:47    INFO  epoch 27 training [time: 14.15s, train loss: 2030.9802]
+12 Feb 12:47    INFO  epoch 27 evaluating [time: 0.01s, valid_score: 0.037200]
+12 Feb 12:47    INFO  valid result: 
+hit@1 : 0.0046    hit@5 : 0.045    hit@10 : 0.0817    hit@20 : 0.133    ndcg@1 : 0.0046    ndcg@5 : 0.0255    ndcg@10 : 0.0372    ndcg@20 : 0.0501    mrr@1 : 0.0046    mrr@5 : 0.0191    mrr@10 : 0.0238    mrr@20 : 0.0273
+12 Feb 12:47    INFO  epoch 28 training [time: 14.06s, train loss: 2026.3154]
+12 Feb 12:47    INFO  epoch 28 evaluating [time: 0.01s, valid_score: 0.037100]
+12 Feb 12:47    INFO  valid result: 
+hit@1 : 0.0073    hit@5 : 0.044    hit@10 : 0.078    hit@20 : 0.1284    ndcg@1 : 0.0073    ndcg@5 : 0.026    ndcg@10 : 0.0371    ndcg@20 : 0.0498    mrr@1 : 0.0073    mrr@5 : 0.0201    mrr@10 : 0.0247    mrr@20 : 0.0282
+12 Feb 12:47    INFO  epoch 29 training [time: 14.06s, train loss: 2020.8356]
+12 Feb 12:47    INFO  epoch 29 evaluating [time: 0.01s, valid_score: 0.036800]
+12 Feb 12:47    INFO  valid result: 
+hit@1 : 0.0037    hit@5 : 0.0514    hit@10 : 0.0761    hit@20 : 0.1248    ndcg@1 : 0.0037    ndcg@5 : 0.0288    ndcg@10 : 0.0368    ndcg@20 : 0.0491    mrr@1 : 0.0037    mrr@5 : 0.0213    mrr@10 : 0.0246    mrr@20 : 0.028
+12 Feb 12:48    INFO  epoch 30 training [time: 14.05s, train loss: 2023.1535]
+12 Feb 12:48    INFO  epoch 30 evaluating [time: 0.01s, valid_score: 0.040900]
+12 Feb 12:48    INFO  valid result: 
+hit@1 : 0.0073    hit@5 : 0.0495    hit@10 : 0.0844    hit@20 : 0.1349    ndcg@1 : 0.0073    ndcg@5 : 0.0299    ndcg@10 : 0.0409    ndcg@20 : 0.0535    mrr@1 : 0.0073    mrr@5 : 0.0234    mrr@10 : 0.0277    mrr@20 : 0.0311
+12 Feb 12:48    INFO  Saving current: outputs/sasrec_lastfm/SASRec-Feb-12-2026_12-40-45.pth
+12 Feb 12:48    INFO  epoch 31 training [time: 14.06s, train loss: 2015.4705]
+12 Feb 12:48    INFO  epoch 31 evaluating [time: 0.01s, valid_score: 0.041600]
+12 Feb 12:48    INFO  valid result: 
+hit@1 : 0.0101    hit@5 : 0.0495    hit@10 : 0.0862    hit@20 : 0.133    ndcg@1 : 0.0101    ndcg@5 : 0.0298    ndcg@10 : 0.0416    ndcg@20 : 0.0533    mrr@1 : 0.0101    mrr@5 : 0.0234    mrr@10 : 0.0282    mrr@20 : 0.0314
+12 Feb 12:48    INFO  Saving current: outputs/sasrec_lastfm/SASRec-Feb-12-2026_12-40-45.pth
+12 Feb 12:48    INFO  epoch 32 training [time: 14.08s, train loss: 2014.9685]
+12 Feb 12:48    INFO  epoch 32 evaluating [time: 0.01s, valid_score: 0.039000]
+12 Feb 12:48    INFO  valid result: 
+hit@1 : 0.0073    hit@5 : 0.0569    hit@10 : 0.0798    hit@20 : 0.1303    ndcg@1 : 0.0073    ndcg@5 : 0.0315    ndcg@10 : 0.039    ndcg@20 : 0.0517    mrr@1 : 0.0073    mrr@5 : 0.0233    mrr@10 : 0.0264    mrr@20 : 0.0299
+12 Feb 12:48    INFO  epoch 33 training [time: 14.10s, train loss: 2016.1012]
+12 Feb 12:48    INFO  epoch 33 evaluating [time: 0.01s, valid_score: 0.039400]
+12 Feb 12:48    INFO  valid result: 
+hit@1 : 0.0055    hit@5 : 0.0532    hit@10 : 0.0844    hit@20 : 0.133    ndcg@1 : 0.0055    ndcg@5 : 0.0294    ndcg@10 : 0.0394    ndcg@20 : 0.0518    mrr@1 : 0.0055    mrr@5 : 0.0216    mrr@10 : 0.0257    mrr@20 : 0.0291
+12 Feb 12:49    INFO  epoch 34 training [time: 14.08s, train loss: 2007.7048]
+12 Feb 12:49    INFO  epoch 34 evaluating [time: 0.01s, valid_score: 0.039100]
+12 Feb 12:49    INFO  valid result: 
+hit@1 : 0.0055    hit@5 : 0.0486    hit@10 : 0.0826    hit@20 : 0.1349    ndcg@1 : 0.0055    ndcg@5 : 0.0282    ndcg@10 : 0.0391    ndcg@20 : 0.0523    mrr@1 : 0.0055    mrr@5 : 0.0214    mrr@10 : 0.0259    mrr@20 : 0.0295
+12 Feb 12:49    INFO  epoch 35 training [time: 14.08s, train loss: 2009.1663]
+12 Feb 12:49    INFO  epoch 35 evaluating [time: 0.01s, valid_score: 0.038000]
+12 Feb 12:49    INFO  valid result: 
+hit@1 : 0.0037    hit@5 : 0.0431    hit@10 : 0.0862    hit@20 : 0.1339    ndcg@1 : 0.0037    ndcg@5 : 0.024    ndcg@10 : 0.038    ndcg@20 : 0.0501    mrr@1 : 0.0037    mrr@5 : 0.0177    mrr@10 : 0.0235    mrr@20 : 0.0268
+12 Feb 12:49    INFO  epoch 36 training [time: 14.08s, train loss: 2008.9338]
+12 Feb 12:49    INFO  epoch 36 evaluating [time: 0.01s, valid_score: 0.040400]
+12 Feb 12:49    INFO  valid result: 
+hit@1 : 0.0073    hit@5 : 0.0495    hit@10 : 0.0853    hit@20 : 0.1266    ndcg@1 : 0.0073    ndcg@5 : 0.0289    ndcg@10 : 0.0404    ndcg@20 : 0.0509    mrr@1 : 0.0073    mrr@5 : 0.0221    mrr@10 : 0.0268    mrr@20 : 0.0297
+12 Feb 12:49    INFO  epoch 37 training [time: 14.05s, train loss: 1998.7578]
+12 Feb 12:49    INFO  epoch 37 evaluating [time: 0.01s, valid_score: 0.037200]
+12 Feb 12:49    INFO  valid result: 
+hit@1 : 0.0046    hit@5 : 0.0468    hit@10 : 0.0835    hit@20 : 0.1303    ndcg@1 : 0.0046    ndcg@5 : 0.0255    ndcg@10 : 0.0372    ndcg@20 : 0.0491    mrr@1 : 0.0046    mrr@5 : 0.0185    mrr@10 : 0.0233    mrr@20 : 0.0266
+12 Feb 12:49    INFO  epoch 38 training [time: 14.09s, train loss: 1998.4564]
+12 Feb 12:49    INFO  epoch 38 evaluating [time: 0.01s, valid_score: 0.034100]
+12 Feb 12:49    INFO  valid result: 
+hit@1 : 0.0028    hit@5 : 0.044    hit@10 : 0.0771    hit@20 : 0.1248    ndcg@1 : 0.0028    ndcg@5 : 0.0235    ndcg@10 : 0.0341    ndcg@20 : 0.046    mrr@1 : 0.0028    mrr@5 : 0.0168    mrr@10 : 0.0211    mrr@20 : 0.0243
+12 Feb 12:50    INFO  epoch 39 training [time: 14.08s, train loss: 1998.2777]
+12 Feb 12:50    INFO  epoch 39 evaluating [time: 0.01s, valid_score: 0.038500]
+12 Feb 12:50    INFO  valid result: 
+hit@1 : 0.0055    hit@5 : 0.0514    hit@10 : 0.0798    hit@20 : 0.1321    ndcg@1 : 0.0055    ndcg@5 : 0.0292    ndcg@10 : 0.0385    ndcg@20 : 0.0515    mrr@1 : 0.0055    mrr@5 : 0.0219    mrr@10 : 0.0258    mrr@20 : 0.0292
+12 Feb 12:50    INFO  epoch 40 training [time: 14.05s, train loss: 1995.8560]
+12 Feb 12:50    INFO  epoch 40 evaluating [time: 0.01s, valid_score: 0.037500]
+12 Feb 12:50    INFO  valid result: 
+hit@1 : 0.0055    hit@5 : 0.0477    hit@10 : 0.0817    hit@20 : 0.1358    ndcg@1 : 0.0055    ndcg@5 : 0.0267    ndcg@10 : 0.0375    ndcg@20 : 0.0509    mrr@1 : 0.0055    mrr@5 : 0.0199    mrr@10 : 0.0242    mrr@20 : 0.0277
+12 Feb 12:50    INFO  epoch 41 training [time: 14.05s, train loss: 1992.6843]
+12 Feb 12:50    INFO  epoch 41 evaluating [time: 0.01s, valid_score: 0.037200]
+12 Feb 12:50    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.045    hit@10 : 0.0761    hit@20 : 0.1339    ndcg@1 : 0.0064    ndcg@5 : 0.0271    ndcg@10 : 0.0372    ndcg@20 : 0.0517    mrr@1 : 0.0064    mrr@5 : 0.0212    mrr@10 : 0.0253    mrr@20 : 0.0293
+12 Feb 12:50    INFO  epoch 42 training [time: 14.06s, train loss: 1987.5734]
+12 Feb 12:50    INFO  epoch 42 evaluating [time: 0.01s, valid_score: 0.039700]
+12 Feb 12:50    INFO  valid result: 
+hit@1 : 0.0055    hit@5 : 0.0523    hit@10 : 0.0853    hit@20 : 0.1394    ndcg@1 : 0.0055    ndcg@5 : 0.0291    ndcg@10 : 0.0397    ndcg@20 : 0.0532    mrr@1 : 0.0055    mrr@5 : 0.0215    mrr@10 : 0.0258    mrr@20 : 0.0295
+12 Feb 12:50    INFO  Finished training, best eval result in epoch 31
+12 Feb 12:50    INFO  Loading model structure and parameters from outputs/sasrec_lastfm/SASRec-Feb-12-2026_12-40-45.pth
+12 Feb 12:50    INFO  The running environment of this training is as follows:
++-------------+------------------+
+| Environment |      Usage       |
++=============+==================+
+| CPU         |      1.90 %      |
++-------------+------------------+
+| GPU         |  0.53 G/79.44 G  |
++-------------+------------------+
+| Memory      | 1.29 G/2015.66 G |
++-------------+------------------+
+12 Feb 12:50    INFO  best valid : OrderedDict([('hit@1', 0.0101), ('hit@5', 0.0495), ('hit@10', 0.0862), ('hit@20', 0.133), ('ndcg@1', 0.0101), ('ndcg@5', 0.0298), ('ndcg@10', 0.0416), ('ndcg@20', 0.0533), ('mrr@1', 0.0101), ('mrr@5', 0.0234), ('mrr@10', 0.0282), ('mrr@20', 0.0314)])
+12 Feb 12:50    INFO  test result: OrderedDict([('hit@1', 0.0101), ('hit@5', 0.0404), ('hit@10', 0.0606), ('hit@20', 0.0881), ('ndcg@1', 0.0101), ('ndcg@5', 0.0255), ('ndcg@10', 0.0319), ('ndcg@20', 0.0387), ('mrr@1', 0.0101), ('mrr@5', 0.0207), ('mrr@10', 0.0232), ('mrr@20', 0.025)])

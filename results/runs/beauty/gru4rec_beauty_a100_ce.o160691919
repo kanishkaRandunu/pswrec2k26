@@ -1,0 +1,274 @@
+=== hostname ===
+gadi-dgx-a100-0001.gadi.nci.org.au
+=== PBS_JOBID ===
+160691919.gadi-pbs
+command line args [-m GRU4Rec -d amazon-beauty --config_files configs/beauty/beauty_GRU4Rec.yaml] will not be used in RecBole
+11 Feb 22:45    INFO  ['RecBole/run_recbole.py', '-m', 'GRU4Rec', '-d', 'amazon-beauty', '--config_files', 'configs/beauty/beauty_GRU4Rec.yaml']
+11 Feb 22:45    INFO  
+General Hyper Parameters:
+gpu_id = 0
+use_gpu = True
+seed = 2026
+state = INFO
+reproducibility = True
+data_path = /scratch/up63/kd6504/recbole_datasets/amazon-beauty
+checkpoint_dir = outputs/gru4rec_beauty
+show_progress = False
+save_dataset = False
+dataset_save_path = None
+save_dataloaders = False
+dataloaders_save_path = None
+log_wandb = False
+
+Training Hyper Parameters:
+epochs = 200
+train_batch_size = 128
+learner = adam
+learning_rate = 0.001
+train_neg_sample_args = {'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}
+eval_step = 1
+stopping_step = 10
+clip_grad_norm = None
+weight_decay = 0.0
+loss_decimal_place = 4
+
+Evaluation Hyper Parameters:
+eval_args = {'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}
+repeatable = True
+metrics = ['Hit', 'NDCG', 'MRR']
+topk = [1, 5, 10, 20]
+valid_metric = NDCG@10
+valid_metric_bigger = True
+eval_batch_size = 4096
+metric_decimal_place = 4
+
+Dataset Hyper Parameters:
+field_separator = 	
+seq_separator =  
+USER_ID_FIELD = user_id
+ITEM_ID_FIELD = item_id
+RATING_FIELD = rating
+TIME_FIELD = timestamp
+seq_len = None
+LABEL_FIELD = label
+threshold = None
+NEG_PREFIX = neg_
+load_col = {'inter': ['user_id', 'item_id', 'rating', 'timestamp']}
+unload_col = None
+unused_col = {'inter': ['rating']}
+additional_feat_suffix = None
+rm_dup_inter = None
+val_interval = None
+filter_inter_by_user_or_item = True
+user_inter_num_interval = [5,inf)
+item_inter_num_interval = [5,inf)
+alias_of_user_id = None
+alias_of_item_id = None
+alias_of_entity_id = None
+alias_of_relation_id = None
+preload_weight = None
+normalize_field = None
+normalize_all = None
+ITEM_LIST_LENGTH_FIELD = item_length
+LIST_SUFFIX = _list
+MAX_ITEM_LIST_LENGTH = 50
+POSITION_FIELD = position_id
+HEAD_ENTITY_ID_FIELD = head_id
+TAIL_ENTITY_ID_FIELD = tail_id
+RELATION_ID_FIELD = relation_id
+ENTITY_ID_FIELD = entity_id
+benchmark_filename = None
+
+Other Hyper Parameters: 
+worker = 0
+wandb_project = recbole
+shuffle = True
+require_pow = False
+enable_amp = False
+enable_scaler = False
+transform = None
+embedding_size = 64
+hidden_size = 128
+num_layers = 1
+dropout_prob = 0.3
+loss_type = CE
+numerical_features = []
+discretization = None
+kg_reverse_r = False
+entity_kg_num_interval = [0,inf)
+relation_kg_num_interval = [0,inf)
+MODEL_TYPE = ModelType.SEQUENTIAL
+MODEL_INPUT_TYPE = InputType.POINTWISE
+eval_type = EvaluatorType.RANKING
+single_spec = True
+local_rank = 0
+device = cuda
+valid_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+test_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+
+
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:648: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=0, inplace=True)
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:650: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=feat[field].mean(), inplace=True)
+11 Feb 22:45    INFO  amazon-beauty
+The number of users: 22364
+Average actions of users: 8.876358270357287
+The number of items: 12102
+Average actions of items: 16.403768283612923
+The number of inters: 198502
+The sparsity of the dataset: 99.92665707018277%
+Remain Fields: ['user_id', 'item_id', 'rating', 'timestamp']
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:2202: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:203.)
+  new_data[k] = torch.LongTensor(value)
+11 Feb 22:46    INFO  [Training]: train_batch_size = [128] train_neg_sample_args: [{'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}]
+11 Feb 22:46    INFO  [Evaluation]: eval_batch_size = [4096] eval_args: [{'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}]
+11 Feb 22:46    INFO  GRU4Rec(
+  (item_embedding): Embedding(12102, 64, padding_idx=0)
+  (emb_dropout): Dropout(p=0.3, inplace=False)
+  (gru_layers): GRU(64, 128, bias=False, batch_first=True)
+  (dense): Linear(in_features=128, out_features=64, bias=True)
+  (loss_fct): CrossEntropyLoss()
+)
+Trainable parameters: 856512
+/scratch/up63/kd6504/venvs/hopper-cu124/lib64/python3.11/site-packages/torch/nn/modules/rnn.py:1393: UserWarning: RNN module weights are not part of single contiguous chunk of memory. This means they need to be compacted at every call, possibly greatly increasing memory usage. To compact weights again call flatten_parameters(). (Triggered internally at /pytorch/aten/src/ATen/native/cudnn/RNN.cpp:1412.)
+  result = _VF.gru(
+11 Feb 22:46    INFO  FLOPs: 4144064.0
+/home/572/kd6504/TRACT/RecBole/recbole/trainer/trainer.py:235: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = amp.GradScaler(enabled=self.enable_scaler)
+11 Feb 22:46    INFO  epoch 0 training [time: 6.37s, train loss: 8836.9510]
+11 Feb 22:46    INFO  epoch 0 evaluating [time: 0.24s, valid_score: 0.016300]
+11 Feb 22:46    INFO  valid result: 
+hit@1 : 0.0042    hit@5 : 0.0183    hit@10 : 0.0341    hit@20 : 0.0563    ndcg@1 : 0.0042    ndcg@5 : 0.0112    ndcg@10 : 0.0163    ndcg@20 : 0.0219    mrr@1 : 0.0042    mrr@5 : 0.0089    mrr@10 : 0.011    mrr@20 : 0.0125
+11 Feb 22:46    INFO  Saving current: outputs/gru4rec_beauty/GRU4Rec-Feb-11-2026_22-46-02.pth
+11 Feb 22:46    INFO  epoch 1 training [time: 6.02s, train loss: 8209.9837]
+11 Feb 22:46    INFO  epoch 1 evaluating [time: 0.17s, valid_score: 0.025500]
+11 Feb 22:46    INFO  valid result: 
+hit@1 : 0.0074    hit@5 : 0.0313    hit@10 : 0.051    hit@20 : 0.0804    ndcg@1 : 0.0074    ndcg@5 : 0.0192    ndcg@10 : 0.0255    ndcg@20 : 0.0329    mrr@1 : 0.0074    mrr@5 : 0.0153    mrr@10 : 0.0178    mrr@20 : 0.0198
+11 Feb 22:46    INFO  Saving current: outputs/gru4rec_beauty/GRU4Rec-Feb-11-2026_22-46-02.pth
+11 Feb 22:46    INFO  epoch 2 training [time: 6.00s, train loss: 7903.4743]
+11 Feb 22:46    INFO  epoch 2 evaluating [time: 0.18s, valid_score: 0.031700]
+11 Feb 22:46    INFO  valid result: 
+hit@1 : 0.0106    hit@5 : 0.0383    hit@10 : 0.0618    hit@20 : 0.0961    ndcg@1 : 0.0106    ndcg@5 : 0.0242    ndcg@10 : 0.0317    ndcg@20 : 0.0404    mrr@1 : 0.0106    mrr@5 : 0.0196    mrr@10 : 0.0227    mrr@20 : 0.025
+11 Feb 22:46    INFO  Saving current: outputs/gru4rec_beauty/GRU4Rec-Feb-11-2026_22-46-02.pth
+11 Feb 22:46    INFO  epoch 3 training [time: 5.98s, train loss: 7698.7229]
+11 Feb 22:46    INFO  epoch 3 evaluating [time: 0.18s, valid_score: 0.037200]
+11 Feb 22:46    INFO  valid result: 
+hit@1 : 0.0121    hit@5 : 0.0447    hit@10 : 0.0721    hit@20 : 0.1083    ndcg@1 : 0.0121    ndcg@5 : 0.0284    ndcg@10 : 0.0372    ndcg@20 : 0.0464    mrr@1 : 0.0121    mrr@5 : 0.0231    mrr@10 : 0.0267    mrr@20 : 0.0292
+11 Feb 22:46    INFO  Saving current: outputs/gru4rec_beauty/GRU4Rec-Feb-11-2026_22-46-02.pth
+11 Feb 22:46    INFO  epoch 4 training [time: 5.98s, train loss: 7536.5402]
+11 Feb 22:46    INFO  epoch 4 evaluating [time: 0.18s, valid_score: 0.041500]
+11 Feb 22:46    INFO  valid result: 
+hit@1 : 0.0141    hit@5 : 0.0511    hit@10 : 0.0787    hit@20 : 0.1145    ndcg@1 : 0.0141    ndcg@5 : 0.0326    ndcg@10 : 0.0415    ndcg@20 : 0.0505    mrr@1 : 0.0141    mrr@5 : 0.0266    mrr@10 : 0.0302    mrr@20 : 0.0327
+11 Feb 22:46    INFO  Saving current: outputs/gru4rec_beauty/GRU4Rec-Feb-11-2026_22-46-02.pth
+11 Feb 22:46    INFO  epoch 5 training [time: 6.00s, train loss: 7388.2026]
+11 Feb 22:46    INFO  epoch 5 evaluating [time: 0.18s, valid_score: 0.043800]
+11 Feb 22:46    INFO  valid result: 
+hit@1 : 0.0155    hit@5 : 0.0532    hit@10 : 0.0814    hit@20 : 0.1183    ndcg@1 : 0.0155    ndcg@5 : 0.0346    ndcg@10 : 0.0438    ndcg@20 : 0.053    mrr@1 : 0.0155    mrr@5 : 0.0285    mrr@10 : 0.0323    mrr@20 : 0.0348
+11 Feb 22:46    INFO  Saving current: outputs/gru4rec_beauty/GRU4Rec-Feb-11-2026_22-46-02.pth
+11 Feb 22:46    INFO  epoch 6 training [time: 5.98s, train loss: 7247.9917]
+11 Feb 22:46    INFO  epoch 6 evaluating [time: 0.17s, valid_score: 0.043700]
+11 Feb 22:46    INFO  valid result: 
+hit@1 : 0.0146    hit@5 : 0.0546    hit@10 : 0.0817    hit@20 : 0.1215    ndcg@1 : 0.0146    ndcg@5 : 0.035    ndcg@10 : 0.0437    ndcg@20 : 0.0537    mrr@1 : 0.0146    mrr@5 : 0.0285    mrr@10 : 0.0321    mrr@20 : 0.0348
+11 Feb 22:46    INFO  epoch 7 training [time: 5.97s, train loss: 7119.1402]
+11 Feb 22:46    INFO  epoch 7 evaluating [time: 0.17s, valid_score: 0.045900]
+11 Feb 22:46    INFO  valid result: 
+hit@1 : 0.0162    hit@5 : 0.0565    hit@10 : 0.0856    hit@20 : 0.1243    ndcg@1 : 0.0162    ndcg@5 : 0.0365    ndcg@10 : 0.0459    ndcg@20 : 0.0556    mrr@1 : 0.0162    mrr@5 : 0.03    mrr@10 : 0.0338    mrr@20 : 0.0364
+11 Feb 22:46    INFO  Saving current: outputs/gru4rec_beauty/GRU4Rec-Feb-11-2026_22-46-02.pth
+11 Feb 22:47    INFO  epoch 8 training [time: 6.01s, train loss: 6989.8774]
+11 Feb 22:47    INFO  epoch 8 evaluating [time: 0.18s, valid_score: 0.046700]
+11 Feb 22:47    INFO  valid result: 
+hit@1 : 0.0178    hit@5 : 0.0574    hit@10 : 0.0858    hit@20 : 0.1212    ndcg@1 : 0.0178    ndcg@5 : 0.0376    ndcg@10 : 0.0467    ndcg@20 : 0.0556    mrr@1 : 0.0178    mrr@5 : 0.0311    mrr@10 : 0.0349    mrr@20 : 0.0373
+11 Feb 22:47    INFO  Saving current: outputs/gru4rec_beauty/GRU4Rec-Feb-11-2026_22-46-02.pth
+11 Feb 22:47    INFO  epoch 9 training [time: 6.01s, train loss: 6869.4436]
+11 Feb 22:47    INFO  epoch 9 evaluating [time: 0.17s, valid_score: 0.045900]
+11 Feb 22:47    INFO  valid result: 
+hit@1 : 0.0166    hit@5 : 0.0573    hit@10 : 0.0847    hit@20 : 0.1214    ndcg@1 : 0.0166    ndcg@5 : 0.0371    ndcg@10 : 0.0459    ndcg@20 : 0.0552    mrr@1 : 0.0166    mrr@5 : 0.0305    mrr@10 : 0.0341    mrr@20 : 0.0367
+11 Feb 22:47    INFO  epoch 10 training [time: 6.01s, train loss: 6745.8352]
+11 Feb 22:47    INFO  epoch 10 evaluating [time: 0.18s, valid_score: 0.047500]
+11 Feb 22:47    INFO  valid result: 
+hit@1 : 0.019    hit@5 : 0.0571    hit@10 : 0.0853    hit@20 : 0.1217    ndcg@1 : 0.019    ndcg@5 : 0.0384    ndcg@10 : 0.0475    ndcg@20 : 0.0566    mrr@1 : 0.019    mrr@5 : 0.0323    mrr@10 : 0.036    mrr@20 : 0.0385
+11 Feb 22:47    INFO  Saving current: outputs/gru4rec_beauty/GRU4Rec-Feb-11-2026_22-46-02.pth
+11 Feb 22:47    INFO  epoch 11 training [time: 5.99s, train loss: 6628.4525]
+11 Feb 22:47    INFO  epoch 11 evaluating [time: 0.17s, valid_score: 0.046300]
+11 Feb 22:47    INFO  valid result: 
+hit@1 : 0.0179    hit@5 : 0.0563    hit@10 : 0.0842    hit@20 : 0.1215    ndcg@1 : 0.0179    ndcg@5 : 0.0373    ndcg@10 : 0.0463    ndcg@20 : 0.0557    mrr@1 : 0.0179    mrr@5 : 0.0311    mrr@10 : 0.0348    mrr@20 : 0.0374
+11 Feb 22:47    INFO  epoch 12 training [time: 6.00s, train loss: 6517.3878]
+11 Feb 22:47    INFO  epoch 12 evaluating [time: 0.17s, valid_score: 0.046100]
+11 Feb 22:47    INFO  valid result: 
+hit@1 : 0.0183    hit@5 : 0.056    hit@10 : 0.0829    hit@20 : 0.119    ndcg@1 : 0.0183    ndcg@5 : 0.0374    ndcg@10 : 0.0461    ndcg@20 : 0.0552    mrr@1 : 0.0183    mrr@5 : 0.0314    mrr@10 : 0.0349    mrr@20 : 0.0374
+11 Feb 22:47    INFO  epoch 13 training [time: 6.02s, train loss: 6404.2898]
+11 Feb 22:47    INFO  epoch 13 evaluating [time: 0.18s, valid_score: 0.045300]
+11 Feb 22:47    INFO  valid result: 
+hit@1 : 0.0171    hit@5 : 0.0565    hit@10 : 0.0824    hit@20 : 0.1183    ndcg@1 : 0.0171    ndcg@5 : 0.037    ndcg@10 : 0.0453    ndcg@20 : 0.0543    mrr@1 : 0.0171    mrr@5 : 0.0306    mrr@10 : 0.034    mrr@20 : 0.0365
+11 Feb 22:47    INFO  epoch 14 training [time: 6.01s, train loss: 6299.6815]
+11 Feb 22:47    INFO  epoch 14 evaluating [time: 0.17s, valid_score: 0.045000]
+11 Feb 22:47    INFO  valid result: 
+hit@1 : 0.0167    hit@5 : 0.0546    hit@10 : 0.0821    hit@20 : 0.1181    ndcg@1 : 0.0167    ndcg@5 : 0.0362    ndcg@10 : 0.045    ndcg@20 : 0.0541    mrr@1 : 0.0167    mrr@5 : 0.0301    mrr@10 : 0.0337    mrr@20 : 0.0362
+11 Feb 22:47    INFO  epoch 15 training [time: 6.02s, train loss: 6191.5005]
+11 Feb 22:47    INFO  epoch 15 evaluating [time: 0.18s, valid_score: 0.044700]
+11 Feb 22:47    INFO  valid result: 
+hit@1 : 0.0182    hit@5 : 0.0549    hit@10 : 0.0801    hit@20 : 0.1148    ndcg@1 : 0.0182    ndcg@5 : 0.0366    ndcg@10 : 0.0447    ndcg@20 : 0.0534    mrr@1 : 0.0182    mrr@5 : 0.0306    mrr@10 : 0.0339    mrr@20 : 0.0363
+11 Feb 22:47    INFO  epoch 16 training [time: 5.99s, train loss: 6095.6005]
+11 Feb 22:47    INFO  epoch 16 evaluating [time: 0.17s, valid_score: 0.044400]
+11 Feb 22:47    INFO  valid result: 
+hit@1 : 0.0184    hit@5 : 0.0535    hit@10 : 0.0793    hit@20 : 0.114    ndcg@1 : 0.0184    ndcg@5 : 0.0361    ndcg@10 : 0.0444    ndcg@20 : 0.0531    mrr@1 : 0.0184    mrr@5 : 0.0304    mrr@10 : 0.0338    mrr@20 : 0.0362
+11 Feb 22:47    INFO  epoch 17 training [time: 6.00s, train loss: 5998.5952]
+11 Feb 22:47    INFO  epoch 17 evaluating [time: 0.17s, valid_score: 0.044000]
+11 Feb 22:47    INFO  valid result: 
+hit@1 : 0.0182    hit@5 : 0.0522    hit@10 : 0.0784    hit@20 : 0.1126    ndcg@1 : 0.0182    ndcg@5 : 0.0356    ndcg@10 : 0.044    ndcg@20 : 0.0526    mrr@1 : 0.0182    mrr@5 : 0.0301    mrr@10 : 0.0336    mrr@20 : 0.0359
+11 Feb 22:48    INFO  epoch 18 training [time: 6.01s, train loss: 5906.7588]
+11 Feb 22:48    INFO  epoch 18 evaluating [time: 0.18s, valid_score: 0.044600]
+11 Feb 22:48    INFO  valid result: 
+hit@1 : 0.0182    hit@5 : 0.0546    hit@10 : 0.079    hit@20 : 0.1117    ndcg@1 : 0.0182    ndcg@5 : 0.0368    ndcg@10 : 0.0446    ndcg@20 : 0.0528    mrr@1 : 0.0182    mrr@5 : 0.0309    mrr@10 : 0.0341    mrr@20 : 0.0363
+11 Feb 22:48    INFO  epoch 19 training [time: 6.01s, train loss: 5821.8996]
+11 Feb 22:48    INFO  epoch 19 evaluating [time: 0.17s, valid_score: 0.044900]
+11 Feb 22:48    INFO  valid result: 
+hit@1 : 0.0192    hit@5 : 0.0541    hit@10 : 0.0797    hit@20 : 0.1124    ndcg@1 : 0.0192    ndcg@5 : 0.0367    ndcg@10 : 0.0449    ndcg@20 : 0.0532    mrr@1 : 0.0192    mrr@5 : 0.031    mrr@10 : 0.0344    mrr@20 : 0.0367
+11 Feb 22:48    INFO  epoch 20 training [time: 5.99s, train loss: 5744.4869]
+11 Feb 22:48    INFO  epoch 20 evaluating [time: 0.17s, valid_score: 0.044900]
+11 Feb 22:48    INFO  valid result: 
+hit@1 : 0.0193    hit@5 : 0.0533    hit@10 : 0.0792    hit@20 : 0.1126    ndcg@1 : 0.0193    ndcg@5 : 0.0365    ndcg@10 : 0.0449    ndcg@20 : 0.0533    mrr@1 : 0.0193    mrr@5 : 0.031    mrr@10 : 0.0344    mrr@20 : 0.0367
+11 Feb 22:48    INFO  epoch 21 training [time: 5.99s, train loss: 5660.8301]
+11 Feb 22:48    INFO  epoch 21 evaluating [time: 0.18s, valid_score: 0.043800]
+11 Feb 22:48    INFO  valid result: 
+hit@1 : 0.0188    hit@5 : 0.054    hit@10 : 0.0765    hit@20 : 0.1092    ndcg@1 : 0.0188    ndcg@5 : 0.0366    ndcg@10 : 0.0438    ndcg@20 : 0.052    mrr@1 : 0.0188    mrr@5 : 0.0309    mrr@10 : 0.0338    mrr@20 : 0.0361
+11 Feb 22:48    INFO  Finished training, best eval result in epoch 10
+11 Feb 22:48    INFO  Loading model structure and parameters from outputs/gru4rec_beauty/GRU4Rec-Feb-11-2026_22-46-02.pth
+11 Feb 22:48    INFO  The running environment of this training is as follows:
++-------------+------------------+
+| Environment |      Usage       |
++=============+==================+
+| CPU         |      3.30 %      |
++-------------+------------------+
+| GPU         |  3.56 G/79.44 G  |
++-------------+------------------+
+| Memory      | 1.50 G/2015.66 G |
++-------------+------------------+
+11 Feb 22:48    INFO  best valid : OrderedDict([('hit@1', 0.019), ('hit@5', 0.0571), ('hit@10', 0.0853), ('hit@20', 0.1217), ('ndcg@1', 0.019), ('ndcg@5', 0.0384), ('ndcg@10', 0.0475), ('ndcg@20', 0.0566), ('mrr@1', 0.019), ('mrr@5', 0.0323), ('mrr@10', 0.036), ('mrr@20', 0.0385)])
+11 Feb 22:48    INFO  test result: OrderedDict([('hit@1', 0.0135), ('hit@5', 0.0414), ('hit@10', 0.0623), ('hit@20', 0.0922), ('ndcg@1', 0.0135), ('ndcg@5', 0.0274), ('ndcg@10', 0.0342), ('ndcg@20', 0.0417), ('mrr@1', 0.0135), ('mrr@5', 0.0229), ('mrr@10', 0.0256), ('mrr@20', 0.0277)])
+Job completed.
+
+======================================================================================
+                  Resource Usage on 2026-02-11 22:48:26:
+   Job Id:             160691919.gadi-pbs
+   Project:            up63
+   Exit Status:        0
+   Service Units:      3.38
+   NCPUs Requested:    16                  CPU Time Used: 00:02:45        
+   Memory Requested:   16.0GB                Memory Used: 1.41GB          
+   NGPUs Requested:    1                 GPU Utilisation: 29%             
+                                         GPU Memory Used: 4.06GB          
+   Walltime Requested: 04:00:00            Walltime Used: 00:02:49        
+   JobFS Requested:    100.0MB                JobFS Used: 5.03KB          
+======================================================================================

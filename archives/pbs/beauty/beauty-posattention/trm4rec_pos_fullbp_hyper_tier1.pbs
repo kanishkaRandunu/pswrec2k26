@@ -1,0 +1,40 @@
+#!/bin/bash
+#PBS -P up63
+#PBS -q dgxa100
+#PBS -l ncpus=16
+#PBS -l mem=16GB
+#PBS -l ngpus=1
+#PBS -l walltime=12:00:00
+#PBS -l storage=scratch/up63+gdata/up63
+#PBS -l wd
+#PBS -j oe
+#PBS -N trm4rec_fullbp_hyper_t1
+
+# TRM4RecPos FullBP B1 Tier 1 hyperparameter tuning (12 runs). Submit from repo root:
+# qsub pbs/beauty/beauty-posattention/trm4rec_pos_fullbp_hyper_tier1.pbs
+
+set -e
+cd "$PBS_O_WORKDIR"
+
+echo "=== hostname ==="
+hostname
+echo "=== PBS_JOBID ==="
+echo "$PBS_JOBID"
+
+module purge
+module load cuda/12.9.0
+
+source /scratch/up63/kd6504/venvs/hopper-cu124/bin/activate
+mkdir -p log/TRM4RecPos
+mkdir -p results
+echo "$(date '+%Y-%m-%d %H:%M:%S')" > "log/TRM4RecPos/.job_${PBS_JOBID}.started"
+
+LIVE_LOG="trm4rec_pos_fullbp_hyper_tier1_${PBS_JOBID}.log"
+python -u RecBole/run_hyper.py \
+  --config_files configs/beauty-posattention/beauty_pos_posonly_fullbp_tuning_base.yaml \
+  --params_file configs/beauty-posattention/trm4recpos_fullbp_tier1.hyper \
+  --output_file results/trm4recpos_fullbp_tier1_beauty.result \
+  --tool Hyperopt \
+  2>&1 | tee "${LIVE_LOG}"
+
+echo "Job completed."

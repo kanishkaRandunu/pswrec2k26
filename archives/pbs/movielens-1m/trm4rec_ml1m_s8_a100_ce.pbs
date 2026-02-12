@@ -1,0 +1,36 @@
+#!/bin/bash
+#PBS -P up63
+#PBS -q dgxa100
+#PBS -l ncpus=16
+#PBS -l mem=16GB
+#PBS -l ngpus=1
+#PBS -l walltime=06:00:00
+#PBS -l storage=scratch/up63+gdata/up63
+#PBS -l wd
+#PBS -j oe
+#PBS -N trm4rec_ml1m_s8_a100_ce
+
+# TRM4Rec S8 (8 trm_steps) on MovieLens 1M on A100 (config: configs/ml-1m_TRM4Rec_S8.yaml).
+# Submit from repo root: qsub pbs/trm4rec_ml1m_s8_a100_ce.pbs
+# Queue dgxa100 = A100 on NCI Gadi.
+
+set -e
+cd "$PBS_O_WORKDIR"
+
+echo "=== hostname ==="
+hostname
+echo "=== PBS_JOBID ==="
+echo "$PBS_JOBID"
+
+module purge
+module load cuda/12.9.0
+
+source /scratch/up63/kd6504/venvs/hopper-cu124/bin/activate
+mkdir -p log/TRM4Rec
+echo "$(date '+%Y-%m-%d %H:%M:%S')" > "log/TRM4Rec/.job_${PBS_JOBID}.started"
+
+# Live log (follow with: tail -f trm4rec_ml1m_s8_a100_live_<JOBID>.log)
+LIVE_LOG="trm4rec_ml1m_s8_a100_live_${PBS_JOBID}.log"
+python -u RecBole/run_recbole.py -m TRM4Rec -d ml-1m --config_files configs/ml-1m_TRM4Rec_S8.yaml 2>&1 | tee "${LIVE_LOG}"
+
+echo "Job completed."

@@ -1,0 +1,395 @@
+=== hostname ===
+gadi-dgx-a100-0001.gadi.nci.org.au
+=== PBS_JOBID ===
+160753786.gadi-pbs
+command line args [-m WEARec -d amazon-beauty --config_files configs/beauty/beauty_WEARec.yaml] will not be used in RecBole
+12 Feb 17:25    INFO  ['RecBole/run_recbole.py', '-m', 'WEARec', '-d', 'amazon-beauty', '--config_files', 'configs/beauty/beauty_WEARec.yaml']
+12 Feb 17:25    INFO  
+General Hyper Parameters:
+gpu_id = 0
+use_gpu = True
+seed = 2026
+state = INFO
+reproducibility = True
+data_path = /scratch/up63/kd6504/recbole_datasets/amazon-beauty
+checkpoint_dir = outputs/wearec_beauty
+show_progress = False
+save_dataset = False
+dataset_save_path = None
+save_dataloaders = False
+dataloaders_save_path = None
+log_wandb = False
+
+Training Hyper Parameters:
+epochs = 200
+train_batch_size = 128
+learner = adam
+learning_rate = 0.0005
+train_neg_sample_args = {'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}
+eval_step = 1
+stopping_step = 10
+clip_grad_norm = None
+weight_decay = 0.0
+loss_decimal_place = 4
+
+Evaluation Hyper Parameters:
+eval_args = {'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}
+repeatable = True
+metrics = ['Hit', 'NDCG', 'MRR']
+topk = [1, 5, 10, 20]
+valid_metric = NDCG@10
+valid_metric_bigger = True
+eval_batch_size = 4096
+metric_decimal_place = 4
+
+Dataset Hyper Parameters:
+field_separator = 	
+seq_separator =  
+USER_ID_FIELD = user_id
+ITEM_ID_FIELD = item_id
+RATING_FIELD = rating
+TIME_FIELD = timestamp
+seq_len = None
+LABEL_FIELD = label
+threshold = None
+NEG_PREFIX = neg_
+load_col = {'inter': ['user_id', 'item_id', 'rating', 'timestamp']}
+unload_col = None
+unused_col = {'inter': ['rating']}
+additional_feat_suffix = None
+rm_dup_inter = None
+val_interval = None
+filter_inter_by_user_or_item = True
+user_inter_num_interval = [5,inf)
+item_inter_num_interval = [5,inf)
+alias_of_user_id = None
+alias_of_item_id = None
+alias_of_entity_id = None
+alias_of_relation_id = None
+preload_weight = None
+normalize_field = None
+normalize_all = None
+ITEM_LIST_LENGTH_FIELD = item_length
+LIST_SUFFIX = _list
+MAX_ITEM_LIST_LENGTH = 50
+POSITION_FIELD = position_id
+HEAD_ENTITY_ID_FIELD = head_id
+TAIL_ENTITY_ID_FIELD = tail_id
+RELATION_ID_FIELD = relation_id
+ENTITY_ID_FIELD = entity_id
+benchmark_filename = None
+
+Other Hyper Parameters: 
+worker = 0
+wandb_project = recbole
+shuffle = True
+require_pow = False
+enable_amp = False
+enable_scaler = False
+transform = None
+n_layers = 2
+n_heads = 8
+hidden_size = 64
+inner_size = 256
+hidden_dropout_prob = 0.5
+hidden_act = gelu
+layer_norm_eps = 1e-12
+initializer_range = 0.02
+loss_type = CE
+alpha = 0.2
+numerical_features = []
+discretization = None
+kg_reverse_r = False
+entity_kg_num_interval = [0,inf)
+relation_kg_num_interval = [0,inf)
+MODEL_TYPE = ModelType.SEQUENTIAL
+MODEL_INPUT_TYPE = InputType.POINTWISE
+eval_type = EvaluatorType.RANKING
+single_spec = True
+local_rank = 0
+device = cuda
+valid_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+test_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+
+
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:648: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=0, inplace=True)
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:650: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=feat[field].mean(), inplace=True)
+12 Feb 17:25    INFO  amazon-beauty
+The number of users: 22364
+Average actions of users: 8.876358270357287
+The number of items: 12102
+Average actions of items: 16.403768283612923
+The number of inters: 198502
+The sparsity of the dataset: 99.92665707018277%
+Remain Fields: ['user_id', 'item_id', 'rating', 'timestamp']
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:2202: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:203.)
+  new_data[k] = torch.LongTensor(value)
+12 Feb 17:25    INFO  [Training]: train_batch_size = [128] train_neg_sample_args: [{'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}]
+12 Feb 17:25    INFO  [Evaluation]: eval_batch_size = [4096] eval_args: [{'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}]
+12 Feb 17:25    INFO  WEARec(
+  (item_embedding): Embedding(12102, 64, padding_idx=0)
+  (position_embedding): Embedding(50, 64)
+  (LayerNorm): LayerNorm()
+  (dropout): Dropout(p=0.5, inplace=False)
+  (item_encoder): WEARecEncoder(
+    (blocks): ModuleList(
+      (0-1): 2 x WEARecBlock(
+        (layer): WEARecLayer(
+          (adaptive_mlp): Sequential(
+            (0): Linear(in_features=64, out_features=64, bias=True)
+            (1): GELU(approximate='none')
+            (2): Linear(in_features=64, out_features=416, bias=True)
+          )
+          (out_dropout): Dropout(p=0.5, inplace=False)
+          (LayerNorm): LayerNorm()
+        )
+        (feed_forward): FeedForward(
+          (dense_1): Linear(in_features=64, out_features=256, bias=True)
+          (dense_2): Linear(in_features=256, out_features=64, bias=True)
+          (LayerNorm): LayerNorm()
+          (dropout): Dropout(p=0.5, inplace=False)
+        )
+      )
+    )
+  )
+  (loss_fct): CrossEntropyLoss()
+)
+Trainable parameters: 910976
+12 Feb 17:25    INFO  FLOPs: 3344704.0
+/home/572/kd6504/TRACT/RecBole/recbole/trainer/trainer.py:235: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = amp.GradScaler(enabled=self.enable_scaler)
+12 Feb 17:26    INFO  epoch 0 training [time: 52.57s, train loss: 9002.8331]
+12 Feb 17:26    INFO  epoch 0 evaluating [time: 0.43s, valid_score: 0.013200]
+12 Feb 17:26    INFO  valid result: 
+hit@1 : 0.0036    hit@5 : 0.0157    hit@10 : 0.0269    hit@20 : 0.0426    ndcg@1 : 0.0036    ndcg@5 : 0.0096    ndcg@10 : 0.0132    ndcg@20 : 0.0172    mrr@1 : 0.0036    mrr@5 : 0.0077    mrr@10 : 0.0091    mrr@20 : 0.0102
+12 Feb 17:26    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:27    INFO  epoch 1 training [time: 51.04s, train loss: 8399.7093]
+12 Feb 17:27    INFO  epoch 1 evaluating [time: 0.23s, valid_score: 0.024200]
+12 Feb 17:27    INFO  valid result: 
+hit@1 : 0.0073    hit@5 : 0.0286    hit@10 : 0.0486    hit@20 : 0.0738    ndcg@1 : 0.0073    ndcg@5 : 0.0178    ndcg@10 : 0.0242    ndcg@20 : 0.0306    mrr@1 : 0.0073    mrr@5 : 0.0143    mrr@10 : 0.0169    mrr@20 : 0.0186
+12 Feb 17:27    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:28    INFO  epoch 2 training [time: 50.94s, train loss: 8029.2073]
+12 Feb 17:28    INFO  epoch 2 evaluating [time: 0.23s, valid_score: 0.029000]
+12 Feb 17:28    INFO  valid result: 
+hit@1 : 0.0081    hit@5 : 0.0363    hit@10 : 0.058    hit@20 : 0.0899    ndcg@1 : 0.0081    ndcg@5 : 0.022    ndcg@10 : 0.029    ndcg@20 : 0.037    mrr@1 : 0.0081    mrr@5 : 0.0174    mrr@10 : 0.0202    mrr@20 : 0.0224
+12 Feb 17:28    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:29    INFO  epoch 3 training [time: 50.89s, train loss: 7782.8088]
+12 Feb 17:29    INFO  epoch 3 evaluating [time: 0.22s, valid_score: 0.036500]
+12 Feb 17:29    INFO  valid result: 
+hit@1 : 0.0101    hit@5 : 0.045    hit@10 : 0.0728    hit@20 : 0.1096    ndcg@1 : 0.0101    ndcg@5 : 0.0275    ndcg@10 : 0.0365    ndcg@20 : 0.0458    mrr@1 : 0.0101    mrr@5 : 0.0219    mrr@10 : 0.0255    mrr@20 : 0.028
+12 Feb 17:29    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:30    INFO  epoch 4 training [time: 50.91s, train loss: 7578.2127]
+12 Feb 17:30    INFO  epoch 4 evaluating [time: 0.23s, valid_score: 0.040600]
+12 Feb 17:30    INFO  valid result: 
+hit@1 : 0.0108    hit@5 : 0.0504    hit@10 : 0.082    hit@20 : 0.123    ndcg@1 : 0.0108    ndcg@5 : 0.0304    ndcg@10 : 0.0406    ndcg@20 : 0.0509    mrr@1 : 0.0108    mrr@5 : 0.0239    mrr@10 : 0.0281    mrr@20 : 0.0309
+12 Feb 17:30    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:30    INFO  epoch 5 training [time: 50.84s, train loss: 7399.5862]
+12 Feb 17:30    INFO  epoch 5 evaluating [time: 0.22s, valid_score: 0.043700]
+12 Feb 17:30    INFO  valid result: 
+hit@1 : 0.011    hit@5 : 0.0561    hit@10 : 0.0883    hit@20 : 0.1296    ndcg@1 : 0.011    ndcg@5 : 0.0333    ndcg@10 : 0.0437    ndcg@20 : 0.0541    mrr@1 : 0.011    mrr@5 : 0.0259    mrr@10 : 0.0301    mrr@20 : 0.033
+12 Feb 17:30    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:31    INFO  epoch 6 training [time: 51.07s, train loss: 7251.6844]
+12 Feb 17:31    INFO  epoch 6 evaluating [time: 0.23s, valid_score: 0.045000]
+12 Feb 17:31    INFO  valid result: 
+hit@1 : 0.0097    hit@5 : 0.058    hit@10 : 0.0927    hit@20 : 0.1351    ndcg@1 : 0.0097    ndcg@5 : 0.0338    ndcg@10 : 0.045    ndcg@20 : 0.0557    mrr@1 : 0.0097    mrr@5 : 0.0259    mrr@10 : 0.0305    mrr@20 : 0.0334
+12 Feb 17:31    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:32    INFO  epoch 7 training [time: 50.84s, train loss: 7123.7173]
+12 Feb 17:32    INFO  epoch 7 evaluating [time: 0.22s, valid_score: 0.045500]
+12 Feb 17:32    INFO  valid result: 
+hit@1 : 0.0085    hit@5 : 0.0597    hit@10 : 0.0948    hit@20 : 0.1406    ndcg@1 : 0.0085    ndcg@5 : 0.0342    ndcg@10 : 0.0455    ndcg@20 : 0.0571    mrr@1 : 0.0085    mrr@5 : 0.0259    mrr@10 : 0.0306    mrr@20 : 0.0337
+12 Feb 17:32    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:33    INFO  epoch 8 training [time: 51.02s, train loss: 7022.8067]
+12 Feb 17:33    INFO  epoch 8 evaluating [time: 0.23s, valid_score: 0.045700]
+12 Feb 17:33    INFO  valid result: 
+hit@1 : 0.0085    hit@5 : 0.0612    hit@10 : 0.0948    hit@20 : 0.1391    ndcg@1 : 0.0085    ndcg@5 : 0.0348    ndcg@10 : 0.0457    ndcg@20 : 0.0569    mrr@1 : 0.0085    mrr@5 : 0.0262    mrr@10 : 0.0307    mrr@20 : 0.0338
+12 Feb 17:33    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:34    INFO  epoch 9 training [time: 50.91s, train loss: 6930.7309]
+12 Feb 17:34    INFO  epoch 9 evaluating [time: 0.23s, valid_score: 0.046900]
+12 Feb 17:34    INFO  valid result: 
+hit@1 : 0.0076    hit@5 : 0.063    hit@10 : 0.0986    hit@20 : 0.1428    ndcg@1 : 0.0076    ndcg@5 : 0.0354    ndcg@10 : 0.0469    ndcg@20 : 0.0581    mrr@1 : 0.0076    mrr@5 : 0.0264    mrr@10 : 0.0311    mrr@20 : 0.0342
+12 Feb 17:34    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:35    INFO  epoch 10 training [time: 50.93s, train loss: 6858.4263]
+12 Feb 17:35    INFO  epoch 10 evaluating [time: 0.23s, valid_score: 0.047700]
+12 Feb 17:35    INFO  valid result: 
+hit@1 : 0.0082    hit@5 : 0.0629    hit@10 : 0.0988    hit@20 : 0.1426    ndcg@1 : 0.0082    ndcg@5 : 0.0361    ndcg@10 : 0.0477    ndcg@20 : 0.0588    mrr@1 : 0.0082    mrr@5 : 0.0273    mrr@10 : 0.0321    mrr@20 : 0.0351
+12 Feb 17:35    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:36    INFO  epoch 11 training [time: 50.78s, train loss: 6792.6271]
+12 Feb 17:36    INFO  epoch 11 evaluating [time: 0.22s, valid_score: 0.047700]
+12 Feb 17:36    INFO  valid result: 
+hit@1 : 0.0082    hit@5 : 0.064    hit@10 : 0.0997    hit@20 : 0.1444    ndcg@1 : 0.0082    ndcg@5 : 0.0362    ndcg@10 : 0.0477    ndcg@20 : 0.059    mrr@1 : 0.0082    mrr@5 : 0.0271    mrr@10 : 0.0318    mrr@20 : 0.0349
+12 Feb 17:36    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:36    INFO  epoch 12 training [time: 51.08s, train loss: 6744.8287]
+12 Feb 17:36    INFO  epoch 12 evaluating [time: 0.23s, valid_score: 0.046600]
+12 Feb 17:36    INFO  valid result: 
+hit@1 : 0.0089    hit@5 : 0.0619    hit@10 : 0.0971    hit@20 : 0.1439    ndcg@1 : 0.0089    ndcg@5 : 0.0353    ndcg@10 : 0.0466    ndcg@20 : 0.0585    mrr@1 : 0.0089    mrr@5 : 0.0266    mrr@10 : 0.0313    mrr@20 : 0.0345
+12 Feb 17:37    INFO  epoch 13 training [time: 51.06s, train loss: 6692.6239]
+12 Feb 17:37    INFO  epoch 13 evaluating [time: 0.22s, valid_score: 0.047500]
+12 Feb 17:37    INFO  valid result: 
+hit@1 : 0.0082    hit@5 : 0.0632    hit@10 : 0.0998    hit@20 : 0.1441    ndcg@1 : 0.0082    ndcg@5 : 0.0356    ndcg@10 : 0.0475    ndcg@20 : 0.0586    mrr@1 : 0.0082    mrr@5 : 0.0266    mrr@10 : 0.0315    mrr@20 : 0.0346
+12 Feb 17:38    INFO  epoch 14 training [time: 50.87s, train loss: 6656.8147]
+12 Feb 17:38    INFO  epoch 14 evaluating [time: 0.23s, valid_score: 0.047900]
+12 Feb 17:38    INFO  valid result: 
+hit@1 : 0.0077    hit@5 : 0.064    hit@10 : 0.1012    hit@20 : 0.1443    ndcg@1 : 0.0077    ndcg@5 : 0.036    ndcg@10 : 0.0479    ndcg@20 : 0.0588    mrr@1 : 0.0077    mrr@5 : 0.0268    mrr@10 : 0.0317    mrr@20 : 0.0346
+12 Feb 17:38    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:39    INFO  epoch 15 training [time: 50.87s, train loss: 6619.4168]
+12 Feb 17:39    INFO  epoch 15 evaluating [time: 0.22s, valid_score: 0.047600]
+12 Feb 17:39    INFO  valid result: 
+hit@1 : 0.0085    hit@5 : 0.0627    hit@10 : 0.0997    hit@20 : 0.1435    ndcg@1 : 0.0085    ndcg@5 : 0.0356    ndcg@10 : 0.0476    ndcg@20 : 0.0587    mrr@1 : 0.0085    mrr@5 : 0.0268    mrr@10 : 0.0317    mrr@20 : 0.0347
+12 Feb 17:40    INFO  epoch 16 training [time: 50.73s, train loss: 6588.0278]
+12 Feb 17:40    INFO  epoch 16 evaluating [time: 0.23s, valid_score: 0.046900]
+12 Feb 17:40    INFO  valid result: 
+hit@1 : 0.0077    hit@5 : 0.0625    hit@10 : 0.0994    hit@20 : 0.1427    ndcg@1 : 0.0077    ndcg@5 : 0.035    ndcg@10 : 0.0469    ndcg@20 : 0.0578    mrr@1 : 0.0077    mrr@5 : 0.026    mrr@10 : 0.0309    mrr@20 : 0.0339
+12 Feb 17:41    INFO  epoch 17 training [time: 50.79s, train loss: 6559.6076]
+12 Feb 17:41    INFO  epoch 17 evaluating [time: 0.22s, valid_score: 0.047100]
+12 Feb 17:41    INFO  valid result: 
+hit@1 : 0.0081    hit@5 : 0.0621    hit@10 : 0.0994    hit@20 : 0.1447    ndcg@1 : 0.0081    ndcg@5 : 0.0351    ndcg@10 : 0.0471    ndcg@20 : 0.0585    mrr@1 : 0.0081    mrr@5 : 0.0263    mrr@10 : 0.0312    mrr@20 : 0.0343
+12 Feb 17:42    INFO  epoch 18 training [time: 50.96s, train loss: 6537.5286]
+12 Feb 17:42    INFO  epoch 18 evaluating [time: 0.23s, valid_score: 0.048600]
+12 Feb 17:42    INFO  valid result: 
+hit@1 : 0.0102    hit@5 : 0.0634    hit@10 : 0.1    hit@20 : 0.1456    ndcg@1 : 0.0102    ndcg@5 : 0.0369    ndcg@10 : 0.0486    ndcg@20 : 0.06    mrr@1 : 0.0102    mrr@5 : 0.0282    mrr@10 : 0.0329    mrr@20 : 0.036
+12 Feb 17:42    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:42    INFO  epoch 19 training [time: 51.12s, train loss: 6511.6991]
+12 Feb 17:42    INFO  epoch 19 evaluating [time: 0.23s, valid_score: 0.047500]
+12 Feb 17:42    INFO  valid result: 
+hit@1 : 0.0085    hit@5 : 0.0629    hit@10 : 0.0991    hit@20 : 0.1446    ndcg@1 : 0.0085    ndcg@5 : 0.0358    ndcg@10 : 0.0475    ndcg@20 : 0.059    mrr@1 : 0.0085    mrr@5 : 0.027    mrr@10 : 0.0318    mrr@20 : 0.0349
+12 Feb 17:43    INFO  epoch 20 training [time: 51.78s, train loss: 6494.2143]
+12 Feb 17:43    INFO  epoch 20 evaluating [time: 0.23s, valid_score: 0.048100]
+12 Feb 17:43    INFO  valid result: 
+hit@1 : 0.0088    hit@5 : 0.064    hit@10 : 0.1005    hit@20 : 0.1448    ndcg@1 : 0.0088    ndcg@5 : 0.0364    ndcg@10 : 0.0481    ndcg@20 : 0.0593    mrr@1 : 0.0088    mrr@5 : 0.0273    mrr@10 : 0.0322    mrr@20 : 0.0352
+12 Feb 17:44    INFO  epoch 21 training [time: 51.69s, train loss: 6469.3892]
+12 Feb 17:44    INFO  epoch 21 evaluating [time: 0.23s, valid_score: 0.047500]
+12 Feb 17:44    INFO  valid result: 
+hit@1 : 0.0079    hit@5 : 0.0645    hit@10 : 0.0993    hit@20 : 0.1459    ndcg@1 : 0.0079    ndcg@5 : 0.0362    ndcg@10 : 0.0475    ndcg@20 : 0.0592    mrr@1 : 0.0079    mrr@5 : 0.027    mrr@10 : 0.0316    mrr@20 : 0.0348
+12 Feb 17:45    INFO  epoch 22 training [time: 51.73s, train loss: 6450.2463]
+12 Feb 17:45    INFO  epoch 22 evaluating [time: 0.22s, valid_score: 0.048500]
+12 Feb 17:45    INFO  valid result: 
+hit@1 : 0.0087    hit@5 : 0.0646    hit@10 : 0.1015    hit@20 : 0.1464    ndcg@1 : 0.0087    ndcg@5 : 0.0366    ndcg@10 : 0.0485    ndcg@20 : 0.0599    mrr@1 : 0.0087    mrr@5 : 0.0274    mrr@10 : 0.0324    mrr@20 : 0.0355
+12 Feb 17:46    INFO  epoch 23 training [time: 51.70s, train loss: 6438.6040]
+12 Feb 17:46    INFO  epoch 23 evaluating [time: 0.23s, valid_score: 0.048600]
+12 Feb 17:46    INFO  valid result: 
+hit@1 : 0.0093    hit@5 : 0.0628    hit@10 : 0.1014    hit@20 : 0.1457    ndcg@1 : 0.0093    ndcg@5 : 0.0361    ndcg@10 : 0.0486    ndcg@20 : 0.0597    mrr@1 : 0.0093    mrr@5 : 0.0274    mrr@10 : 0.0325    mrr@20 : 0.0356
+12 Feb 17:46    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:47    INFO  epoch 24 training [time: 51.58s, train loss: 6418.1523]
+12 Feb 17:47    INFO  epoch 24 evaluating [time: 0.22s, valid_score: 0.048400]
+12 Feb 17:47    INFO  valid result: 
+hit@1 : 0.0082    hit@5 : 0.0635    hit@10 : 0.102    hit@20 : 0.1469    ndcg@1 : 0.0082    ndcg@5 : 0.036    ndcg@10 : 0.0484    ndcg@20 : 0.0597    mrr@1 : 0.0082    mrr@5 : 0.0269    mrr@10 : 0.032    mrr@20 : 0.0351
+12 Feb 17:48    INFO  epoch 25 training [time: 51.67s, train loss: 6403.1889]
+12 Feb 17:48    INFO  epoch 25 evaluating [time: 0.23s, valid_score: 0.047500]
+12 Feb 17:48    INFO  valid result: 
+hit@1 : 0.0081    hit@5 : 0.0618    hit@10 : 0.1001    hit@20 : 0.1456    ndcg@1 : 0.0081    ndcg@5 : 0.0351    ndcg@10 : 0.0475    ndcg@20 : 0.059    mrr@1 : 0.0081    mrr@5 : 0.0263    mrr@10 : 0.0315    mrr@20 : 0.0347
+12 Feb 17:48    INFO  epoch 26 training [time: 51.71s, train loss: 6394.9779]
+12 Feb 17:48    INFO  epoch 26 evaluating [time: 0.22s, valid_score: 0.048900]
+12 Feb 17:48    INFO  valid result: 
+hit@1 : 0.009    hit@5 : 0.0647    hit@10 : 0.1017    hit@20 : 0.1456    ndcg@1 : 0.009    ndcg@5 : 0.0369    ndcg@10 : 0.0489    ndcg@20 : 0.06    mrr@1 : 0.009    mrr@5 : 0.0279    mrr@10 : 0.0328    mrr@20 : 0.0358
+12 Feb 17:48    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:49    INFO  epoch 27 training [time: 51.64s, train loss: 6377.9362]
+12 Feb 17:49    INFO  epoch 27 evaluating [time: 0.23s, valid_score: 0.048800]
+12 Feb 17:49    INFO  valid result: 
+hit@1 : 0.0093    hit@5 : 0.0645    hit@10 : 0.1019    hit@20 : 0.1448    ndcg@1 : 0.0093    ndcg@5 : 0.0367    ndcg@10 : 0.0488    ndcg@20 : 0.0596    mrr@1 : 0.0093    mrr@5 : 0.0276    mrr@10 : 0.0326    mrr@20 : 0.0355
+12 Feb 17:50    INFO  epoch 28 training [time: 51.75s, train loss: 6368.9441]
+12 Feb 17:50    INFO  epoch 28 evaluating [time: 0.23s, valid_score: 0.049100]
+12 Feb 17:50    INFO  valid result: 
+hit@1 : 0.0098    hit@5 : 0.0657    hit@10 : 0.1018    hit@20 : 0.1454    ndcg@1 : 0.0098    ndcg@5 : 0.0375    ndcg@10 : 0.0491    ndcg@20 : 0.0601    mrr@1 : 0.0098    mrr@5 : 0.0283    mrr@10 : 0.0331    mrr@20 : 0.0361
+12 Feb 17:50    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:51    INFO  epoch 29 training [time: 51.64s, train loss: 6354.8375]
+12 Feb 17:51    INFO  epoch 29 evaluating [time: 0.22s, valid_score: 0.048000]
+12 Feb 17:51    INFO  valid result: 
+hit@1 : 0.0086    hit@5 : 0.0636    hit@10 : 0.1006    hit@20 : 0.1454    ndcg@1 : 0.0086    ndcg@5 : 0.0361    ndcg@10 : 0.048    ndcg@20 : 0.0593    mrr@1 : 0.0086    mrr@5 : 0.0271    mrr@10 : 0.032    mrr@20 : 0.035
+12 Feb 17:52    INFO  epoch 30 training [time: 51.62s, train loss: 6343.4949]
+12 Feb 17:52    INFO  epoch 30 evaluating [time: 0.23s, valid_score: 0.048800]
+12 Feb 17:52    INFO  valid result: 
+hit@1 : 0.0097    hit@5 : 0.0637    hit@10 : 0.1013    hit@20 : 0.1466    ndcg@1 : 0.0097    ndcg@5 : 0.0366    ndcg@10 : 0.0488    ndcg@20 : 0.0602    mrr@1 : 0.0097    mrr@5 : 0.0278    mrr@10 : 0.0328    mrr@20 : 0.0359
+12 Feb 17:53    INFO  epoch 31 training [time: 51.59s, train loss: 6336.0778]
+12 Feb 17:53    INFO  epoch 31 evaluating [time: 0.22s, valid_score: 0.047900]
+12 Feb 17:53    INFO  valid result: 
+hit@1 : 0.0089    hit@5 : 0.0639    hit@10 : 0.0998    hit@20 : 0.1451    ndcg@1 : 0.0089    ndcg@5 : 0.0363    ndcg@10 : 0.0479    ndcg@20 : 0.0593    mrr@1 : 0.0089    mrr@5 : 0.0273    mrr@10 : 0.0321    mrr@20 : 0.0352
+12 Feb 17:54    INFO  epoch 32 training [time: 51.64s, train loss: 6322.1706]
+12 Feb 17:54    INFO  epoch 32 evaluating [time: 0.23s, valid_score: 0.049500]
+12 Feb 17:54    INFO  valid result: 
+hit@1 : 0.0093    hit@5 : 0.0652    hit@10 : 0.1025    hit@20 : 0.1464    ndcg@1 : 0.0093    ndcg@5 : 0.0375    ndcg@10 : 0.0495    ndcg@20 : 0.0605    mrr@1 : 0.0093    mrr@5 : 0.0284    mrr@10 : 0.0334    mrr@20 : 0.0363
+12 Feb 17:54    INFO  Saving current: outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 17:55    INFO  epoch 33 training [time: 51.71s, train loss: 6312.6693]
+12 Feb 17:55    INFO  epoch 33 evaluating [time: 0.22s, valid_score: 0.048700]
+12 Feb 17:55    INFO  valid result: 
+hit@1 : 0.009    hit@5 : 0.0638    hit@10 : 0.101    hit@20 : 0.1447    ndcg@1 : 0.009    ndcg@5 : 0.0366    ndcg@10 : 0.0487    ndcg@20 : 0.0597    mrr@1 : 0.009    mrr@5 : 0.0277    mrr@10 : 0.0327    mrr@20 : 0.0357
+12 Feb 17:55    INFO  epoch 34 training [time: 51.72s, train loss: 6305.6324]
+12 Feb 17:55    INFO  epoch 34 evaluating [time: 0.23s, valid_score: 0.048500]
+12 Feb 17:55    INFO  valid result: 
+hit@1 : 0.0091    hit@5 : 0.0634    hit@10 : 0.1012    hit@20 : 0.1449    ndcg@1 : 0.0091    ndcg@5 : 0.0362    ndcg@10 : 0.0485    ndcg@20 : 0.0595    mrr@1 : 0.0091    mrr@5 : 0.0274    mrr@10 : 0.0324    mrr@20 : 0.0354
+12 Feb 17:56    INFO  epoch 35 training [time: 51.68s, train loss: 6292.3034]
+12 Feb 17:56    INFO  epoch 35 evaluating [time: 0.22s, valid_score: 0.049200]
+12 Feb 17:56    INFO  valid result: 
+hit@1 : 0.0097    hit@5 : 0.0653    hit@10 : 0.1014    hit@20 : 0.146    ndcg@1 : 0.0097    ndcg@5 : 0.0375    ndcg@10 : 0.0492    ndcg@20 : 0.0604    mrr@1 : 0.0097    mrr@5 : 0.0284    mrr@10 : 0.0332    mrr@20 : 0.0363
+12 Feb 17:57    INFO  epoch 36 training [time: 51.78s, train loss: 6280.9190]
+12 Feb 17:57    INFO  epoch 36 evaluating [time: 0.23s, valid_score: 0.049200]
+12 Feb 17:57    INFO  valid result: 
+hit@1 : 0.0099    hit@5 : 0.0641    hit@10 : 0.1015    hit@20 : 0.1442    ndcg@1 : 0.0099    ndcg@5 : 0.0371    ndcg@10 : 0.0492    ndcg@20 : 0.06    mrr@1 : 0.0099    mrr@5 : 0.0283    mrr@10 : 0.0333    mrr@20 : 0.0362
+12 Feb 17:58    INFO  epoch 37 training [time: 51.77s, train loss: 6269.9032]
+12 Feb 17:58    INFO  epoch 37 evaluating [time: 0.23s, valid_score: 0.047400]
+12 Feb 17:58    INFO  valid result: 
+hit@1 : 0.0082    hit@5 : 0.0624    hit@10 : 0.1003    hit@20 : 0.1457    ndcg@1 : 0.0082    ndcg@5 : 0.0351    ndcg@10 : 0.0474    ndcg@20 : 0.0588    mrr@1 : 0.0082    mrr@5 : 0.0262    mrr@10 : 0.0312    mrr@20 : 0.0344
+12 Feb 17:59    INFO  epoch 38 training [time: 51.72s, train loss: 6268.7311]
+12 Feb 17:59    INFO  epoch 38 evaluating [time: 0.22s, valid_score: 0.048700]
+12 Feb 17:59    INFO  valid result: 
+hit@1 : 0.0097    hit@5 : 0.0634    hit@10 : 0.1007    hit@20 : 0.1452    ndcg@1 : 0.0097    ndcg@5 : 0.0366    ndcg@10 : 0.0487    ndcg@20 : 0.0599    mrr@1 : 0.0097    mrr@5 : 0.0279    mrr@10 : 0.0328    mrr@20 : 0.0359
+12 Feb 18:00    INFO  epoch 39 training [time: 51.81s, train loss: 6254.7526]
+12 Feb 18:00    INFO  epoch 39 evaluating [time: 0.23s, valid_score: 0.048200]
+12 Feb 18:00    INFO  valid result: 
+hit@1 : 0.0096    hit@5 : 0.0629    hit@10 : 0.1003    hit@20 : 0.1457    ndcg@1 : 0.0096    ndcg@5 : 0.0362    ndcg@10 : 0.0482    ndcg@20 : 0.0597    mrr@1 : 0.0096    mrr@5 : 0.0274    mrr@10 : 0.0324    mrr@20 : 0.0356
+12 Feb 18:01    INFO  epoch 40 training [time: 51.80s, train loss: 6249.8586]
+12 Feb 18:01    INFO  epoch 40 evaluating [time: 0.22s, valid_score: 0.048800]
+12 Feb 18:01    INFO  valid result: 
+hit@1 : 0.0095    hit@5 : 0.0638    hit@10 : 0.1016    hit@20 : 0.1468    ndcg@1 : 0.0095    ndcg@5 : 0.0366    ndcg@10 : 0.0488    ndcg@20 : 0.0602    mrr@1 : 0.0095    mrr@5 : 0.0277    mrr@10 : 0.0327    mrr@20 : 0.0358
+12 Feb 18:01    INFO  epoch 41 training [time: 51.83s, train loss: 6247.9566]
+12 Feb 18:01    INFO  epoch 41 evaluating [time: 0.23s, valid_score: 0.048600]
+12 Feb 18:01    INFO  valid result: 
+hit@1 : 0.0094    hit@5 : 0.0635    hit@10 : 0.1007    hit@20 : 0.1443    ndcg@1 : 0.0094    ndcg@5 : 0.0366    ndcg@10 : 0.0486    ndcg@20 : 0.0595    mrr@1 : 0.0094    mrr@5 : 0.0278    mrr@10 : 0.0327    mrr@20 : 0.0357
+12 Feb 18:02    INFO  epoch 42 training [time: 51.75s, train loss: 6230.9958]
+12 Feb 18:02    INFO  epoch 42 evaluating [time: 0.22s, valid_score: 0.048900]
+12 Feb 18:02    INFO  valid result: 
+hit@1 : 0.0099    hit@5 : 0.0629    hit@10 : 0.1017    hit@20 : 0.147    ndcg@1 : 0.0099    ndcg@5 : 0.0364    ndcg@10 : 0.0489    ndcg@20 : 0.0603    mrr@1 : 0.0099    mrr@5 : 0.0278    mrr@10 : 0.0329    mrr@20 : 0.036
+12 Feb 18:03    INFO  epoch 43 training [time: 51.73s, train loss: 6231.5943]
+12 Feb 18:03    INFO  epoch 43 evaluating [time: 0.23s, valid_score: 0.047900]
+12 Feb 18:03    INFO  valid result: 
+hit@1 : 0.0094    hit@5 : 0.0635    hit@10 : 0.1    hit@20 : 0.1455    ndcg@1 : 0.0094    ndcg@5 : 0.0362    ndcg@10 : 0.0479    ndcg@20 : 0.0594    mrr@1 : 0.0094    mrr@5 : 0.0273    mrr@10 : 0.0321    mrr@20 : 0.0352
+12 Feb 18:03    INFO  Finished training, best eval result in epoch 32
+12 Feb 18:03    INFO  Loading model structure and parameters from outputs/wearec_beauty/WEARec-Feb-12-2026_17-25-45.pth
+12 Feb 18:03    INFO  The running environment of this training is as follows:
++-------------+------------------+
+| Environment |      Usage       |
++=============+==================+
+| CPU         |      1.60 %      |
++-------------+------------------+
+| GPU         |  2.11 G/79.44 G  |
++-------------+------------------+
+| Memory      | 1.57 G/2015.66 G |
++-------------+------------------+
+12 Feb 18:03    INFO  best valid : OrderedDict([('hit@1', 0.0093), ('hit@5', 0.0652), ('hit@10', 0.1025), ('hit@20', 0.1464), ('ndcg@1', 0.0093), ('ndcg@5', 0.0375), ('ndcg@10', 0.0495), ('ndcg@20', 0.0605), ('mrr@1', 0.0093), ('mrr@5', 0.0284), ('mrr@10', 0.0334), ('mrr@20', 0.0363)])
+12 Feb 18:03    INFO  test result: OrderedDict([('hit@1', 0.0083), ('hit@5', 0.0504), ('hit@10', 0.0814), ('hit@20', 0.1192), ('ndcg@1', 0.0083), ('ndcg@5', 0.0295), ('ndcg@10', 0.0395), ('ndcg@20', 0.0491), ('mrr@1', 0.0083), ('mrr@5', 0.0227), ('mrr@10', 0.0268), ('mrr@20', 0.0294)])
+Job completed.
+
+======================================================================================
+                  Resource Usage on 2026-02-12 18:03:48:
+   Job Id:             160753786.gadi-pbs
+   Project:            up63
+   Exit Status:        0
+   Service Units:      46.86
+   NCPUs Requested:    16                  CPU Time Used: 00:38:18        
+   Memory Requested:   16.0GB                Memory Used: 1.63GB          
+   NGPUs Requested:    1                 GPU Utilisation: 17%             
+                                         GPU Memory Used: 2.62GB          
+   Walltime Requested: 04:00:00            Walltime Used: 00:39:03        
+   JobFS Requested:    100.0MB                JobFS Used: 5.03KB          
+======================================================================================

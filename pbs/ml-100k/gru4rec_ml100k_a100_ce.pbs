@@ -1,0 +1,33 @@
+#!/bin/bash
+#PBS -P up63
+#PBS -q dgxa100
+#PBS -l ncpus=16
+#PBS -l mem=16GB
+#PBS -l ngpus=1
+#PBS -l walltime=04:00:00
+#PBS -l storage=scratch/up63+gdata/up63
+#PBS -l wd
+#PBS -j oe
+#PBS -N gru4rec_ml100k_a100_ce
+
+# GRU4Rec on ML-100K (benchmark). Submit from repo root: qsub pbs/ml-100k/gru4rec_ml100k_a100_ce.pbs
+
+set -e
+cd "$PBS_O_WORKDIR"
+
+echo "=== hostname ==="
+hostname
+echo "=== PBS_JOBID ==="
+echo "$PBS_JOBID"
+
+module purge
+module load cuda/12.9.0
+
+source /scratch/up63/kd6504/venvs/hopper-cu124/bin/activate
+mkdir -p log/GRU4Rec
+echo "$(date '+%Y-%m-%d %H:%M:%S')" > "log/GRU4Rec/.job_${PBS_JOBID}.started"
+
+LIVE_LOG="gru4rec_ml100k_live_${PBS_JOBID}.log"
+python -u RecBole/run_recbole.py -m GRU4Rec -d ml-100k --config_files configs/ml-100k/ml100k_GRU4Rec.yaml 2>&1 | tee "${LIVE_LOG}"
+
+echo "Job completed."

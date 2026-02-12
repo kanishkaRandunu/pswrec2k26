@@ -1,0 +1,17 @@
+# TRM4RecPos model defaults (TRM with learned position embeddings)
+# use_rope: true = learned pos + RoPE; false = learned pos only
+# use_full_backprop: true = full BP; false = gradient-saving trick
+
+trm_steps: 4
+trm_blocks_per_step: 1
+use_rope: true
+use_full_backprop: false
+expansion: 4.0
+rope_theta: 10000.0
+rms_norm_eps: 1e-5
+check_item_id_range: false
+
+hidden_size: 64
+n_heads: 2
+initializer_range: 0.02
+loss_type: 'CE'

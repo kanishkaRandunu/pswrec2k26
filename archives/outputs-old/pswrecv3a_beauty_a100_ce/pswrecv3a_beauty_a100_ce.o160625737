@@ -1,0 +1,411 @@
+=== hostname ===
+gadi-dgx-a100-0001.gadi.nci.org.au
+=== PBS_JOBID ===
+160625737.gadi-pbs
+command line args [-m pswrecv3 -d amazon-beauty --config_files configs/beauty/beauty_pswrecv3a_a100_ce.yaml] will not be used in RecBole
+11 Feb 09:25    INFO  ['RecBole/run_recbole.py', '-m', 'pswrecv3', '-d', 'amazon-beauty', '--config_files', 'configs/beauty/beauty_pswrecv3a_a100_ce.yaml']
+11 Feb 09:25    INFO  
+General Hyper Parameters:
+gpu_id = 0
+use_gpu = True
+seed = 2026
+state = INFO
+reproducibility = True
+data_path = /scratch/up63/kd6504/recbole_datasets/amazon-beauty
+checkpoint_dir = outputs/pswrecv3a_beauty_a100_ce
+show_progress = False
+save_dataset = False
+dataset_save_path = None
+save_dataloaders = False
+dataloaders_save_path = None
+log_wandb = False
+
+Training Hyper Parameters:
+epochs = 200
+train_batch_size = 128
+learner = adam
+learning_rate = 0.001
+train_neg_sample_args = {'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}
+eval_step = 1
+stopping_step = 10
+clip_grad_norm = None
+weight_decay = 0.0
+loss_decimal_place = 4
+
+Evaluation Hyper Parameters:
+eval_args = {'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}
+repeatable = True
+metrics = ['Hit', 'NDCG', 'MRR', 'Recall']
+topk = [10]
+valid_metric = NDCG@10
+valid_metric_bigger = True
+eval_batch_size = 4096
+metric_decimal_place = 4
+
+Dataset Hyper Parameters:
+field_separator = 	
+seq_separator =  
+USER_ID_FIELD = user_id
+ITEM_ID_FIELD = item_id
+RATING_FIELD = rating
+TIME_FIELD = timestamp
+seq_len = None
+LABEL_FIELD = label
+threshold = None
+NEG_PREFIX = neg_
+load_col = {'inter': ['user_id', 'item_id', 'rating', 'timestamp']}
+unload_col = None
+unused_col = {'inter': ['rating']}
+additional_feat_suffix = None
+rm_dup_inter = None
+val_interval = None
+filter_inter_by_user_or_item = True
+user_inter_num_interval = [5,inf)
+item_inter_num_interval = [5,inf)
+alias_of_user_id = None
+alias_of_item_id = None
+alias_of_entity_id = None
+alias_of_relation_id = None
+preload_weight = None
+normalize_field = None
+normalize_all = None
+ITEM_LIST_LENGTH_FIELD = item_length
+LIST_SUFFIX = _list
+MAX_ITEM_LIST_LENGTH = 50
+POSITION_FIELD = position_id
+HEAD_ENTITY_ID_FIELD = head_id
+TAIL_ENTITY_ID_FIELD = tail_id
+RELATION_ID_FIELD = relation_id
+ENTITY_ID_FIELD = entity_id
+benchmark_filename = None
+
+Other Hyper Parameters: 
+worker = 0
+wandb_project = recbole
+shuffle = True
+require_pow = False
+enable_amp = False
+enable_scaler = False
+transform = None
+n_layers = 2
+n_heads = 2
+hidden_size = 64
+inner_size = 256
+hidden_dropout_prob = 0.3
+attn_dropout_prob = 0.5
+hidden_act = gelu
+layer_norm_eps = 1e-12
+initializer_range = 0.02
+loss_type = CE
+n_bands = 4
+band_kernel_sizes = [3, 7, 15, 31]
+band_dilations = [1, 2, 4, 8]
+phase_bias_scale = 0.2
+phase_aux = True
+phase_aux_weight = 0.001
+numerical_features = []
+discretization = None
+kg_reverse_r = False
+entity_kg_num_interval = [0,inf)
+relation_kg_num_interval = [0,inf)
+MODEL_TYPE = ModelType.SEQUENTIAL
+MODEL_INPUT_TYPE = InputType.POINTWISE
+eval_type = EvaluatorType.RANKING
+single_spec = True
+local_rank = 0
+device = cuda
+valid_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+test_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+
+
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:648: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=0, inplace=True)
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:650: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=feat[field].mean(), inplace=True)
+11 Feb 09:25    INFO  amazon-beauty
+The number of users: 22364
+Average actions of users: 8.876358270357287
+The number of items: 12102
+Average actions of items: 16.403768283612923
+The number of inters: 198502
+The sparsity of the dataset: 99.92665707018277%
+Remain Fields: ['user_id', 'item_id', 'rating', 'timestamp']
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:2202: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:203.)
+  new_data[k] = torch.LongTensor(value)
+11 Feb 09:25    INFO  [Training]: train_batch_size = [128] train_neg_sample_args: [{'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}]
+11 Feb 09:25    INFO  [Evaluation]: eval_batch_size = [4096] eval_args: [{'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}]
+11 Feb 09:25    INFO  pswrecv3(
+  (item_embedding): Embedding(12102, 64, padding_idx=0)
+  (position_embedding): Embedding(50, 64)
+  (phase_filter): LocalPhaseFilterBankV3(
+    (real_convs): ModuleList(
+      (0): Conv1d(64, 64, kernel_size=(3,), stride=(1,), groups=64, bias=False)
+      (1): Conv1d(64, 64, kernel_size=(7,), stride=(1,), dilation=(2,), groups=64, bias=False)
+      (2): Conv1d(64, 64, kernel_size=(15,), stride=(1,), dilation=(4,), groups=64, bias=False)
+      (3): Conv1d(64, 64, kernel_size=(31,), stride=(1,), dilation=(8,), groups=64, bias=False)
+    )
+    (imag_convs): ModuleList(
+      (0): Conv1d(64, 64, kernel_size=(3,), stride=(1,), groups=64, bias=False)
+      (1): Conv1d(64, 64, kernel_size=(7,), stride=(1,), dilation=(2,), groups=64, bias=False)
+      (2): Conv1d(64, 64, kernel_size=(15,), stride=(1,), dilation=(4,), groups=64, bias=False)
+      (3): Conv1d(64, 64, kernel_size=(31,), stride=(1,), dilation=(8,), groups=64, bias=False)
+    )
+  )
+  (encoder): PSWEncoderV3(
+    (layers): ModuleList(
+      (0-1): 2 x PSWBlockV3(
+        (attn): PhaseSyncAttentionV3(
+          (query): Linear(in_features=64, out_features=64, bias=True)
+          (key): Linear(in_features=64, out_features=64, bias=True)
+          (value): Linear(in_features=64, out_features=64, bias=True)
+          (attn_dropout): Dropout(p=0.5, inplace=False)
+          (out_proj): Linear(in_features=64, out_features=64, bias=True)
+          (out_dropout): Dropout(p=0.3, inplace=False)
+          (layer_norm): LayerNorm((64,), eps=1e-12, elementwise_affine=True)
+        )
+        (ffn): FeedForwardV3(
+          (dense_1): Linear(in_features=64, out_features=256, bias=True)
+          (dense_2): Linear(in_features=256, out_features=64, bias=True)
+          (layer_norm): LayerNorm((64,), eps=1e-12, elementwise_affine=True)
+          (dropout): Dropout(p=0.3, inplace=False)
+        )
+      )
+    )
+  )
+  (layer_norm): LayerNorm((64,), eps=1e-12, elementwise_affine=True)
+  (dropout): Dropout(p=0.3, inplace=False)
+  (loss_fct): CrossEntropyLoss()
+)
+Trainable parameters: 885012
+11 Feb 09:25    INFO  FLOPs: 5312064.0
+/home/572/kd6504/TRACT/RecBole/recbole/trainer/trainer.py:235: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = amp.GradScaler(enabled=self.enable_scaler)
+11 Feb 09:26    INFO  epoch 0 training [time: 72.62s, train loss: 8753.8543]
+11 Feb 09:26    INFO  epoch 0 evaluating [time: 0.36s, valid_score: 0.022400]
+11 Feb 09:26    INFO  valid result: 
+hit@10 : 0.0461    ndcg@10 : 0.0224    mrr@10 : 0.0153    recall@10 : 0.0461
+11 Feb 09:26    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 09:27    INFO  epoch 1 training [time: 72.46s, train loss: 7990.9594]
+11 Feb 09:27    INFO  epoch 1 evaluating [time: 0.31s, valid_score: 0.035900]
+11 Feb 09:27    INFO  valid result: 
+hit@10 : 0.0694    ndcg@10 : 0.0359    mrr@10 : 0.0258    recall@10 : 0.0694
+11 Feb 09:27    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 09:29    INFO  epoch 2 training [time: 72.39s, train loss: 7580.1187]
+11 Feb 09:29    INFO  epoch 2 evaluating [time: 0.31s, valid_score: 0.043600]
+11 Feb 09:29    INFO  valid result: 
+hit@10 : 0.0863    ndcg@10 : 0.0436    mrr@10 : 0.0305    recall@10 : 0.0863
+11 Feb 09:29    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 09:30    INFO  epoch 3 training [time: 72.39s, train loss: 7236.3527]
+11 Feb 09:30    INFO  epoch 3 evaluating [time: 0.31s, valid_score: 0.046200]
+11 Feb 09:30    INFO  valid result: 
+hit@10 : 0.0936    ndcg@10 : 0.0462    mrr@10 : 0.0318    recall@10 : 0.0936
+11 Feb 09:30    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 09:31    INFO  epoch 4 training [time: 72.42s, train loss: 6981.3291]
+11 Feb 09:31    INFO  epoch 4 evaluating [time: 0.31s, valid_score: 0.048600]
+11 Feb 09:31    INFO  valid result: 
+hit@10 : 0.0983    ndcg@10 : 0.0486    mrr@10 : 0.0333    recall@10 : 0.0983
+11 Feb 09:31    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 09:32    INFO  epoch 5 training [time: 72.40s, train loss: 6805.0722]
+11 Feb 09:32    INFO  epoch 5 evaluating [time: 0.30s, valid_score: 0.048100]
+11 Feb 09:32    INFO  valid result: 
+hit@10 : 0.0973    ndcg@10 : 0.0481    mrr@10 : 0.033    recall@10 : 0.0973
+11 Feb 09:33    INFO  epoch 6 training [time: 72.43s, train loss: 6665.7834]
+11 Feb 09:33    INFO  epoch 6 evaluating [time: 0.30s, valid_score: 0.048800]
+11 Feb 09:33    INFO  valid result: 
+hit@10 : 0.0985    ndcg@10 : 0.0488    mrr@10 : 0.0335    recall@10 : 0.0985
+11 Feb 09:33    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 09:35    INFO  epoch 7 training [time: 72.48s, train loss: 6573.4435]
+11 Feb 09:35    INFO  epoch 7 evaluating [time: 0.32s, valid_score: 0.049300]
+11 Feb 09:35    INFO  valid result: 
+hit@10 : 0.0988    ndcg@10 : 0.0493    mrr@10 : 0.0341    recall@10 : 0.0988
+11 Feb 09:35    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 09:36    INFO  epoch 8 training [time: 72.46s, train loss: 6492.7702]
+11 Feb 09:36    INFO  epoch 8 evaluating [time: 0.30s, valid_score: 0.049900]
+11 Feb 09:36    INFO  valid result: 
+hit@10 : 0.1004    ndcg@10 : 0.0499    mrr@10 : 0.0345    recall@10 : 0.1004
+11 Feb 09:36    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 09:37    INFO  epoch 9 training [time: 72.52s, train loss: 6429.7810]
+11 Feb 09:37    INFO  epoch 9 evaluating [time: 0.32s, valid_score: 0.050000]
+11 Feb 09:37    INFO  valid result: 
+hit@10 : 0.1007    ndcg@10 : 0.05    mrr@10 : 0.0345    recall@10 : 0.1007
+11 Feb 09:37    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 09:38    INFO  epoch 10 training [time: 72.47s, train loss: 6373.4963]
+11 Feb 09:38    INFO  epoch 10 evaluating [time: 0.31s, valid_score: 0.050000]
+11 Feb 09:38    INFO  valid result: 
+hit@10 : 0.1004    ndcg@10 : 0.05    mrr@10 : 0.0345    recall@10 : 0.1004
+11 Feb 09:38    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 09:40    INFO  epoch 11 training [time: 72.46s, train loss: 6322.9397]
+11 Feb 09:40    INFO  epoch 11 evaluating [time: 0.32s, valid_score: 0.050500]
+11 Feb 09:40    INFO  valid result: 
+hit@10 : 0.1004    ndcg@10 : 0.0505    mrr@10 : 0.0351    recall@10 : 0.1004
+11 Feb 09:40    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 09:41    INFO  epoch 12 training [time: 72.49s, train loss: 6281.9208]
+11 Feb 09:41    INFO  epoch 12 evaluating [time: 0.31s, valid_score: 0.049800]
+11 Feb 09:41    INFO  valid result: 
+hit@10 : 0.0995    ndcg@10 : 0.0498    mrr@10 : 0.0346    recall@10 : 0.0995
+11 Feb 09:42    INFO  epoch 13 training [time: 72.43s, train loss: 6241.4462]
+11 Feb 09:42    INFO  epoch 13 evaluating [time: 0.31s, valid_score: 0.049900]
+11 Feb 09:42    INFO  valid result: 
+hit@10 : 0.0994    ndcg@10 : 0.0499    mrr@10 : 0.0347    recall@10 : 0.0994
+11 Feb 09:43    INFO  epoch 14 training [time: 72.48s, train loss: 6205.6054]
+11 Feb 09:43    INFO  epoch 14 evaluating [time: 0.31s, valid_score: 0.049700]
+11 Feb 09:43    INFO  valid result: 
+hit@10 : 0.0987    ndcg@10 : 0.0497    mrr@10 : 0.0347    recall@10 : 0.0987
+11 Feb 09:44    INFO  epoch 15 training [time: 72.55s, train loss: 6175.7610]
+11 Feb 09:44    INFO  epoch 15 evaluating [time: 0.31s, valid_score: 0.049400]
+11 Feb 09:44    INFO  valid result: 
+hit@10 : 0.0987    ndcg@10 : 0.0494    mrr@10 : 0.0343    recall@10 : 0.0987
+11 Feb 09:46    INFO  epoch 16 training [time: 72.70s, train loss: 6146.4530]
+11 Feb 09:46    INFO  epoch 16 evaluating [time: 0.31s, valid_score: 0.050200]
+11 Feb 09:46    INFO  valid result: 
+hit@10 : 0.0994    ndcg@10 : 0.0502    mrr@10 : 0.0351    recall@10 : 0.0994
+11 Feb 09:47    INFO  epoch 17 training [time: 72.78s, train loss: 6116.0998]
+11 Feb 09:47    INFO  epoch 17 evaluating [time: 0.31s, valid_score: 0.050200]
+11 Feb 09:47    INFO  valid result: 
+hit@10 : 0.099    ndcg@10 : 0.0502    mrr@10 : 0.0352    recall@10 : 0.099
+11 Feb 09:48    INFO  epoch 18 training [time: 72.63s, train loss: 6087.3236]
+11 Feb 09:48    INFO  epoch 18 evaluating [time: 0.31s, valid_score: 0.049900]
+11 Feb 09:48    INFO  valid result: 
+hit@10 : 0.0959    ndcg@10 : 0.0499    mrr@10 : 0.0358    recall@10 : 0.0959
+11 Feb 09:49    INFO  epoch 19 training [time: 72.69s, train loss: 6063.1565]
+11 Feb 09:49    INFO  epoch 19 evaluating [time: 0.31s, valid_score: 0.049700]
+11 Feb 09:49    INFO  valid result: 
+hit@10 : 0.0974    ndcg@10 : 0.0497    mrr@10 : 0.0351    recall@10 : 0.0974
+11 Feb 09:50    INFO  epoch 20 training [time: 72.50s, train loss: 6038.9926]
+11 Feb 09:50    INFO  epoch 20 evaluating [time: 0.31s, valid_score: 0.050800]
+11 Feb 09:50    INFO  valid result: 
+hit@10 : 0.0986    ndcg@10 : 0.0508    mrr@10 : 0.0361    recall@10 : 0.0986
+11 Feb 09:50    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 09:52    INFO  epoch 21 training [time: 72.62s, train loss: 6016.9582]
+11 Feb 09:52    INFO  epoch 21 evaluating [time: 0.32s, valid_score: 0.050300]
+11 Feb 09:52    INFO  valid result: 
+hit@10 : 0.0976    ndcg@10 : 0.0503    mrr@10 : 0.0357    recall@10 : 0.0976
+11 Feb 09:53    INFO  epoch 22 training [time: 72.63s, train loss: 5996.8399]
+11 Feb 09:53    INFO  epoch 22 evaluating [time: 0.32s, valid_score: 0.050700]
+11 Feb 09:53    INFO  valid result: 
+hit@10 : 0.0985    ndcg@10 : 0.0507    mrr@10 : 0.0359    recall@10 : 0.0985
+11 Feb 09:54    INFO  epoch 23 training [time: 72.58s, train loss: 5981.9824]
+11 Feb 09:54    INFO  epoch 23 evaluating [time: 0.30s, valid_score: 0.048900]
+11 Feb 09:54    INFO  valid result: 
+hit@10 : 0.0949    ndcg@10 : 0.0489    mrr@10 : 0.0348    recall@10 : 0.0949
+11 Feb 09:55    INFO  epoch 24 training [time: 72.43s, train loss: 5962.0393]
+11 Feb 09:55    INFO  epoch 24 evaluating [time: 0.30s, valid_score: 0.050300]
+11 Feb 09:55    INFO  valid result: 
+hit@10 : 0.0972    ndcg@10 : 0.0503    mrr@10 : 0.0358    recall@10 : 0.0972
+11 Feb 09:57    INFO  epoch 25 training [time: 72.49s, train loss: 5944.1944]
+11 Feb 09:57    INFO  epoch 25 evaluating [time: 0.32s, valid_score: 0.049600]
+11 Feb 09:57    INFO  valid result: 
+hit@10 : 0.0966    ndcg@10 : 0.0496    mrr@10 : 0.0351    recall@10 : 0.0966
+11 Feb 09:58    INFO  epoch 26 training [time: 72.41s, train loss: 5926.5834]
+11 Feb 09:58    INFO  epoch 26 evaluating [time: 0.31s, valid_score: 0.050200]
+11 Feb 09:58    INFO  valid result: 
+hit@10 : 0.0961    ndcg@10 : 0.0502    mrr@10 : 0.0361    recall@10 : 0.0961
+11 Feb 09:59    INFO  epoch 27 training [time: 72.45s, train loss: 5912.0532]
+11 Feb 09:59    INFO  epoch 27 evaluating [time: 0.30s, valid_score: 0.051400]
+11 Feb 09:59    INFO  valid result: 
+hit@10 : 0.0985    ndcg@10 : 0.0514    mrr@10 : 0.037    recall@10 : 0.0985
+11 Feb 09:59    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 10:00    INFO  epoch 28 training [time: 72.48s, train loss: 5896.9017]
+11 Feb 10:00    INFO  epoch 28 evaluating [time: 0.31s, valid_score: 0.050000]
+11 Feb 10:00    INFO  valid result: 
+hit@10 : 0.0949    ndcg@10 : 0.05    mrr@10 : 0.0361    recall@10 : 0.0949
+11 Feb 10:01    INFO  epoch 29 training [time: 72.51s, train loss: 5879.6097]
+11 Feb 10:01    INFO  epoch 29 evaluating [time: 0.31s, valid_score: 0.049900]
+11 Feb 10:01    INFO  valid result: 
+hit@10 : 0.096    ndcg@10 : 0.0499    mrr@10 : 0.0357    recall@10 : 0.096
+11 Feb 10:03    INFO  epoch 30 training [time: 72.51s, train loss: 5870.2700]
+11 Feb 10:03    INFO  epoch 30 evaluating [time: 0.31s, valid_score: 0.050900]
+11 Feb 10:03    INFO  valid result: 
+hit@10 : 0.097    ndcg@10 : 0.0509    mrr@10 : 0.0368    recall@10 : 0.097
+11 Feb 10:04    INFO  epoch 31 training [time: 72.45s, train loss: 5857.2409]
+11 Feb 10:04    INFO  epoch 31 evaluating [time: 0.32s, valid_score: 0.050700]
+11 Feb 10:04    INFO  valid result: 
+hit@10 : 0.0973    ndcg@10 : 0.0507    mrr@10 : 0.0364    recall@10 : 0.0973
+11 Feb 10:05    INFO  epoch 32 training [time: 72.39s, train loss: 5839.9096]
+11 Feb 10:05    INFO  epoch 32 evaluating [time: 0.30s, valid_score: 0.052200]
+11 Feb 10:05    INFO  valid result: 
+hit@10 : 0.0984    ndcg@10 : 0.0522    mrr@10 : 0.038    recall@10 : 0.0984
+11 Feb 10:05    INFO  Saving current: outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 10:06    INFO  epoch 33 training [time: 72.45s, train loss: 5829.7090]
+11 Feb 10:06    INFO  epoch 33 evaluating [time: 0.32s, valid_score: 0.051100]
+11 Feb 10:06    INFO  valid result: 
+hit@10 : 0.098    ndcg@10 : 0.0511    mrr@10 : 0.0368    recall@10 : 0.098
+11 Feb 10:07    INFO  epoch 34 training [time: 72.41s, train loss: 5814.7361]
+11 Feb 10:07    INFO  epoch 34 evaluating [time: 0.32s, valid_score: 0.050400]
+11 Feb 10:07    INFO  valid result: 
+hit@10 : 0.0965    ndcg@10 : 0.0504    mrr@10 : 0.0362    recall@10 : 0.0965
+11 Feb 10:09    INFO  epoch 35 training [time: 72.47s, train loss: 5804.3646]
+11 Feb 10:09    INFO  epoch 35 evaluating [time: 0.32s, valid_score: 0.051600]
+11 Feb 10:09    INFO  valid result: 
+hit@10 : 0.0986    ndcg@10 : 0.0516    mrr@10 : 0.0372    recall@10 : 0.0986
+11 Feb 10:10    INFO  epoch 36 training [time: 72.36s, train loss: 5793.1768]
+11 Feb 10:10    INFO  epoch 36 evaluating [time: 0.31s, valid_score: 0.050700]
+11 Feb 10:10    INFO  valid result: 
+hit@10 : 0.0951    ndcg@10 : 0.0507    mrr@10 : 0.037    recall@10 : 0.0951
+11 Feb 10:11    INFO  epoch 37 training [time: 72.47s, train loss: 5781.4173]
+11 Feb 10:11    INFO  epoch 37 evaluating [time: 0.31s, valid_score: 0.050000]
+11 Feb 10:11    INFO  valid result: 
+hit@10 : 0.0964    ndcg@10 : 0.05    mrr@10 : 0.0358    recall@10 : 0.0964
+11 Feb 10:12    INFO  epoch 38 training [time: 72.39s, train loss: 5769.9075]
+11 Feb 10:12    INFO  epoch 38 evaluating [time: 0.31s, valid_score: 0.049800]
+11 Feb 10:12    INFO  valid result: 
+hit@10 : 0.0948    ndcg@10 : 0.0498    mrr@10 : 0.036    recall@10 : 0.0948
+11 Feb 10:13    INFO  epoch 39 training [time: 72.43s, train loss: 5753.8652]
+11 Feb 10:14    INFO  epoch 39 evaluating [time: 0.31s, valid_score: 0.050400]
+11 Feb 10:14    INFO  valid result: 
+hit@10 : 0.0956    ndcg@10 : 0.0504    mrr@10 : 0.0365    recall@10 : 0.0956
+11 Feb 10:15    INFO  epoch 40 training [time: 72.47s, train loss: 5750.4909]
+11 Feb 10:15    INFO  epoch 40 evaluating [time: 0.31s, valid_score: 0.050800]
+11 Feb 10:15    INFO  valid result: 
+hit@10 : 0.0959    ndcg@10 : 0.0508    mrr@10 : 0.0369    recall@10 : 0.0959
+11 Feb 10:16    INFO  epoch 41 training [time: 72.49s, train loss: 5737.8206]
+11 Feb 10:16    INFO  epoch 41 evaluating [time: 0.32s, valid_score: 0.050600]
+11 Feb 10:16    INFO  valid result: 
+hit@10 : 0.0947    ndcg@10 : 0.0506    mrr@10 : 0.0371    recall@10 : 0.0947
+11 Feb 10:17    INFO  epoch 42 training [time: 72.53s, train loss: 5727.9320]
+11 Feb 10:17    INFO  epoch 42 evaluating [time: 0.31s, valid_score: 0.050700]
+11 Feb 10:17    INFO  valid result: 
+hit@10 : 0.0951    ndcg@10 : 0.0507    mrr@10 : 0.0372    recall@10 : 0.0951
+11 Feb 10:18    INFO  epoch 43 training [time: 72.51s, train loss: 5722.7153]
+11 Feb 10:18    INFO  epoch 43 evaluating [time: 0.31s, valid_score: 0.050000]
+11 Feb 10:18    INFO  valid result: 
+hit@10 : 0.0953    ndcg@10 : 0.05    mrr@10 : 0.0361    recall@10 : 0.0953
+11 Feb 10:18    INFO  Finished training, best eval result in epoch 32
+11 Feb 10:18    INFO  Loading model structure and parameters from outputs/pswrecv3a_beauty_a100_ce/pswrecv3-Feb-11-2026_09-25-24.pth
+11 Feb 10:18    INFO  The running environment of this training is as follows:
++-------------+------------------+
+| Environment |      Usage       |
++=============+==================+
+| CPU         |      3.00 %      |
++-------------+------------------+
+| GPU         |  2.47 G/79.44 G  |
++-------------+------------------+
+| Memory      | 1.57 G/2015.66 G |
++-------------+------------------+
+11 Feb 10:18    INFO  best valid : OrderedDict([('hit@10', 0.0984), ('ndcg@10', 0.0522), ('mrr@10', 0.038), ('recall@10', 0.0984)])
+11 Feb 10:18    INFO  test result: OrderedDict([('hit@10', 0.0742), ('ndcg@10', 0.0392), ('mrr@10', 0.0285), ('recall@10', 0.0742)])
+Job completed.
+
+======================================================================================
+                  Resource Usage on 2026-02-11 10:18:57:
+   Job Id:             160625737.gadi-pbs
+   Project:            up63
+   Exit Status:        0
+   Service Units:      64.80
+   NCPUs Requested:    16                  CPU Time Used: 00:53:51        
+   Memory Requested:   16.0GB                Memory Used: 1.44GB          
+   NGPUs Requested:    1                 GPU Utilisation: 18%             
+                                         GPU Memory Used: 2.97GB          
+   Walltime Requested: 06:00:00            Walltime Used: 00:54:00        
+   JobFS Requested:    100.0MB                JobFS Used: 5.03KB          
+======================================================================================

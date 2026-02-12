@@ -1,0 +1,23 @@
+# Dataset lock file for benchmark reproducibility.
+# If preprocessing or filtering changes, earlier runs become invalid. Freeze and version.
+#
+# See experiment/benchmarking_internal.md Section 7.
+
+amazon-beauty:
+  source: "Amazon Review Data (Beauty category). RecBole processed version."
+  reference: "Ni et al. / He & McAuley. Commonly used in RecBole benchmarks."
+  version: "RecBole processed (via url.yaml or RecSysDatasets)"
+  download_hash: null  # Set if available from RecBole/upstream
+
+  filtering:
+    user_inter_num_interval: "[5,inf)"
+    item_inter_num_interval: "[5,inf)"
+
+  counts_after_filtering:
+    users: 22364
+    items: 12102
+    interactions: 198502
+    sparsity: "99.93%"
+
+  verified_from: "SASRec run 160183476 (archives/results/results_old/benchmark_beauty.md)"
+  data_path: "/scratch/up63/kd6504/recbole_datasets"

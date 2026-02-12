@@ -1,0 +1,34 @@
+{
+  "amazon-beauty": {
+    "GRU4Rec": {
+      "loss_type": "CE",
+      "train_neg_sample_args": null,
+      "config": "configs/beauty/beauty_GRU4Rec.yaml"
+    },
+    "SASRec": {
+      "loss_type": "CE",
+      "train_neg_sample_args": null,
+      "config": "configs/beauty/beauty_SASRec.yaml"
+    },
+    "BERT4Rec": {
+      "loss_type": "CE",
+      "train_neg_sample_args": null,
+      "config": "configs/beauty/beauty_BERT4Rec.yaml"
+    },
+    "FEARec": {
+      "loss_type": "CE",
+      "train_neg_sample_args": null,
+      "config": "configs/beauty/beauty_FEARec.yaml"
+    },
+    "wearec": {
+      "loss_type": "CE",
+      "train_neg_sample_args": null,
+      "config": "configs/beauty/beauty_wearec.yaml"
+    },
+    "pswrecv4h": {
+      "loss_type": "CE",
+      "train_neg_sample_args": null,
+      "config": "configs/beauty/beauty_pswrecv4h.yaml"
+    }
+  }
+}

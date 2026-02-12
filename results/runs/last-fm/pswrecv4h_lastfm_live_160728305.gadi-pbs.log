@@ -1,0 +1,342 @@
+command line args [-m pswrecv4h -d lastfm --config_files configs/lastfm/lastfm_pswrecv4h.yaml] will not be used in RecBole
+12 Feb 13:14    INFO  ['RecBole/run_recbole.py', '-m', 'pswrecv4h', '-d', 'lastfm', '--config_files', 'configs/lastfm/lastfm_pswrecv4h.yaml']
+12 Feb 13:14    INFO  
+General Hyper Parameters:
+gpu_id = 0
+use_gpu = True
+seed = 2026
+state = INFO
+reproducibility = True
+data_path = /scratch/up63/kd6504/recbole_datasets/lastfm
+checkpoint_dir = outputs/pswrecv4h_lastfm
+show_progress = False
+save_dataset = False
+dataset_save_path = None
+save_dataloaders = False
+dataloaders_save_path = None
+log_wandb = False
+
+Training Hyper Parameters:
+epochs = 200
+train_batch_size = 128
+learner = adam
+learning_rate = 0.001
+train_neg_sample_args = {'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}
+eval_step = 1
+stopping_step = 10
+clip_grad_norm = None
+weight_decay = 0.0
+loss_decimal_place = 4
+
+Evaluation Hyper Parameters:
+eval_args = {'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}
+repeatable = True
+metrics = ['Hit', 'NDCG', 'MRR']
+topk = [1, 5, 10, 20]
+valid_metric = NDCG@10
+valid_metric_bigger = True
+eval_batch_size = 4096
+metric_decimal_place = 4
+
+Dataset Hyper Parameters:
+field_separator = 	
+seq_separator =  
+USER_ID_FIELD = user_id
+ITEM_ID_FIELD = artist_id
+RATING_FIELD = rating
+TIME_FIELD = timestamp
+seq_len = None
+LABEL_FIELD = label
+threshold = None
+NEG_PREFIX = neg_
+load_col = {'inter': ['user_id', 'artist_id', 'timestamp']}
+unload_col = None
+unused_col = None
+additional_feat_suffix = None
+rm_dup_inter = None
+val_interval = None
+filter_inter_by_user_or_item = True
+user_inter_num_interval = [5,inf)
+item_inter_num_interval = [5,inf)
+alias_of_user_id = None
+alias_of_item_id = None
+alias_of_entity_id = None
+alias_of_relation_id = None
+preload_weight = None
+normalize_field = None
+normalize_all = None
+ITEM_LIST_LENGTH_FIELD = item_length
+LIST_SUFFIX = _list
+MAX_ITEM_LIST_LENGTH = 50
+POSITION_FIELD = position_id
+HEAD_ENTITY_ID_FIELD = head_id
+TAIL_ENTITY_ID_FIELD = tail_id
+RELATION_ID_FIELD = relation_id
+ENTITY_ID_FIELD = entity_id
+benchmark_filename = None
+
+Other Hyper Parameters: 
+worker = 0
+wandb_project = recbole
+shuffle = True
+require_pow = False
+enable_amp = False
+enable_scaler = False
+transform = None
+numerical_features = []
+discretization = None
+kg_reverse_r = False
+entity_kg_num_interval = [0,inf)
+relation_kg_num_interval = [0,inf)
+MODEL_TYPE = ModelType.SEQUENTIAL
+loss_type = CE
+n_layers = 2
+n_heads = 2
+hidden_size = 64
+inner_size = 256
+hidden_dropout_prob = 0.5
+attn_dropout_prob = 0.5
+hidden_act = gelu
+layer_norm_eps = 1e-12
+initializer_range = 0.02
+n_bands = 4
+band_kernel_sizes = [3, 7, 15, 31]
+band_dilations = [1, 2, 4, 8]
+phase_bias_scale = 0.1
+phase_aux = True
+phase_aux_weight = 0.05
+MODEL_INPUT_TYPE = InputType.POINTWISE
+eval_type = EvaluatorType.RANKING
+single_spec = True
+local_rank = 0
+device = cuda
+valid_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+test_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+
+
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:648: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=0, inplace=True)
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:650: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=feat[field].mean(), inplace=True)
+12 Feb 13:14    INFO  lastfm
+The number of users: 1091
+Average actions of users: 48.21192660550459
+The number of items: 3647
+Average actions of items: 14.413329676357652
+The number of inters: 52551
+The sparsity of the dataset: 98.67925045182346%
+Remain Fields: ['user_id', 'artist_id', 'timestamp']
+/home/572/kd6504/TRACT/RecBole/recbole/data/dataset/dataset.py:2202: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:203.)
+  new_data[k] = torch.LongTensor(value)
+12 Feb 13:14    INFO  [Training]: train_batch_size = [128] train_neg_sample_args: [{'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}]
+12 Feb 13:14    INFO  [Evaluation]: eval_batch_size = [4096] eval_args: [{'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}]
+12 Feb 13:14    INFO  pswrecv4h(
+  (item_embedding): Embedding(3647, 64, padding_idx=0)
+  (position_embedding): Embedding(50, 64)
+  (phase_filter): LocalPhaseFilterBankV4H(
+    (real_convs): ModuleList(
+      (0): Conv1d(64, 64, kernel_size=(3,), stride=(1,), groups=64, bias=False)
+      (1): Conv1d(64, 64, kernel_size=(7,), stride=(1,), dilation=(2,), groups=64, bias=False)
+      (2): Conv1d(64, 64, kernel_size=(15,), stride=(1,), dilation=(4,), groups=64, bias=False)
+      (3): Conv1d(64, 64, kernel_size=(31,), stride=(1,), dilation=(8,), groups=64, bias=False)
+    )
+    (imag_convs): ModuleList(
+      (0): Conv1d(64, 64, kernel_size=(3,), stride=(1,), groups=64, bias=False)
+      (1): Conv1d(64, 64, kernel_size=(7,), stride=(1,), dilation=(2,), groups=64, bias=False)
+      (2): Conv1d(64, 64, kernel_size=(15,), stride=(1,), dilation=(4,), groups=64, bias=False)
+      (3): Conv1d(64, 64, kernel_size=(31,), stride=(1,), dilation=(8,), groups=64, bias=False)
+    )
+  )
+  (encoder): PSWEncoderV4H(
+    (layers): ModuleList(
+      (0-1): 2 x PSWBlockV4H(
+        (attn): PhaseSyncAttentionV4H(
+          (query): Linear(in_features=64, out_features=64, bias=True)
+          (key): Linear(in_features=64, out_features=64, bias=True)
+          (value): Linear(in_features=64, out_features=64, bias=True)
+          (attn_dropout): Dropout(p=0.5, inplace=False)
+          (out_proj): Linear(in_features=64, out_features=64, bias=True)
+          (out_dropout): Dropout(p=0.5, inplace=False)
+          (layer_norm): LayerNorm((64,), eps=1e-12, elementwise_affine=True)
+        )
+        (ffn): FeedForwardV4H(
+          (dense_1): Linear(in_features=64, out_features=256, bias=True)
+          (dense_2): Linear(in_features=256, out_features=64, bias=True)
+          (layer_norm): LayerNorm((64,), eps=1e-12, elementwise_affine=True)
+          (dropout): Dropout(p=0.5, inplace=False)
+        )
+      )
+    )
+  )
+  (layer_norm): LayerNorm((64,), eps=1e-12, elementwise_affine=True)
+  (dropout): Dropout(p=0.5, inplace=False)
+  (loss_fct): CrossEntropyLoss()
+)
+Trainable parameters: 343892
+12 Feb 13:14    INFO  FLOPs: 5312064.0
+/home/572/kd6504/TRACT/RecBole/recbole/trainer/trainer.py:235: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = amp.GradScaler(enabled=self.enable_scaler)
+12 Feb 13:15    INFO  epoch 0 training [time: 26.21s, train loss: 2997.1783]
+12 Feb 13:15    INFO  epoch 0 evaluating [time: 0.06s, valid_score: 0.016300]
+12 Feb 13:15    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.0202    hit@10 : 0.0294    hit@20 : 0.0495    ndcg@1 : 0.0064    ndcg@5 : 0.0133    ndcg@10 : 0.0163    ndcg@20 : 0.0214    mrr@1 : 0.0064    mrr@5 : 0.011    mrr@10 : 0.0123    mrr@20 : 0.0137
+12 Feb 13:15    INFO  Saving current: outputs/pswrecv4h_lastfm/pswrecv4h-Feb-12-2026_13-14-45.pth
+12 Feb 13:15    INFO  epoch 1 training [time: 25.84s, train loss: 2756.6186]
+12 Feb 13:15    INFO  epoch 1 evaluating [time: 0.02s, valid_score: 0.026900]
+12 Feb 13:15    INFO  valid result: 
+hit@1 : 0.0073    hit@5 : 0.0349    hit@10 : 0.0523    hit@20 : 0.0771    ndcg@1 : 0.0073    ndcg@5 : 0.0214    ndcg@10 : 0.0269    ndcg@20 : 0.0331    mrr@1 : 0.0073    mrr@5 : 0.017    mrr@10 : 0.0192    mrr@20 : 0.0209
+12 Feb 13:15    INFO  Saving current: outputs/pswrecv4h_lastfm/pswrecv4h-Feb-12-2026_13-14-45.pth
+12 Feb 13:16    INFO  epoch 2 training [time: 25.81s, train loss: 2576.7927]
+12 Feb 13:16    INFO  epoch 2 evaluating [time: 0.02s, valid_score: 0.035500]
+12 Feb 13:16    INFO  valid result: 
+hit@1 : 0.0119    hit@5 : 0.045    hit@10 : 0.0688    hit@20 : 0.0927    ndcg@1 : 0.0119    ndcg@5 : 0.0279    ndcg@10 : 0.0355    ndcg@20 : 0.0414    mrr@1 : 0.0119    mrr@5 : 0.0224    mrr@10 : 0.0255    mrr@20 : 0.027
+12 Feb 13:16    INFO  Saving current: outputs/pswrecv4h_lastfm/pswrecv4h-Feb-12-2026_13-14-45.pth
+12 Feb 13:16    INFO  epoch 3 training [time: 25.80s, train loss: 2445.8325]
+12 Feb 13:16    INFO  epoch 3 evaluating [time: 0.02s, valid_score: 0.033300]
+12 Feb 13:16    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.0394    hit@10 : 0.0716    hit@20 : 0.111    ndcg@1 : 0.0064    ndcg@5 : 0.0227    ndcg@10 : 0.0333    ndcg@20 : 0.0431    mrr@1 : 0.0064    mrr@5 : 0.0172    mrr@10 : 0.0217    mrr@20 : 0.0243
+12 Feb 13:16    INFO  epoch 4 training [time: 25.93s, train loss: 2359.3287]
+12 Feb 13:16    INFO  epoch 4 evaluating [time: 0.02s, valid_score: 0.035200]
+12 Feb 13:16    INFO  valid result: 
+hit@1 : 0.0101    hit@5 : 0.0376    hit@10 : 0.0716    hit@20 : 0.1083    ndcg@1 : 0.0101    ndcg@5 : 0.0243    ndcg@10 : 0.0352    ndcg@20 : 0.0444    mrr@1 : 0.0101    mrr@5 : 0.0199    mrr@10 : 0.0243    mrr@20 : 0.0268
+12 Feb 13:17    INFO  epoch 5 training [time: 25.86s, train loss: 2299.0064]
+12 Feb 13:17    INFO  epoch 5 evaluating [time: 0.02s, valid_score: 0.032700]
+12 Feb 13:17    INFO  valid result: 
+hit@1 : 0.0073    hit@5 : 0.0394    hit@10 : 0.067    hit@20 : 0.1101    ndcg@1 : 0.0073    ndcg@5 : 0.0239    ndcg@10 : 0.0327    ndcg@20 : 0.0436    mrr@1 : 0.0073    mrr@5 : 0.0188    mrr@10 : 0.0224    mrr@20 : 0.0254
+12 Feb 13:17    INFO  epoch 6 training [time: 26.19s, train loss: 2253.6978]
+12 Feb 13:17    INFO  epoch 6 evaluating [time: 0.02s, valid_score: 0.034500]
+12 Feb 13:17    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.045    hit@10 : 0.0725    hit@20 : 0.1138    ndcg@1 : 0.0064    ndcg@5 : 0.0258    ndcg@10 : 0.0345    ndcg@20 : 0.0448    mrr@1 : 0.0064    mrr@5 : 0.0194    mrr@10 : 0.023    mrr@20 : 0.0257
+12 Feb 13:18    INFO  epoch 7 training [time: 25.92s, train loss: 2222.4485]
+12 Feb 13:18    INFO  epoch 7 evaluating [time: 0.02s, valid_score: 0.033600]
+12 Feb 13:18    INFO  valid result: 
+hit@1 : 0.0046    hit@5 : 0.0413    hit@10 : 0.0752    hit@20 : 0.1147    ndcg@1 : 0.0046    ndcg@5 : 0.0226    ndcg@10 : 0.0336    ndcg@20 : 0.0437    mrr@1 : 0.0046    mrr@5 : 0.0165    mrr@10 : 0.0211    mrr@20 : 0.0239
+12 Feb 13:18    INFO  epoch 8 training [time: 25.88s, train loss: 2194.1289]
+12 Feb 13:18    INFO  epoch 8 evaluating [time: 0.02s, valid_score: 0.033800]
+12 Feb 13:18    INFO  valid result: 
+hit@1 : 0.0028    hit@5 : 0.0422    hit@10 : 0.0734    hit@20 : 0.1202    ndcg@1 : 0.0028    ndcg@5 : 0.0238    ndcg@10 : 0.0338    ndcg@20 : 0.0455    mrr@1 : 0.0028    mrr@5 : 0.0177    mrr@10 : 0.0218    mrr@20 : 0.0249
+12 Feb 13:19    INFO  epoch 9 training [time: 26.00s, train loss: 2176.0551]
+12 Feb 13:19    INFO  epoch 9 evaluating [time: 0.02s, valid_score: 0.035200]
+12 Feb 13:19    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.0422    hit@10 : 0.0761    hit@20 : 0.1183    ndcg@1 : 0.0064    ndcg@5 : 0.0243    ndcg@10 : 0.0352    ndcg@20 : 0.0459    mrr@1 : 0.0064    mrr@5 : 0.0184    mrr@10 : 0.0229    mrr@20 : 0.0258
+12 Feb 13:19    INFO  epoch 10 training [time: 25.92s, train loss: 2159.5749]
+12 Feb 13:19    INFO  epoch 10 evaluating [time: 0.02s, valid_score: 0.032700]
+12 Feb 13:19    INFO  valid result: 
+hit@1 : 0.0018    hit@5 : 0.0413    hit@10 : 0.0752    hit@20 : 0.1294    ndcg@1 : 0.0018    ndcg@5 : 0.0219    ndcg@10 : 0.0327    ndcg@20 : 0.0463    mrr@1 : 0.0018    mrr@5 : 0.0155    mrr@10 : 0.0199    mrr@20 : 0.0236
+12 Feb 13:19    INFO  epoch 11 training [time: 25.93s, train loss: 2141.4767]
+12 Feb 13:19    INFO  epoch 11 evaluating [time: 0.02s, valid_score: 0.033800]
+12 Feb 13:19    INFO  valid result: 
+hit@1 : 0.0073    hit@5 : 0.0404    hit@10 : 0.0706    hit@20 : 0.1229    ndcg@1 : 0.0073    ndcg@5 : 0.0243    ndcg@10 : 0.0338    ndcg@20 : 0.047    mrr@1 : 0.0073    mrr@5 : 0.019    mrr@10 : 0.0228    mrr@20 : 0.0264
+12 Feb 13:20    INFO  epoch 12 training [time: 25.86s, train loss: 2129.2401]
+12 Feb 13:20    INFO  epoch 12 evaluating [time: 0.02s, valid_score: 0.036300]
+12 Feb 13:20    INFO  valid result: 
+hit@1 : 0.0046    hit@5 : 0.0431    hit@10 : 0.0807    hit@20 : 0.1239    ndcg@1 : 0.0046    ndcg@5 : 0.0241    ndcg@10 : 0.0363    ndcg@20 : 0.0469    mrr@1 : 0.0046    mrr@5 : 0.0179    mrr@10 : 0.0229    mrr@20 : 0.0257
+12 Feb 13:20    INFO  Saving current: outputs/pswrecv4h_lastfm/pswrecv4h-Feb-12-2026_13-14-45.pth
+12 Feb 13:20    INFO  epoch 13 training [time: 25.92s, train loss: 2116.2697]
+12 Feb 13:20    INFO  epoch 13 evaluating [time: 0.02s, valid_score: 0.034600]
+12 Feb 13:20    INFO  valid result: 
+hit@1 : 0.0055    hit@5 : 0.044    hit@10 : 0.0743    hit@20 : 0.1229    ndcg@1 : 0.0055    ndcg@5 : 0.0248    ndcg@10 : 0.0346    ndcg@20 : 0.0469    mrr@1 : 0.0055    mrr@5 : 0.0186    mrr@10 : 0.0226    mrr@20 : 0.0259
+12 Feb 13:21    INFO  epoch 14 training [time: 25.87s, train loss: 2106.4477]
+12 Feb 13:21    INFO  epoch 14 evaluating [time: 0.02s, valid_score: 0.035600]
+12 Feb 13:21    INFO  valid result: 
+hit@1 : 0.0073    hit@5 : 0.0468    hit@10 : 0.0716    hit@20 : 0.1211    ndcg@1 : 0.0073    ndcg@5 : 0.0277    ndcg@10 : 0.0356    ndcg@20 : 0.0482    mrr@1 : 0.0073    mrr@5 : 0.0214    mrr@10 : 0.0246    mrr@20 : 0.0281
+12 Feb 13:21    INFO  epoch 15 training [time: 25.91s, train loss: 2096.9059]
+12 Feb 13:21    INFO  epoch 15 evaluating [time: 0.02s, valid_score: 0.036800]
+12 Feb 13:21    INFO  valid result: 
+hit@1 : 0.0055    hit@5 : 0.0422    hit@10 : 0.0789    hit@20 : 0.1229    ndcg@1 : 0.0055    ndcg@5 : 0.025    ndcg@10 : 0.0368    ndcg@20 : 0.0477    mrr@1 : 0.0055    mrr@5 : 0.0193    mrr@10 : 0.0241    mrr@20 : 0.027
+12 Feb 13:21    INFO  Saving current: outputs/pswrecv4h_lastfm/pswrecv4h-Feb-12-2026_13-14-45.pth
+12 Feb 13:22    INFO  epoch 16 training [time: 25.94s, train loss: 2092.5211]
+12 Feb 13:22    INFO  epoch 16 evaluating [time: 0.02s, valid_score: 0.034100]
+12 Feb 13:22    INFO  valid result: 
+hit@1 : 0.0037    hit@5 : 0.0459    hit@10 : 0.0734    hit@20 : 0.1312    ndcg@1 : 0.0037    ndcg@5 : 0.0253    ndcg@10 : 0.0341    ndcg@20 : 0.0485    mrr@1 : 0.0037    mrr@5 : 0.0185    mrr@10 : 0.0221    mrr@20 : 0.0259
+12 Feb 13:22    INFO  epoch 17 training [time: 25.87s, train loss: 2082.1370]
+12 Feb 13:22    INFO  epoch 17 evaluating [time: 0.02s, valid_score: 0.036300]
+12 Feb 13:22    INFO  valid result: 
+hit@1 : 0.0037    hit@5 : 0.0514    hit@10 : 0.078    hit@20 : 0.1294    ndcg@1 : 0.0037    ndcg@5 : 0.0277    ndcg@10 : 0.0363    ndcg@20 : 0.0491    mrr@1 : 0.0037    mrr@5 : 0.0199    mrr@10 : 0.0235    mrr@20 : 0.0269
+12 Feb 13:22    INFO  epoch 18 training [time: 25.90s, train loss: 2073.4617]
+12 Feb 13:22    INFO  epoch 18 evaluating [time: 0.02s, valid_score: 0.034700]
+12 Feb 13:22    INFO  valid result: 
+hit@1 : 0.0055    hit@5 : 0.045    hit@10 : 0.0725    hit@20 : 0.1257    ndcg@1 : 0.0055    ndcg@5 : 0.0257    ndcg@10 : 0.0347    ndcg@20 : 0.0479    mrr@1 : 0.0055    mrr@5 : 0.0194    mrr@10 : 0.0231    mrr@20 : 0.0266
+12 Feb 13:23    INFO  epoch 19 training [time: 25.87s, train loss: 2066.8097]
+12 Feb 13:23    INFO  epoch 19 evaluating [time: 0.02s, valid_score: 0.038200]
+12 Feb 13:23    INFO  valid result: 
+hit@1 : 0.0073    hit@5 : 0.0505    hit@10 : 0.0798    hit@20 : 0.1193    ndcg@1 : 0.0073    ndcg@5 : 0.0288    ndcg@10 : 0.0382    ndcg@20 : 0.0481    mrr@1 : 0.0073    mrr@5 : 0.0218    mrr@10 : 0.0256    mrr@20 : 0.0283
+12 Feb 13:23    INFO  Saving current: outputs/pswrecv4h_lastfm/pswrecv4h-Feb-12-2026_13-14-45.pth
+12 Feb 13:23    INFO  epoch 20 training [time: 25.88s, train loss: 2067.9955]
+12 Feb 13:23    INFO  epoch 20 evaluating [time: 0.02s, valid_score: 0.041900]
+12 Feb 13:23    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.0495    hit@10 : 0.0908    hit@20 : 0.1248    ndcg@1 : 0.0064    ndcg@5 : 0.0287    ndcg@10 : 0.0419    ndcg@20 : 0.0505    mrr@1 : 0.0064    mrr@5 : 0.0218    mrr@10 : 0.0272    mrr@20 : 0.0296
+12 Feb 13:23    INFO  Saving current: outputs/pswrecv4h_lastfm/pswrecv4h-Feb-12-2026_13-14-45.pth
+12 Feb 13:24    INFO  epoch 21 training [time: 25.87s, train loss: 2050.4644]
+12 Feb 13:24    INFO  epoch 21 evaluating [time: 0.02s, valid_score: 0.042100]
+12 Feb 13:24    INFO  valid result: 
+hit@1 : 0.011    hit@5 : 0.0541    hit@10 : 0.0844    hit@20 : 0.1321    ndcg@1 : 0.011    ndcg@5 : 0.0324    ndcg@10 : 0.0421    ndcg@20 : 0.054    mrr@1 : 0.011    mrr@5 : 0.0253    mrr@10 : 0.0293    mrr@20 : 0.0324
+12 Feb 13:24    INFO  Saving current: outputs/pswrecv4h_lastfm/pswrecv4h-Feb-12-2026_13-14-45.pth
+12 Feb 13:24    INFO  epoch 22 training [time: 25.92s, train loss: 2053.1025]
+12 Feb 13:24    INFO  epoch 22 evaluating [time: 0.02s, valid_score: 0.039200]
+12 Feb 13:24    INFO  valid result: 
+hit@1 : 0.0046    hit@5 : 0.0495    hit@10 : 0.0862    hit@20 : 0.1394    ndcg@1 : 0.0046    ndcg@5 : 0.0273    ndcg@10 : 0.0392    ndcg@20 : 0.0524    mrr@1 : 0.0046    mrr@5 : 0.02    mrr@10 : 0.025    mrr@20 : 0.0284
+12 Feb 13:25    INFO  epoch 23 training [time: 25.92s, train loss: 2043.9261]
+12 Feb 13:25    INFO  epoch 23 evaluating [time: 0.02s, valid_score: 0.038600]
+12 Feb 13:25    INFO  valid result: 
+hit@1 : 0.0073    hit@5 : 0.0514    hit@10 : 0.0798    hit@20 : 0.1275    ndcg@1 : 0.0073    ndcg@5 : 0.0295    ndcg@10 : 0.0386    ndcg@20 : 0.0507    mrr@1 : 0.0073    mrr@5 : 0.0224    mrr@10 : 0.0261    mrr@20 : 0.0294
+12 Feb 13:25    INFO  epoch 24 training [time: 25.90s, train loss: 2042.3948]
+12 Feb 13:25    INFO  epoch 24 evaluating [time: 0.02s, valid_score: 0.039600]
+12 Feb 13:25    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.0486    hit@10 : 0.0835    hit@20 : 0.1303    ndcg@1 : 0.0064    ndcg@5 : 0.0285    ndcg@10 : 0.0396    ndcg@20 : 0.0514    mrr@1 : 0.0064    mrr@5 : 0.0219    mrr@10 : 0.0264    mrr@20 : 0.0296
+12 Feb 13:26    INFO  epoch 25 training [time: 25.99s, train loss: 2034.4685]
+12 Feb 13:26    INFO  epoch 25 evaluating [time: 0.02s, valid_score: 0.035900]
+12 Feb 13:26    INFO  valid result: 
+hit@1 : 0.0055    hit@5 : 0.0468    hit@10 : 0.0798    hit@20 : 0.1339    ndcg@1 : 0.0055    ndcg@5 : 0.0256    ndcg@10 : 0.0359    ndcg@20 : 0.0495    mrr@1 : 0.0055    mrr@5 : 0.0187    mrr@10 : 0.0228    mrr@20 : 0.0264
+12 Feb 13:26    INFO  epoch 26 training [time: 25.93s, train loss: 2032.5006]
+12 Feb 13:26    INFO  epoch 26 evaluating [time: 0.02s, valid_score: 0.041000]
+12 Feb 13:26    INFO  valid result: 
+hit@1 : 0.0055    hit@5 : 0.0486    hit@10 : 0.0899    hit@20 : 0.1367    ndcg@1 : 0.0055    ndcg@5 : 0.0277    ndcg@10 : 0.041    ndcg@20 : 0.0526    mrr@1 : 0.0055    mrr@5 : 0.0208    mrr@10 : 0.0263    mrr@20 : 0.0293
+12 Feb 13:26    INFO  epoch 27 training [time: 25.94s, train loss: 2027.0128]
+12 Feb 13:26    INFO  epoch 27 evaluating [time: 0.02s, valid_score: 0.039800]
+12 Feb 13:26    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.0505    hit@10 : 0.0853    hit@20 : 0.1248    ndcg@1 : 0.0064    ndcg@5 : 0.0286    ndcg@10 : 0.0398    ndcg@20 : 0.0499    mrr@1 : 0.0064    mrr@5 : 0.0215    mrr@10 : 0.026    mrr@20 : 0.0288
+12 Feb 13:27    INFO  epoch 28 training [time: 25.92s, train loss: 2027.1272]
+12 Feb 13:27    INFO  epoch 28 evaluating [time: 0.02s, valid_score: 0.039900]
+12 Feb 13:27    INFO  valid result: 
+hit@1 : 0.0046    hit@5 : 0.0477    hit@10 : 0.0862    hit@20 : 0.1385    ndcg@1 : 0.0046    ndcg@5 : 0.0275    ndcg@10 : 0.0399    ndcg@20 : 0.053    mrr@1 : 0.0046    mrr@5 : 0.0207    mrr@10 : 0.0259    mrr@20 : 0.0294
+12 Feb 13:27    INFO  epoch 29 training [time: 25.92s, train loss: 2017.9626]
+12 Feb 13:27    INFO  epoch 29 evaluating [time: 0.02s, valid_score: 0.039900]
+12 Feb 13:27    INFO  valid result: 
+hit@1 : 0.0028    hit@5 : 0.055    hit@10 : 0.0862    hit@20 : 0.1294    ndcg@1 : 0.0028    ndcg@5 : 0.0301    ndcg@10 : 0.0399    ndcg@20 : 0.0507    mrr@1 : 0.0028    mrr@5 : 0.0218    mrr@10 : 0.0257    mrr@20 : 0.0286
+12 Feb 13:28    INFO  epoch 30 training [time: 25.91s, train loss: 2020.8981]
+12 Feb 13:28    INFO  epoch 30 evaluating [time: 0.02s, valid_score: 0.038200]
+12 Feb 13:28    INFO  valid result: 
+hit@1 : 0.0037    hit@5 : 0.0459    hit@10 : 0.0872    hit@20 : 0.1284    ndcg@1 : 0.0037    ndcg@5 : 0.025    ndcg@10 : 0.0382    ndcg@20 : 0.0486    mrr@1 : 0.0037    mrr@5 : 0.0181    mrr@10 : 0.0236    mrr@20 : 0.0264
+12 Feb 13:28    INFO  epoch 31 training [time: 25.88s, train loss: 2014.3224]
+12 Feb 13:28    INFO  epoch 31 evaluating [time: 0.02s, valid_score: 0.039100]
+12 Feb 13:28    INFO  valid result: 
+hit@1 : 0.0083    hit@5 : 0.0495    hit@10 : 0.0789    hit@20 : 0.1275    ndcg@1 : 0.0083    ndcg@5 : 0.0296    ndcg@10 : 0.0391    ndcg@20 : 0.0514    mrr@1 : 0.0083    mrr@5 : 0.023    mrr@10 : 0.027    mrr@20 : 0.0303
+12 Feb 13:29    INFO  epoch 32 training [time: 25.90s, train loss: 2013.4634]
+12 Feb 13:29    INFO  epoch 32 evaluating [time: 0.02s, valid_score: 0.038600]
+12 Feb 13:29    INFO  valid result: 
+hit@1 : 0.0064    hit@5 : 0.0486    hit@10 : 0.0826    hit@20 : 0.1257    ndcg@1 : 0.0064    ndcg@5 : 0.0276    ndcg@10 : 0.0386    ndcg@20 : 0.0495    mrr@1 : 0.0064    mrr@5 : 0.0207    mrr@10 : 0.0253    mrr@20 : 0.0282
+12 Feb 13:29    INFO  Finished training, best eval result in epoch 21
+12 Feb 13:29    INFO  Loading model structure and parameters from outputs/pswrecv4h_lastfm/pswrecv4h-Feb-12-2026_13-14-45.pth
+12 Feb 13:29    INFO  The running environment of this training is as follows:
++-------------+------------------+
+| Environment |      Usage       |
++=============+==================+
+| CPU         |      2.00 %      |
++-------------+------------------+
+| GPU         |  0.57 G/79.44 G  |
++-------------+------------------+
+| Memory      | 1.33 G/2015.66 G |
++-------------+------------------+
+12 Feb 13:29    INFO  best valid : OrderedDict([('hit@1', 0.011), ('hit@5', 0.0541), ('hit@10', 0.0844), ('hit@20', 0.1321), ('ndcg@1', 0.011), ('ndcg@5', 0.0324), ('ndcg@10', 0.0421), ('ndcg@20', 0.054), ('mrr@1', 0.011), ('mrr@5', 0.0253), ('mrr@10', 0.0293), ('mrr@20', 0.0324)])
+12 Feb 13:29    INFO  test result: OrderedDict([('hit@1', 0.0064), ('hit@5', 0.0404), ('hit@10', 0.0578), ('hit@20', 0.0927), ('ndcg@1', 0.0064), ('ndcg@5', 0.0242), ('ndcg@10', 0.03), ('ndcg@20', 0.0387), ('mrr@1', 0.0064), ('mrr@5', 0.0189), ('mrr@10', 0.0213), ('mrr@20', 0.0237)])

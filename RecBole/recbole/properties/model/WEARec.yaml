@@ -1,0 +1,10 @@
+n_layers: 2                      # (int) Number of WEARec blocks (wavelet+FFT + FFN).
+n_heads: 2                       # (int) Number of heads for frequency/wavelet branches.
+hidden_size: 64                  # (int) Embedding size.
+inner_size: 256                 # (int) Feed-forward inner size (4*hidden_size).
+hidden_dropout_prob: 0.5        # (float) Dropout probability.
+hidden_act: 'gelu'              # (str) Activation in feed-forward layer.
+layer_norm_eps: 1e-12           # (float) LayerNorm epsilon.
+initializer_range: 0.02         # (float) Std for normal init.
+loss_type: 'CE'                 # (str) Loss: CE only (full softmax).
+alpha: 0.2                      # (float) Gate: (1-alpha)*wavelet + alpha*fft.
