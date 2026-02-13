@@ -5,7 +5,7 @@
 Experiment entry-point: WEARec Official vs PSWRec comparison.
 
 This script extends WEARec's ``main.py`` by:
-  1. Adding PSWRec V5-V8 WOF models to the model registry.
+  1. Adding PSWRec V5-V8, V10 WOF models to the model registry.
   2. Injecting PSWRec-specific CLI arguments into argparse.
 
 Everything else (data pipeline, trainer, evaluation) is WEARec's own code.
@@ -16,6 +16,7 @@ Supported model_type values:
   - pswrecv6_wof    (V5 + Dynamic Phase Evolution)
   - pswrecv7_wof    (V6 + Cross-Frequency Phase Coupling)
   - pswrecv8_wof    (V7 + Phase-Aware Values)
+  - pswrecv10_wof   (V10 + Wave Superposition Attention)
 
 Usage
 -----
@@ -74,6 +75,8 @@ PSWRecV5WOFModel = _load_wof_model("pswrecv5_wof.py", "PSWRecV5WOFModel")
 PSWRecV6WOFModel = _load_wof_model("pswrecv6_wof.py", "PSWRecV6WOFModel")
 PSWRecV7WOFModel = _load_wof_model("pswrecv7_wof.py", "PSWRecV7WOFModel")
 PSWRecV8WOFModel = _load_wof_model("pswrecv8_wof.py", "PSWRecV8WOFModel")
+PSWRecV10WOFModel = _load_wof_model("pswrecv10_wof.py", "PSWRecV10WOFModel")
+PSWRecV11WOFModel = _load_wof_model("pswrecv11_wof.py", "PSWRecV11WOFModel")
 
 # ---------------------------------------------------------------------------
 # Register all PSWRec WOF models alongside the existing WEARec models.
@@ -82,6 +85,8 @@ MODEL_DICT["pswrecv5_wof"] = PSWRecV5WOFModel
 MODEL_DICT["pswrecv6_wof"] = PSWRecV6WOFModel
 MODEL_DICT["pswrecv7_wof"] = PSWRecV7WOFModel
 MODEL_DICT["pswrecv8_wof"] = PSWRecV8WOFModel
+MODEL_DICT["pswrecv10_wof"] = PSWRecV10WOFModel
+MODEL_DICT["pswrecv11_wof"] = PSWRecV11WOFModel
 
 
 def _build_unified_args() -> argparse.Namespace:
@@ -137,9 +142,9 @@ def _build_unified_args() -> argparse.Namespace:
         parser.add_argument("--num_heads", default=2, type=int)
         parser.add_argument("--alpha", default=0.3, type=float)
     elif temp_args.model_type.lower() in (
-        "pswrecv5_wof", "pswrecv6_wof", "pswrecv7_wof", "pswrecv8_wof",
+        "pswrecv5_wof", "pswrecv6_wof", "pswrecv7_wof", "pswrecv8_wof", "pswrecv10_wof", "pswrecv11_wof",
     ):
-        # PSWRec V5-V8 share the same CLI flags
+        # PSWRec V5-V8-V10-V11 share the same CLI flags
         parser.add_argument("--n_bands", default=4, type=int)
         parser.add_argument("--band_kernel_sizes", nargs="+", default=[3, 7, 15, 31], type=int)
         parser.add_argument("--band_dilations", nargs="+", default=[1, 2, 4, 8], type=int)

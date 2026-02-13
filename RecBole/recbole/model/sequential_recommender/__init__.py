@@ -41,4 +41,5 @@ from recbole.model.sequential_recommender.pswrecv4 import pswrecv4
 from recbole.model.sequential_recommender.pswrecv4g import pswrecv4g
 from recbole.model.sequential_recommender.pswrecv4h import pswrecv4h
 from recbole.model.sequential_recommender.pswrecv5 import pswrecv5
+from recbole.model.sequential_recommender.pswrecv11 import pswrecv11
 from recbole.model.sequential_recommender.wearec import WEARec
