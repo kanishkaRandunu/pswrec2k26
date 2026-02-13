@@ -1,0 +1,50 @@
+# ============================================================================
+# PSWRecV5 (WOF) -- Beauty dataset hyperparameters
+# ============================================================================
+#
+# PSWRecV5 model architecture params are UNCHANGED from our RecBole config
+# (configs/beauty/beauty_pswrecv5.yaml).  Training protocol params (seed,
+# batch_size) are aligned to WEARec's framework for fair comparison.
+#
+# This file is for documentation/reference.  The actual values are passed
+# as CLI arguments in the PBS script.
+# ============================================================================
+
+# --- model architecture (unchanged from RecBole pswrecv5) ---
+model_type: pswrecv5_wof
+hidden_size: 64
+num_hidden_layers: 2          # maps to n_layers
+num_attention_heads: 2        # maps to n_heads
+inner_size: 256               # FFN intermediate size
+hidden_act: gelu
+hidden_dropout_prob: 0.5
+attention_probs_dropout_prob: 0.5   # maps to attn_dropout_prob
+initializer_range: 0.02
+max_seq_length: 50
+
+# --- PSWRecV5-specific model params ---
+n_bands: 4
+band_kernel_sizes: [3, 7, 15, 31]
+band_dilations: [1, 2, 4, 8]
+phase_bias_scale: 0.1
+phase_gate_scale: 1.0
+phase_aux: true
+phase_aux_weight: 0.05
+
+# --- training (aligned to WEARec protocol) ---
+lr: 0.001                    # our own LR (unchanged)
+batch_size: 256               # aligned with WEARec protocol
+epochs: 200
+patience: 10                  # early stopping patience (NDCG@10)
+weight_decay: 0.0
+adam_beta1: 0.9
+adam_beta2: 0.999
+seed: 42                      # aligned with WEARec protocol
+
+# --- data ---
+data_name: Beauty
+data_dir: ../../WEARec/src/data/    # relative to experiment/wearec-pswrec/
+
+# --- evaluation ---
+# Full-item ranking with seen-item masking (WEARec's protocol)
+# Metrics: HR@{5,10,15,20}, NDCG@{5,10,15,20}

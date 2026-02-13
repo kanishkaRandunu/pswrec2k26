@@ -1,0 +1,73 @@
+# ============================================================================
+# PSWRecV5 Hyperparameter Tuning Plan — Beauty (WEARec Framework)
+# ============================================================================
+#
+# Goal: Close the performance gap between PSWRecV5 and WEARec on WEARec's
+#       own framework (data pipeline + evaluation protocol).
+#
+# Gap to close (from experiment/experiement-results.md):
+#   HR@5:   0.0695 → 0.0721  (+3.7%)
+#   NDCG@5: 0.0496 → 0.0505  (+1.8%)
+#   HR@10:  0.0948 → 0.1016  (+7.2%)
+#   NDCG@10:0.0578 → 0.0599  (+3.6%)
+#   HR@20:  0.1299 → 0.1370  (+5.5%)
+#   NDCG@20:0.0666 → 0.0688  (+3.3%)
+
+# --- Fixed parameters (same for all runs) ---
+fixed:
+  model_type: pswrecv5_wof
+  data_name: Beauty
+  hidden_size: 64
+  num_hidden_layers: 2
+  max_seq_length: 50
+  batch_size: 256
+  epochs: 200
+  patience: 10
+  seed: 42
+  inner_size: 256
+  n_bands: 4
+  band_kernel_sizes: [3, 7, 15, 31]
+  band_dilations: [1, 2, 4, 8]
+  phase_bias_scale: 0.1
+  phase_gate_scale: 1.0
+  phase_aux: true
+  phase_aux_weight: 0.05
+
+# --- Stage 1: Learning-rate sweep ---
+# Rationale: Our LR (0.001) was tuned for RecBole. WEARec uses 0.0005.
+# The optimal LR may differ on this data/pipeline.
+stage1:
+  sweep_param: lr
+  values: [0.0001, 0.0003, 0.0005, 0.001, 0.003]
+  fixed_overrides:
+    hidden_dropout_prob: 0.5
+    attention_probs_dropout_prob: 0.5
+    num_attention_heads: 2
+  jobs: 5
+  naming: "tune_s1_lr{value}"
+  selection_metric: NDCG@10
+
+# --- Stage 2: Dropout × n_heads grid ---
+# Rationale: Dropout may need adjustment for WEARec's data distribution.
+# More attention heads may capture finer patterns needed under seen-item masking.
+stage2:
+  sweep_params:
+    hidden_dropout_prob: [0.2, 0.3, 0.5]         # same as attention_probs_dropout_prob
+    num_attention_heads: [2, 4, 8]
+  fixed_overrides:
+    lr: "${BEST_LR_FROM_STAGE1}"                  # edit after stage 1
+  jobs: 9
+  naming: "tune_s2_d{dropout}_h{nheads}"
+  selection_metric: NDCG@10
+
+# --- Total compute budget ---
+# Stage 1: 5 jobs × ~1h each ≈ 5 GPU-hours
+# Stage 2: 9 jobs × ~1h each ≈ 9 GPU-hours
+# Total: ~14 GPU-hours
+
+# --- How to run ---
+# Stage 1:   bash experiment/wearec-pswrec/tuning/submit_tuning.sh stage1
+# Collect:   bash experiment/wearec-pswrec/tuning/collect_results.sh
+# Update BEST_LR in submit_tuning.sh, then:
+# Stage 2:   bash experiment/wearec-pswrec/tuning/submit_tuning.sh stage2
+# Collect:   bash experiment/wearec-pswrec/tuning/collect_results.sh
