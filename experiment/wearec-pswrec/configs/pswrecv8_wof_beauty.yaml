@@ -1,0 +1,66 @@
+# ============================================================================
+# PSWRecV8 (WOF) -- Beauty dataset hyperparameters
+# ============================================================================
+#
+# V8 = V5 + Dynamic Phase Evolution (DPE)
+#         + Cross-Frequency Phase Coupling (CFPC)
+#         + Phase-Aware Values (PAV).
+#
+#   - DPE: phase filterbank called inside encoder loop (shared weights).
+#   - CFPC: learnable band_coupling matrix for cross-band phase mixing.
+#   - PAV: modulates the attention-value product by phase coherence.
+#     context = matmul(attn_probs_gated * sigmoid(scale * phase_scores), v)
+#     This makes phase influence both *where* to attend and *what* to extract.
+#   - New params over V7: 1 scalar (phase_value_scale) per attention layer.
+#   - No new hyperparams (phase_value_scale is learned).
+#
+# Uses tuned V5 best hyperparameters (lr=0.0003, dropout=0.5, n_heads=2).
+#
+# This file is for documentation/reference.  The actual values are passed
+# as CLI arguments in the PBS script.
+# ============================================================================
+
+# --- model architecture ---
+model_type: pswrecv8_wof
+hidden_size: 64
+num_hidden_layers: 2
+num_attention_heads: 2
+inner_size: 256
+hidden_act: gelu
+hidden_dropout_prob: 0.5
+attention_probs_dropout_prob: 0.5
+initializer_range: 0.02
+max_seq_length: 50
+
+# --- PSWRec-specific model params (same as V5) ---
+n_bands: 4
+band_kernel_sizes: [3, 7, 15, 31]
+band_dilations: [1, 2, 4, 8]
+phase_bias_scale: 0.1
+phase_gate_scale: 1.0
+phase_aux: true
+phase_aux_weight: 0.05
+
+# --- V8 architectural changes ---
+# DPE: phase_filter called inside encoder loop
+# CFPC: band_coupling [H=2, S=4, S=4] per attention layer (32 params)
+# PAV:  phase_value_scale (1 scalar per attention layer, init=0.5)
+#   Total new params over V5: ~34 (negligible)
+
+# --- training (tuned best from V5 search) ---
+lr: 0.0003
+batch_size: 256
+epochs: 200
+patience: 10
+weight_decay: 0.0
+adam_beta1: 0.9
+adam_beta2: 0.999
+seed: 42
+
+# --- data ---
+data_name: Beauty
+data_dir: ../../WEARec/src/data/
+
+# --- evaluation ---
+# Full-item ranking with seen-item masking (WEARec's protocol)
+# Metrics: HR@{5,10,15,20}, NDCG@{5,10,15,20}

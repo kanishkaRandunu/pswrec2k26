@@ -1,0 +1,62 @@
+# ============================================================================
+# PSWRecV7 (WOF) -- Beauty dataset hyperparameters
+# ============================================================================
+#
+# V7 = V5 + Dynamic Phase Evolution (DPE) + Cross-Frequency Phase Coupling (CFPC).
+#   - DPE: phase filterbank called inside encoder loop (shared weights).
+#   - CFPC: learnable [n_heads, n_bands, n_bands] band_coupling matrix in
+#     attention.  Bands are mixed via softmax-normalised coupling before
+#     computing phase scores.  Enables cross-frequency coherence detection.
+#   - New params: n_heads * n_bands * n_bands = 2 * 4 * 4 = 32 (negligible).
+#   - No new hyperparams (coupling is learned end-to-end).
+#
+# Uses tuned V5 best hyperparameters (lr=0.0003, dropout=0.5, n_heads=2).
+#
+# This file is for documentation/reference.  The actual values are passed
+# as CLI arguments in the PBS script.
+# ============================================================================
+
+# --- model architecture ---
+model_type: pswrecv7_wof
+hidden_size: 64
+num_hidden_layers: 2
+num_attention_heads: 2
+inner_size: 256
+hidden_act: gelu
+hidden_dropout_prob: 0.5
+attention_probs_dropout_prob: 0.5
+initializer_range: 0.02
+max_seq_length: 50
+
+# --- PSWRec-specific model params (same as V5) ---
+n_bands: 4
+band_kernel_sizes: [3, 7, 15, 31]
+band_dilations: [1, 2, 4, 8]
+phase_bias_scale: 0.1
+phase_gate_scale: 1.0
+phase_aux: true
+phase_aux_weight: 0.05
+
+# --- V7 architectural changes ---
+# DPE: phase_filter called inside encoder loop
+# CFPC: band_coupling [H=2, S=4, S=4] per attention layer
+#   Initialised near identity (*3.0 on diagonal) so V7 starts close to V6
+#   32 new params total (negligible)
+
+# --- training (tuned best from V5 search) ---
+lr: 0.0003
+batch_size: 256
+epochs: 200
+patience: 10
+weight_decay: 0.0
+adam_beta1: 0.9
+adam_beta2: 0.999
+seed: 42
+
+# --- data ---
+data_name: Beauty
+data_dir: ../../WEARec/src/data/
+
+# --- evaluation ---
+# Full-item ranking with seen-item masking (WEARec's protocol)
+# Metrics: HR@{5,10,15,20}, NDCG@{5,10,15,20}

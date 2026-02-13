@@ -1,0 +1,57 @@
+# ============================================================================
+# PSWRecV6 (WOF) -- Beauty dataset hyperparameters
+# ============================================================================
+#
+# V6 = V5 + Dynamic Phase Evolution (DPE).
+#   - Phase filterbank is called inside the encoder loop at every layer
+#     (shared weights) instead of once at the beginning.
+#   - Zero new parameters; zero new hyperparameters.
+#
+# Uses tuned V5 best hyperparameters (lr=0.0003, dropout=0.5, n_heads=2).
+#
+# This file is for documentation/reference.  The actual values are passed
+# as CLI arguments in the PBS script.
+# ============================================================================
+
+# --- model architecture ---
+model_type: pswrecv6_wof
+hidden_size: 64
+num_hidden_layers: 2
+num_attention_heads: 2
+inner_size: 256
+hidden_act: gelu
+hidden_dropout_prob: 0.5
+attention_probs_dropout_prob: 0.5
+initializer_range: 0.02
+max_seq_length: 50
+
+# --- PSWRec-specific model params (same as V5) ---
+n_bands: 4
+band_kernel_sizes: [3, 7, 15, 31]
+band_dilations: [1, 2, 4, 8]
+phase_bias_scale: 0.1
+phase_gate_scale: 1.0
+phase_aux: true
+phase_aux_weight: 0.05
+
+# --- V6 architectural change ---
+# DPE: phase_filter called inside encoder loop (shared filterbank weights)
+# No new params or hyperparams
+
+# --- training (tuned best from V5 search) ---
+lr: 0.0003
+batch_size: 256
+epochs: 200
+patience: 10
+weight_decay: 0.0
+adam_beta1: 0.9
+adam_beta2: 0.999
+seed: 42
+
+# --- data ---
+data_name: Beauty
+data_dir: ../../WEARec/src/data/
+
+# --- evaluation ---
+# Full-item ranking with seen-item masking (WEARec's protocol)
+# Metrics: HR@{5,10,15,20}, NDCG@{5,10,15,20}

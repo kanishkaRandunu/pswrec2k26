@@ -2,13 +2,20 @@
 # -*- coding: utf-8 -*-
 
 """
-Experiment entry-point: WEARec Official vs PSWRecV5 comparison.
+Experiment entry-point: WEARec Official vs PSWRec comparison.
 
 This script extends WEARec's ``main.py`` by:
-  1. Adding PSWRecV5_WOF to the model registry.
-  2. Injecting PSWRecV5-specific CLI arguments into argparse.
+  1. Adding PSWRec V5-V8 WOF models to the model registry.
+  2. Injecting PSWRec-specific CLI arguments into argparse.
 
 Everything else (data pipeline, trainer, evaluation) is WEARec's own code.
+
+Supported model_type values:
+  - WEARec          (official baseline)
+  - pswrecv5_wof    (V5 baseline)
+  - pswrecv6_wof    (V5 + Dynamic Phase Evolution)
+  - pswrecv7_wof    (V6 + Cross-Frequency Phase Coupling)
+  - pswrecv8_wof    (V7 + Phase-Aware Values)
 
 Usage
 -----
@@ -49,20 +56,32 @@ from utils import EarlyStopping, check_path, set_seed, set_logger, get_local_tim
 from dataset import get_seq_dic, get_dataloder, get_rating_matrix
 
 # ---------------------------------------------------------------------------
-# Load PSWRecV5WOFModel via importlib so that its ``from model._abstract_model
-# import SequentialRecModel`` correctly resolves to WEARec's base class (which
-# is on sys.path) without colliding with a local ``model/`` package.
+# Load PSWRec WOF models via importlib so that their
+# ``from model._abstract_model import SequentialRecModel`` correctly resolves
+# to WEARec's base class (which is on sys.path) without colliding with a
+# local ``model/`` package.
 # ---------------------------------------------------------------------------
-_PSW_MODULE_PATH = os.path.join(_SCRIPT_DIR, "model", "pswrecv5_wof.py")
-_spec = importlib.util.spec_from_file_location("pswrecv5_wof", _PSW_MODULE_PATH)
-_psw_module = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_psw_module)
-PSWRecV5WOFModel = _psw_module.PSWRecV5WOFModel
+
+def _load_wof_model(filename: str, class_name: str):
+    """Load a single WOF model class from experiment/wearec-pswrec/model/."""
+    path = os.path.join(_SCRIPT_DIR, "model", filename)
+    spec = importlib.util.spec_from_file_location(filename.replace(".py", ""), path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return getattr(mod, class_name)
+
+PSWRecV5WOFModel = _load_wof_model("pswrecv5_wof.py", "PSWRecV5WOFModel")
+PSWRecV6WOFModel = _load_wof_model("pswrecv6_wof.py", "PSWRecV6WOFModel")
+PSWRecV7WOFModel = _load_wof_model("pswrecv7_wof.py", "PSWRecV7WOFModel")
+PSWRecV8WOFModel = _load_wof_model("pswrecv8_wof.py", "PSWRecV8WOFModel")
 
 # ---------------------------------------------------------------------------
-# Register PSWRecV5_WOF alongside the existing WEARec models.
+# Register all PSWRec WOF models alongside the existing WEARec models.
 # ---------------------------------------------------------------------------
 MODEL_DICT["pswrecv5_wof"] = PSWRecV5WOFModel
+MODEL_DICT["pswrecv6_wof"] = PSWRecV6WOFModel
+MODEL_DICT["pswrecv7_wof"] = PSWRecV7WOFModel
+MODEL_DICT["pswrecv8_wof"] = PSWRecV8WOFModel
 
 
 def _build_unified_args() -> argparse.Namespace:
@@ -117,8 +136,10 @@ def _build_unified_args() -> argparse.Namespace:
     if temp_args.model_type.lower() == "wearec":
         parser.add_argument("--num_heads", default=2, type=int)
         parser.add_argument("--alpha", default=0.3, type=float)
-    elif temp_args.model_type.lower() == "pswrecv5_wof":
-        # PSWRecV5-specific flags
+    elif temp_args.model_type.lower() in (
+        "pswrecv5_wof", "pswrecv6_wof", "pswrecv7_wof", "pswrecv8_wof",
+    ):
+        # PSWRec V5-V8 share the same CLI flags
         parser.add_argument("--n_bands", default=4, type=int)
         parser.add_argument("--band_kernel_sizes", nargs="+", default=[3, 7, 15, 31], type=int)
         parser.add_argument("--band_dilations", nargs="+", default=[1, 2, 4, 8], type=int)

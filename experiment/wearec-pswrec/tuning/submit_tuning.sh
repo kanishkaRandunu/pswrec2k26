@@ -21,7 +21,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PBS_TEMPLATE="${SCRIPT_DIR}/pswrecv5_tune.pbs"
 
 # ---- Edit this after Stage 1 completes ----
-BEST_LR="0.001"
+BEST_LR="0.003"
 # -------------------------------------------
 
 STAGE="${1:-all}"
