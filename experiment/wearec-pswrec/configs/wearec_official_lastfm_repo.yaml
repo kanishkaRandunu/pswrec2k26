@@ -1,0 +1,47 @@
+# ============================================================================
+# WEARec Official -- LastFM with WEARec repo original experiment parameters
+# ============================================================================
+#
+# Cross-checked against WEARec repo:
+#   - README "Example for LastFM": lr=0.001, alpha=0.3, num_heads=2
+#   - utils.py parse_args(): lr=0.001, batch_size=256, epochs=200, patience=10,
+#     max_seq_length=50, hidden_size=64, num_hidden_layers=2,
+#     hidden_dropout_prob=0.5, attention_probs_dropout_prob=0.5;
+#     WEARec block: num_heads=2, alpha=0.3
+#   - Pretrained checkpoint name (README): WEARec_K_50_LastFM_0.5_0.001_0.3_2
+#     => K=50, dropout=0.5, lr=0.001, alpha=0.3, num_heads=2
+#
+# This file is for documentation/reference. The actual values are passed
+# as CLI arguments in the PBS script.
+# ============================================================================
+
+# --- model (WEARec repo defaults for LastFM) ---
+model_type: WEARec
+hidden_size: 64
+num_hidden_layers: 2
+num_heads: 2                  # WEARec repo default (utils.py)
+alpha: 0.3                     # WEARec repo default (utils.py)
+num_attention_heads: 2
+hidden_act: gelu
+hidden_dropout_prob: 0.5
+attention_probs_dropout_prob: 0.5
+initializer_range: 0.02
+max_seq_length: 50
+
+# --- training (WEARec repo default lr for LastFM) ---
+lr: 0.001                     # WEARec README example for LastFM
+batch_size: 256
+epochs: 200
+patience: 10
+weight_decay: 0.0
+adam_beta1: 0.9
+adam_beta2: 0.999
+seed: 42
+
+# --- data ---
+data_name: LastFM
+data_dir: ../../WEARec/src/data/
+
+# --- evaluation ---
+# Full-item ranking with seen-item masking
+# Metrics: HR@{5,10,15,20}, NDCG@{5,10,15,20}

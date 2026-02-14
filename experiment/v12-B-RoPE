@@ -1,0 +1,67 @@
+1. The Physics of B-RoPE (Behavioral Rotary)
+The core reason V11 failed while V12 should succeed lies in the Geometry of Attention. Standard RoPE uses a fixed monotonic rotation (mθ). B-RoPE replaces this with the Behavioral Phase (Φ) extracted from your wavelet filterbank.
+
+When you rotate Q and K by Φ, the attention score for two items i and j becomes:
+
+Score(i,j)=(W 
+q
+​
+ x 
+i
+​
+ ) 
+⊤
+ R 
+Φ 
+i
+​
+ −Φ 
+j
+​
+ 
+​
+ (W 
+k
+​
+ x 
+j
+​
+ )
+This means the attention mechanism is physically unable to "ignore" phase mismatch. If two behaviors are out of sync (ΔΦ≈π), the dot product is naturally suppressed. You aren't asking the model to learn periodicity; you are enforcing it as the coordinate system.
+
+2. Refining the "Sync-Gate"
+To surpass WEARec, we need to address their Wavelet Feature Enhancement (WFE) strength: reconstructing non-stationary signals. Your "Sync-Gate" in V12 should act as a hard filter against "Behavioral Noise."
+
+The Mechanism: Instead of a soft cos(ΔΦ) multiplier, use a Heaviside-style Mask:
+
+If cos(ΔΦ)>0: Allow standard attention.
+
+If cos(ΔΦ)≤0: Apply a large negative bias (−1e9) before Softmax.
+
+Why this works: It prevents the model from "hallucinating" a relationship between two items that are fundamentally in different behavioral "seasons" or cycles, a common failure point in the Amazon Beauty dataset where repeat purchases are sparse but periodic.
+
+3. Implementation Guardrails for V12
+Based on the "Avenue of Failures," here are the strict constraints for the code shell:
+
+Feature	Constraint	Reason
+Phase Source	Static Embedding-Level	V6/V7 proved abstract layers "melt" the phase.
+Value Matrix (V)	Unmodified	Protects the semantic integrity of the item features.
+Filterbank	4-Band Daubechies	Matches the multi-scale nature of WEARec without adding param bloat.
+Projection	Identity (No learnable W 
+ϕ
+​
+ )	V11 proved that linear layers scramble physical angles.
+4. Why Last.FM/MovieLens?
+WEARec performs exceptionally well on datasets with high "signal density." The Amazon Beauty dataset (NDCG@10≈0.06) is notoriously sparse, making it hard for wavelets to find a "rhythm."
+
+Last.FM: With an average sequence length of 48.2, your filterbank has enough "lookback" to establish a stable Φ.
+
+The Goal: We aren't just looking for a +1.8% gain; we are looking for a scaling advantage where PSWRecV12 widens the gap as sequences get longer.
+
+Comparison: WEARec vs. PSWRecV12
+Metric	WEARec	PSWRecV12 (Hypothesis)
+Filter Type	Frequency-domain (DFF)	Time-Frequency (Wavelet)
+Attention	Attention-Free	Behavioral Rotary Attention
+Constraint	Adaptive Filter	Physical Resonance Mask
+Signal Handling	Non-stationary reconstruction	Geometric Phase Sync
+Next Step: Would you like me to draft the PyTorch implementation of the B-RoPE layer specifically designed to plug into your existing V5 foundation?

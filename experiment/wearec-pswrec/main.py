@@ -77,6 +77,7 @@ PSWRecV7WOFModel = _load_wof_model("pswrecv7_wof.py", "PSWRecV7WOFModel")
 PSWRecV8WOFModel = _load_wof_model("pswrecv8_wof.py", "PSWRecV8WOFModel")
 PSWRecV10WOFModel = _load_wof_model("pswrecv10_wof.py", "PSWRecV10WOFModel")
 PSWRecV11WOFModel = _load_wof_model("pswrecv11_wof.py", "PSWRecV11WOFModel")
+PSWRecV12WOFModel = _load_wof_model("pswrecv12_wof.py", "PSWRecV12WOFModel")
 
 # ---------------------------------------------------------------------------
 # Register all PSWRec WOF models alongside the existing WEARec models.
@@ -87,6 +88,7 @@ MODEL_DICT["pswrecv7_wof"] = PSWRecV7WOFModel
 MODEL_DICT["pswrecv8_wof"] = PSWRecV8WOFModel
 MODEL_DICT["pswrecv10_wof"] = PSWRecV10WOFModel
 MODEL_DICT["pswrecv11_wof"] = PSWRecV11WOFModel
+MODEL_DICT["pswrecv12_wof"] = PSWRecV12WOFModel
 
 
 def _build_unified_args() -> argparse.Namespace:
@@ -142,9 +144,9 @@ def _build_unified_args() -> argparse.Namespace:
         parser.add_argument("--num_heads", default=2, type=int)
         parser.add_argument("--alpha", default=0.3, type=float)
     elif temp_args.model_type.lower() in (
-        "pswrecv5_wof", "pswrecv6_wof", "pswrecv7_wof", "pswrecv8_wof", "pswrecv10_wof", "pswrecv11_wof",
+        "pswrecv5_wof", "pswrecv6_wof", "pswrecv7_wof", "pswrecv8_wof", "pswrecv10_wof", "pswrecv11_wof", "pswrecv12_wof",
     ):
-        # PSWRec V5-V8-V10-V11 share the same CLI flags
+        # PSWRec V5-V8-V10-V11-V12 share the same CLI flags
         parser.add_argument("--n_bands", default=4, type=int)
         parser.add_argument("--band_kernel_sizes", nargs="+", default=[3, 7, 15, 31], type=int)
         parser.add_argument("--band_dilations", nargs="+", default=[1, 2, 4, 8], type=int)
@@ -153,6 +155,8 @@ def _build_unified_args() -> argparse.Namespace:
         parser.add_argument("--phase_aux", action="store_true", default=False)
         parser.add_argument("--phase_aux_weight", default=0.0, type=float)
         parser.add_argument("--inner_size", default=None, type=int)
+        parser.add_argument("--sync_threshold", default=-0.7, type=float,
+                            help="V12 sync-gate: Beauty -0.7/-0.8; LastFM/MovieLens 0.0")
     elif temp_args.model_type.lower() == "bsarec":
         parser.add_argument("--c", default=3, type=int)
         parser.add_argument("--alpha", default=0.9, type=float)

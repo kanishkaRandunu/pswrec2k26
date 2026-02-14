@@ -1,0 +1,53 @@
+# ============================================================================
+# PSWRecV12 (WOF) -- Beauty dataset hyperparameters
+# ============================================================================
+#
+# PSWRecV12 integrates B-RoPE from experiment/B-RoPE-Code:
+#   - Identity phase mapping (no Linear on phases); num_heads must equal n_bands (4).
+#   - Sync-gate: cos(Δφ) < sync_threshold -> -1e9 before softmax.
+# For Beauty (short/sparse) use sync_threshold -0.7 or -0.8.
+#
+# Training params aligned to best-tuned Beauty run: tune_s1_lr0p0003 (lr=0.0003).
+# This file is for documentation/reference.  The actual values are passed
+# as CLI arguments in the PBS script.
+# ============================================================================
+
+# --- model architecture (B-RoPE with sync-gate) ---
+model_type: pswrecv12_wof
+hidden_size: 64
+num_hidden_layers: 2
+num_attention_heads: 4        # must equal n_bands for identity phase mapping
+inner_size: 256
+hidden_act: gelu
+hidden_dropout_prob: 0.5
+attention_probs_dropout_prob: 0.5
+initializer_range: 0.02
+max_seq_length: 50
+
+# --- PSWRecV12-specific ---
+n_bands: 4
+band_kernel_sizes: [3, 7, 15, 31]
+band_dilations: [1, 2, 4, 8]
+sync_threshold: -0.9        # Beauty: only block violently out-of-phase (Δφ≈π); use 0.0 for LastFM/MovieLens
+phase_bias_scale: 0.1
+phase_gate_scale: 1.0
+phase_aux: true
+phase_aux_weight: 0.05
+
+# --- training (best-tuned from tune_s1_lr0p0003: lr=0.0003) ---
+lr: 0.0003
+batch_size: 256
+epochs: 200
+patience: 10
+weight_decay: 0.0
+adam_beta1: 0.9
+adam_beta2: 0.999
+seed: 42
+
+# --- data ---
+data_name: Beauty
+data_dir: ../../WEARec/src/data/
+
+# --- evaluation ---
+# Full-item ranking with seen-item masking (WEARec's protocol)
+# Metrics: HR@{5,10,15,20}, NDCG@{5,10,15,20}

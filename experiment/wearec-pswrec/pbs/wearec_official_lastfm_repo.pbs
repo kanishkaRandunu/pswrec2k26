@@ -8,10 +8,12 @@
 #PBS -l storage=scratch/up63+gdata/up63
 #PBS -l wd
 #PBS -j oe
-#PBS -N wearec_official_lastfm
+#PBS -N wearec_lastfm_repo
 
-# WEARec Official baseline on LastFM dataset.
-# Submit from repo root:  qsub experiment/wearec-pswrec/pbs/wearec_official_lastfm.pbs
+# WEARec Official on LastFM with WEARec repo default hyperparameters.
+# Repo defaults (README + utils.py): lr=0.001, alpha=0.3, num_heads=2.
+# Fair comparison with PSWRecV12 LastFM: same data, same protocol.
+# Submit from repo root:  qsub experiment/wearec-pswrec/pbs/wearec_official_lastfm_repo.pbs
 
 set -e
 cd "$PBS_O_WORKDIR"
@@ -31,14 +33,14 @@ LOG_DIR="log/wearec_official"
 mkdir -p "${LOG_DIR}"
 echo "$(date '+%Y-%m-%d %H:%M:%S')" > "${LOG_DIR}/.job_${PBS_JOBID}.started"
 
-LIVE_LOG="wearec_official_lastfm_live_${PBS_JOBID}.log"
+LIVE_LOG="wearec_official_lastfm_repo_live_${PBS_JOBID}.log"
 
 python -u "${EXPERIMENT_DIR}/main.py" \
     --data_name LastFM \
     --model_type WEARec \
-    --lr 0.0005 \
-    --alpha 0.2 \
-    --num_heads 8 \
+    --lr 0.001 \
+    --alpha 0.3 \
+    --num_heads 2 \
     --hidden_size 64 \
     --num_hidden_layers 2 \
     --max_seq_length 50 \
@@ -48,7 +50,7 @@ python -u "${EXPERIMENT_DIR}/main.py" \
     --epochs 200 \
     --patience 10 \
     --seed 42 \
-    --train_name wearec_official_lastfm \
+    --train_name wearec_official_lastfm_repo \
     2>&1 | tee "${LIVE_LOG}"
 
 echo "Job completed."

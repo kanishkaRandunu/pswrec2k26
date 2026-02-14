@@ -1,0 +1,95 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import math
+
+def rotate_half(x):
+    """Rotates half the hidden dimensions of the input for RoPE."""
+    x1, x2 = x.chunk(2, dim=-1)
+    return torch.cat((-x2, x1), dim=-1)
+
+def apply_behavioral_rope(q, k, phase):
+    """
+    Applies the Behavioral Rotary Position Embedding.
+    Forces Q and K to align geometrically based on the wavelet phase.
+    """
+    # Duplicate the phase for the two halves of the embedding dimension
+    phase = torch.cat([phase, phase], dim=-1) 
+    
+    sin_phase = torch.sin(phase)
+    cos_phase = torch.cos(phase)
+    
+    # Rotate Q and K (V remains untouched)
+    q_rotated = (q * cos_phase) + (rotate_half(q) * sin_phase)
+    k_rotated = (k * cos_phase) + (rotate_half(k) * sin_phase)
+    
+    return q_rotated, k_rotated
+
+class BehavioralRotaryAttention(nn.Module):
+    def __init__(self, d_model, num_heads=4, sync_threshold=0.0):
+        super().__init__()
+        assert d_model % num_heads == 0, "d_model must be divisible by num_heads"
+        
+        self.d_model = d_model
+        self.num_heads = num_heads
+        self.head_dim = d_model // num_heads
+        
+        # The Sync-Gate Tunable Hyperparameter:
+        # 0.0 (Hard Heaviside) -> Optimal for dense rhythmic data (Last.FM, MovieLens)
+        # e.g., -0.8 (Soft Gate) -> Optimal for sparse, bursty data (Amazon Beauty)
+        self.sync_threshold = sync_threshold 
+        
+        # Standard Projections
+        self.q_proj = nn.Linear(d_model, d_model, bias=False)
+        self.k_proj = nn.Linear(d_model, d_model, bias=False)
+        self.v_proj = nn.Linear(d_model, d_model, bias=False)
+        self.out_proj = nn.Linear(d_model, d_model, bias=False)
+
+    def forward(self, x, wavelet_phases, causal_mask=True):
+        """
+        x: (Batch, Seq_Len, d_model) -> Standard item embeddings
+        wavelet_phases: (Batch, Seq_Len, num_heads) -> The 4 raw phase angles from your Daubechies filterbank
+        """
+        B, L, _ = x.shape
+        
+        # 1. Linear Projections
+        q = self.q_proj(x).view(B, L, self.num_heads, self.head_dim).transpose(1, 2) # (B, H, L, D)
+        k = self.k_proj(x).view(B, L, self.num_heads, self.head_dim).transpose(1, 2)
+        v = self.v_proj(x).view(B, L, self.num_heads, self.head_dim).transpose(1, 2)
+        
+        # 2. Map Phase to Heads (Identity Mapping - No Scrambling)
+        # Reshape to (B, H, L, 1) and expand to match half of head_dim for RoPE
+        phase_head = wavelet_phases.transpose(1, 2).unsqueeze(-1) 
+        phase_rope = phase_head.expand(-1, -1, -1, self.head_dim // 2)
+        
+        # 3. Apply Behavioral RoPE
+        q_rotated, k_rotated = apply_behavioral_rope(q, k, phase_rope)
+        
+        # 4. Compute Geometric Attention
+        attn_scores = torch.matmul(q_rotated, k_rotated.transpose(-2, -1)) / math.sqrt(self.head_dim)
+        
+        # 5. The "Sync-Gate" Resonance Mask
+        # Compute pairwise physical phase differences: Phi_i - Phi_j
+        phi_i = phase_head # (B, H, L, 1) - Current target items
+        phi_j = phase_head.transpose(-2, -1) # (B, H, 1, L) - Historical items
+        delta_phi = phi_i - phi_j
+        
+        cos_delta_phi = torch.cos(delta_phi)
+        
+        # Apply the hard mask (Blocks attention if behavioral coherence is below threshold)
+        sync_mask = cos_delta_phi < self.sync_threshold
+        attn_scores = attn_scores.masked_fill(sync_mask, -1e9)
+        
+        # 6. Standard Causal Masking
+        if causal_mask:
+            causal_mat = torch.tril(torch.ones(L, L, device=x.device)).view(1, 1, L, L)
+            attn_scores = attn_scores.masked_fill(causal_mat == 0, -1e9)
+            
+        # 7. Softmax and Value Multiplication 
+        # (V is untouched, protecting the semantic integrity)
+        attn_probs = F.softmax(attn_scores, dim=-1)
+        out = torch.matmul(attn_probs, v) 
+        
+        # 8. Recombine Heads
+        out = out.transpose(1, 2).contiguous().view(B, L, self.d_model)
+        return self.out_proj(out)
