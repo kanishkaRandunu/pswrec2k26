@@ -6,10 +6,12 @@ PSWRecV12 adapted for the WEARec Official Framework (WOF).
 
 Integrates B-RoPE from experiment/B-RoPE-Code:
   - Identity mapping for phase: no nn.Linear on wavelet_phases; (B, L, 4) maps to num_heads=4.
+  - Adaptive Magnitude Gating: Dynamically shuts off B-RoPE for sparse noise (e.g., Beauty)
+    while engaging it for dense rhythmic data (e.g., Last.FM).
   - Only Q and K are rotated by apply_behavioral_rope; V stays pure (semantic integrity).
   - Sync-gate: cos(Δφ) < sync_threshold -> -1e9 before softmax (hard filter on behavioral noise).
 
-For Beauty (short/sparse) use sync_threshold=-0.7 or -0.8; for LastFM/MovieLens use 0.0.
+For Beauty (short/sparse) use sync_threshold=-0.7 or -0.9; for LastFM/MovieLens use 0.0.
 """
 
 import math
@@ -24,12 +26,12 @@ from model._abstract_model import SequentialRecModel
 
 
 # ---------------------------------------------------------------------------
-# Architecture components (filterbank shared with V5/V11)
+# Architecture components (Filterbank with Adaptive Magnitude Gating)
 # ---------------------------------------------------------------------------
 
 
 class LocalPhaseFilterBankV5(nn.Module):
-    r"""Multi-band quadrature filterbank over the sequence axis."""
+    r"""Multi-band quadrature filterbank with Adaptive Magnitude Gating."""
 
     def __init__(
         self,
@@ -70,7 +72,15 @@ class LocalPhaseFilterBankV5(nn.Module):
         self.band_pads = pads
 
         self.mag_eps = 1e-8
-        self.mag_tau = 1e-3
+        self.base_mag_tau = 1e-3
+
+        # Adaptive Magnitude Gate: [Mean, Variance] per band -> dynamic threshold per band
+        self.tau_proj = nn.Sequential(
+            nn.Linear(self.n_bands * 2, self.n_bands * 2),
+            nn.ReLU(),
+            nn.Linear(self.n_bands * 2, self.n_bands),
+            nn.Softplus(),
+        )
 
     def forward(
         self, x: torch.Tensor
@@ -98,7 +108,14 @@ class LocalPhaseFilterBankV5(nn.Module):
         mag = torch.sqrt(U * U + V * V + self.mag_eps)
         # Compute phi safely (U + 1e-8 avoids atan2(0,0) and division-by-zero in backward)
         phi = torch.atan2(V, U + 1e-8)
-        gate = (mag > self.mag_tau).float()
+
+        # Adaptive Magnitude Gating: sequence-level stats -> dynamic tau per user/band
+        mag_mean = mag.mean(dim=-1)  # (B, n_bands)
+        mag_var = mag.var(dim=-1, unbiased=False)  # (B, n_bands)
+        mag_stats = torch.cat([mag_mean, mag_var], dim=-1)  # (B, n_bands * 2)
+        dynamic_tau = self.tau_proj(mag_stats).unsqueeze(-1)  # (B, n_bands, 1)
+        tau = dynamic_tau + self.base_mag_tau
+        gate = (mag > tau).float()
         phi = phi * gate
         cos_phi = torch.cos(phi)
         sin_phi = torch.sin(phi)
@@ -383,7 +400,8 @@ class PSWEncoderV12(nn.Module):
 class PSWRecV12WOFModel(SequentialRecModel):
     r"""PSWRecV12 on WEARec Official Framework.
 
-    B-RoPE with identity phase mapping and sync-gate. For Beauty use sync_threshold=-0.7/-0.8.
+    B-RoPE with identity phase mapping, Adaptive Magnitude Gating, and sync-gate.
+    For Beauty use sync_threshold=-0.7 or -0.9; for LastFM/MovieLens use 0.0.
     """
 
     def __init__(self, args):
@@ -406,8 +424,8 @@ class PSWRecV12WOFModel(SequentialRecModel):
         self.phase_aux_weight = getattr(args, "phase_aux_weight", 0.0)
         self._last_phase_reg: Optional[torch.Tensor] = None
 
-        # Master lever for sync-gate: Beauty (sparse) -> -0.7/-0.8; LastFM/MovieLens (dense) -> 0.0
-        self.sync_threshold = getattr(args, "sync_threshold", -0.7)
+        # Sync-gate: Beauty (sparse) -> -0.7/-0.9; LastFM/MovieLens (dense) -> 0.0
+        self.sync_threshold = getattr(args, "sync_threshold", -0.9)
 
         if self.n_heads != self.n_bands:
             raise ValueError(
