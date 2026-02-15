@@ -1,20 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-PSWRecV13withoutphaserot adapted for the WEARec Official Framework (WOF).
+Residual Dynamic PSWRec (RD-PSWRec / V1111) adapted for the WEARec Official Framework.
 
-V13withoutphaserot:
-1) Head band gamma specialization for amplitude modulation of Q and K
-   Scale per head per token: 1 + sum_s softplus(gamma[h,s]) * mag_s(t)
-
-2) Small additive residual phase bias (no phase rotation)
-   Attention scores: (Q' K') / sqrt(d) + eps_h * PhaseAlign_h(i,j)
-
-No RoPE phase rotation is applied.
-
-n_heads and n_bands are decoupled: each head learns a mixture over bands (via
-band_logits and gamma), so num_attention_heads can be 2, 4, 8, etc. while
-n_bands stays 4. No equality constraint.
+Innovations:
+1) Residual Hyperpersonalization: Nudges the stable V13 global priors (gamma and
+   band_logits) from a context MLP; zero-init on the MLP output so training starts
+   identical to V13 (avoids catastrophic forgetting).
+2) Transient Value Modulation (V-AM): Positive temporal derivative of magnitude
+   (bursts) scales Value vectors only, amplifying payload at intent shifts without
+   corrupting Q/K attention probabilities.
+Static filterbank (LocalPhaseFilterBankV13NoRot) unchanged; no phase_aux.
 """
 
 import math
@@ -28,121 +24,65 @@ from model._abstract_model import SequentialRecModel
 
 
 # ---------------------------------------------------------------------------
-# 1. Filterbank: ungated cos, sin, magnitude
+# 1. Filterbank: ungated cos, sin, magnitude (identical to V13)
 # ---------------------------------------------------------------------------
 class LocalPhaseFilterBankV13NoRot(nn.Module):
-    """Extracts ungated phase features and magnitude for residual phase bias and amplitude modulation."""
+    """Static phase filterbank: extracts cos, sin, mag per band (no modulator)."""
 
-    def __init__(
-        self,
-        hidden_size: int,
-        kernel_sizes: List[int],
-        dilations: Optional[List[int]] = None,
-        mag_tau: float = 0.5,
-        mag_temp: float = 0.5,
-        mag_gate_mode: str = "mean",
-        mag_eps: float = 1e-8,
-    ):
+    def __init__(self, hidden_size: int, kernel_sizes: List[int], dilations: Optional[List[int]] = None):
         super().__init__()
         self.hidden_size = hidden_size
         self.kernel_sizes = kernel_sizes
         if dilations is None:
             dilations = [1 for _ in kernel_sizes]
         if len(dilations) != len(kernel_sizes):
-            raise ValueError(
-                f"band_dilations length {len(dilations)} must match band_kernel_sizes length {len(kernel_sizes)}"
-            )
+            raise ValueError("dilations length must match kernel_sizes length")
         self.dilations = dilations
         self.n_bands = len(kernel_sizes)
-        self.mag_tau = mag_tau
-        self.mag_temp = mag_temp
-        self.mag_gate_mode = mag_gate_mode
-        self.mag_eps = mag_eps
 
         real_convs: List[nn.Conv1d] = []
         imag_convs: List[nn.Conv1d] = []
         pads: List[int] = []
-
         for k, d in zip(kernel_sizes, dilations):
             pad = (k - 1) * d
             pads.append(pad)
             real_convs.append(
-                nn.Conv1d(
-                    hidden_size,
-                    hidden_size,
-                    kernel_size=k,
-                    dilation=d,
-                    padding=0,
-                    groups=hidden_size,
-                    bias=False,
-                )
+                nn.Conv1d(hidden_size, hidden_size, kernel_size=k, dilation=d, padding=0, groups=hidden_size, bias=False)
             )
             imag_convs.append(
-                nn.Conv1d(
-                    hidden_size,
-                    hidden_size,
-                    kernel_size=k,
-                    dilation=d,
-                    padding=0,
-                    groups=hidden_size,
-                    bias=False,
-                )
+                nn.Conv1d(hidden_size, hidden_size, kernel_size=k, dilation=d, padding=0, groups=hidden_size, bias=False)
             )
 
         self.real_convs = nn.ModuleList(real_convs)
         self.imag_convs = nn.ModuleList(imag_convs)
         self.band_pads = pads
+        self.mag_eps = 1e-8
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         B, L, D = x.size()
         x_t = x.transpose(1, 2)
-
         us: List[torch.Tensor] = []
         vs: List[torch.Tensor] = []
 
         for pad, conv_r, conv_i in zip(self.band_pads, self.real_convs, self.imag_convs):
             x_padded = F.pad(x_t, (pad, 0))
-            u = conv_r(x_padded).mean(dim=1)
-            v = conv_i(x_padded).mean(dim=1)
-            us.append(u)
-            vs.append(v)
+            us.append(conv_r(x_padded).mean(dim=1))
+            vs.append(conv_i(x_padded).mean(dim=1))
 
         U = torch.stack(us, dim=1)
         V = torch.stack(vs, dim=1)
         mag = torch.sqrt(U * U + V * V + self.mag_eps)
-        # phase
         phi = torch.atan2(V, U + 1e-8)
-        cos_phi = torch.cos(phi)
-        sin_phi = torch.sin(phi)
-        # soft, scale-aware gating (phase only)
-        # tau_eff is relative to batch signal magnitude so it transfers across datasets
-        if self.mag_gate_mode == "mean":
-            # mag: [B, n_bands, L]
-            mag_mean = mag.mean(dim=(1, 2), keepdim=True)  # [B, 1, 1]
-            tau_eff = self.mag_tau * mag_mean
-        else:
-            # fallback, treat mag_tau as absolute
-            tau_eff = torch.tensor(self.mag_tau, device=mag.device, dtype=mag.dtype).view(1, 1, 1)
-        # temperature is also scaled to keep gating shape stable across datasets
-        temp_eff = self.mag_temp * tau_eff + self.mag_eps
-        gate = torch.sigmoid((mag - tau_eff) / temp_eff)
-        # gate phase only (keep mag intact for AM / mixing modules)
-        cos_phi = cos_phi * gate
-        sin_phi = sin_phi * gate
-        return cos_phi, sin_phi, mag
+        return torch.cos(phi), torch.sin(phi), mag
 
 
 # ---------------------------------------------------------------------------
-# 2. Attention: amplitude modulation + residual phase bias, no phase rotation
+# 2. Residual Dynamic Attention Block
 # ---------------------------------------------------------------------------
-class AMResidualPhaseBiasAttentionV13NoRot(nn.Module):
+class ResidualDynamicAMPhaseAttention(nn.Module):
     """
-    Attention with:
-    - Q,K amplitude modulation: mag_mix[b,h,l] = sum_s softplus(gamma[h,s]) * mag[b,l,s]
-    - Additive residual phase alignment: per-head weights over bands (softmax(band_logits));
-      phase_align via weighted cos/sin features (cos(Δφ) = cos_i cos_j + sin_i sin_j).
-    - No phase rotation (no RoPE).
-    n_heads and n_bands are independent; no equality required.
+    Residual hyperpersonalization (base V13 priors + context nudges) and
+    Transient Value Modulation (V-AM): burst scales V only, not Q/K.
     """
 
     def __init__(
@@ -158,7 +98,6 @@ class AMResidualPhaseBiasAttentionV13NoRot(nn.Module):
         super().__init__()
         if hidden_size % n_heads != 0:
             raise ValueError(f"hidden_size {hidden_size} must be divisible by n_heads {n_heads}")
-
         self.n_heads = n_heads
         self.hidden_size = hidden_size
         self.head_dim = hidden_size // n_heads
@@ -172,21 +111,32 @@ class AMResidualPhaseBiasAttentionV13NoRot(nn.Module):
         self.out_dropout = nn.Dropout(hidden_dropout_prob)
         self.layer_norm = nn.LayerNorm(hidden_size, eps=layer_norm_eps)
 
-        self.band_logits = nn.Parameter(torch.zeros(n_heads, n_bands))
-        self.phase_bias = nn.Parameter(torch.full((n_heads,), float(phase_bias_init)))
-        self.gamma = nn.Parameter(torch.full((n_heads, n_bands), -3.0))
+        # Base V13 priors
+        self.base_band_logits = nn.Parameter(torch.zeros(n_heads, n_bands))
+        self.base_phase_bias = nn.Parameter(torch.full((n_heads,), float(phase_bias_init)))
+        self.base_gamma = nn.Parameter(torch.full((n_heads, n_bands), -3.0))
 
         with torch.no_grad():
             for h in range(n_heads):
                 center = (h + 0.5) * (n_bands / max(n_heads, 1.0))
                 for s in range(n_bands):
                     dist = (s + 0.5) - center
-                    self.band_logits.data[h, s] = -dist * dist
+                    self.base_band_logits.data[h, s] = -dist * dist
+
+        # Hyperpersonalization nudge MLP (output zero-initialized so we start as V13)
+        self.context_mlp = nn.Sequential(
+            nn.Linear(hidden_size, hidden_size // 2),
+            nn.GELU(),
+            nn.Linear(hidden_size // 2, n_heads * n_bands * 2),
+        )
+        nn.init.zeros_(self.context_mlp[-1].weight)
+        nn.init.zeros_(self.context_mlp[-1].bias)
+
+        self.burst_weight = nn.Parameter(torch.full((n_heads,), -5.0))
 
     def _shape(self, x: torch.Tensor) -> torch.Tensor:
         B, L, D = x.size()
-        x = x.view(B, L, self.n_heads, self.head_dim)
-        return x.permute(0, 2, 1, 3)
+        return x.view(B, L, self.n_heads, self.head_dim).permute(0, 2, 1, 3)
 
     def forward(
         self,
@@ -203,43 +153,80 @@ class AMResidualPhaseBiasAttentionV13NoRot(nn.Module):
         k = self._shape(self.key(hidden_states))
         v = self._shape(self.value(hidden_states))
 
-        cos_pl = cos_phi.permute(0, 2, 1)
-        sin_pl = sin_phi.permute(0, 2, 1)
-        mag_pl = mag.permute(0, 2, 1)
+        # 1. Personalization nudges (zero-init so Epoch 0 = V13)
+        context = hidden_states.mean(dim=1)  # (B, D)
+        deltas = self.context_mlp(context)  # (B, 2 * heads * bands)
+        delta_gamma, delta_logits = deltas.chunk(2, dim=-1)
+        delta_gamma = delta_gamma.view(B, self.n_heads, self.n_bands)
+        delta_logits = delta_logits.view(B, self.n_heads, self.n_bands)
 
+        # 2. Residual integration (base + nudge)
+        user_gamma = self.base_gamma.unsqueeze(0) + delta_gamma
+        user_band_logits = self.base_band_logits.unsqueeze(0) + delta_logits
+
+        # 3. Q/K amplitude modulation (no transient; keeps attention probabilities stable)
+        gamma_pos = F.softplus(user_gamma).unsqueeze(2)  # (B, n_heads, 1, n_bands)
+        mag_pl = mag.permute(0, 2, 1)  # (B, n_bands, L)
         mag_pl = mag_pl / (mag_pl.mean(dim=-1, keepdim=True) + 1e-8)
-
-        gamma_pos = F.softplus(self.gamma)
-        mag_mix = (mag_pl.unsqueeze(1) * gamma_pos.view(1, self.n_heads, 1, self.n_bands)).sum(dim=-1)
-        mag_mix = torch.tanh(mag_mix)
-        scale = 1.0 + 0.5 * mag_mix.unsqueeze(-1)
+        mag_mix = (mag_pl.unsqueeze(1) * gamma_pos).sum(dim=-1)  # (B, n_heads, L)
+        scale = 1.0 + 0.5 * torch.tanh(mag_mix).unsqueeze(-1)
         q = q * scale
         k = k * scale
 
-        attn_scores = torch.matmul(q, k.transpose(-1, -2)) / math.sqrt(self.head_dim)
+        # 4. Transient Value Modulation (V-AM): burst scales V only
+        # mag_pl is (B, L, n_bands); keep that layout so pad/diff are along L (sequence), not n_bands
+        # #region agent log
+        try:
+            import json
+            _log = open("/home/572/kd6504/TRACT/.cursor/debug.log", "a")
+            _log.write(json.dumps({"hypothesisId": "H1", "location": "pswrecv1111_wof.py:V-AM", "message": "mag and mag_pl shapes", "data": {"mag_shape": list(mag.shape), "mag_pl_shape": list(mag_pl.shape)}, "timestamp": __import__("time").time()}) + "\n")
+            _log.close()
+        except Exception: pass
+        # #endregion
+        mag_pl_norm = mag_pl  # (B, L, n_bands); do not permute to (B, n_bands, L) or burst_mix becomes (B,1,n_bands)
+        mag_norm = mag_pl_norm / (mag_pl_norm.mean(dim=1, keepdim=True) + 1e-8)
+        mag_padded = F.pad(mag_norm, (0, 0, 1, 0))[:, :-1, :]  # (B, L, n_bands), shift right in L
+        mag_burst = F.relu(mag_norm - mag_padded)
+        burst_mix = mag_burst.sum(dim=-1).unsqueeze(1)  # (B, 1, L)
+        # #region agent log
+        try:
+            _log = open("/home/572/kd6504/TRACT/.cursor/debug.log", "a")
+            _log.write(json.dumps({"hypothesisId": "H2", "location": "pswrecv1111_wof.py:V-AM", "message": "mag_pl_norm burst_mix v v_scale shapes", "data": {"mag_pl_norm_shape": list(mag_pl_norm.shape), "mag_burst_shape": list(mag_burst.shape), "burst_mix_shape": list(burst_mix.shape), "v_shape": list(v.shape)}, "timestamp": __import__("time").time()}) + "\n")
+            _log.close()
+        except Exception: pass
+        # #endregion
+        burst_pos = F.softplus(self.burst_weight).view(1, self.n_heads, 1)  # (1, H, 1)
+        v_scale = (1.0 + burst_pos * burst_mix).unsqueeze(-1)  # (B, H, L, 1) to match v (B, H, L, head_dim)
+        # #region agent log
+        try:
+            _log = open("/home/572/kd6504/TRACT/.cursor/debug.log", "a")
+            _log.write(json.dumps({"hypothesisId": "H3", "location": "pswrecv1111_wof.py:V-AM", "message": "v_scale shape before multiply", "data": {"v_scale_shape": list(v_scale.shape)}, "timestamp": __import__("time").time()}) + "\n")
+            _log.close()
+        except Exception: pass
+        # #endregion
+        v = v * v_scale
 
-        band_weights = torch.softmax(self.band_logits, dim=-1)
+        # 5. Dynamic phase alignment
+        attn_scores = torch.matmul(q, k.transpose(-1, -2)) / math.sqrt(self.head_dim)
+        band_weights = torch.softmax(user_band_logits, dim=-1).unsqueeze(2)  # (B, n_heads, 1, n_bands)
         band_weights_sqrt = torch.sqrt(band_weights + 1e-8)
-        cos_feat = cos_pl.unsqueeze(1) * band_weights_sqrt.view(1, self.n_heads, 1, self.n_bands)
-        sin_feat = sin_pl.unsqueeze(1) * band_weights_sqrt.view(1, self.n_heads, 1, self.n_bands)
+        cos_pl = cos_phi.permute(0, 2, 1)  # (B, L, n_bands)
+        sin_pl = sin_phi.permute(0, 2, 1)
+        cos_feat = cos_pl.unsqueeze(1) * band_weights_sqrt
+        sin_feat = sin_pl.unsqueeze(1) * band_weights_sqrt
         phase_align = torch.matmul(cos_feat, cos_feat.transpose(-1, -2)) + torch.matmul(
             sin_feat, sin_feat.transpose(-1, -2)
         )
         phase_align = phase_align / math.sqrt(self.n_bands)
-        phase_scale = F.softplus(self.phase_bias).view(1, self.n_heads, 1, 1)
+        phase_scale = F.softplus(self.base_phase_bias).view(1, self.n_heads, 1, 1)
         attn_scores = attn_scores + phase_scale * phase_align
 
         if attention_mask is not None:
             attn_scores = attn_scores + attention_mask
 
-        attn_probs = F.softmax(attn_scores, dim=-1)
-        attn_probs = self.attn_dropout(attn_probs)
-        context = torch.matmul(attn_probs, v)
-        context = context.permute(0, 2, 1, 3).contiguous().view(B, L, self.hidden_size)
-        hidden_states = self.out_proj(context)
-        hidden_states = self.out_dropout(hidden_states)
-        hidden_states = self.layer_norm(hidden_states + residual)
-        return hidden_states
+        attn_probs = self.attn_dropout(F.softmax(attn_scores, dim=-1))
+        context_out = torch.matmul(attn_probs, v).permute(0, 2, 1, 3).contiguous().view(B, L, self.hidden_size)
+        return self.layer_norm(self.out_dropout(self.out_proj(context_out)) + residual)
 
 
 # ---------------------------------------------------------------------------
@@ -266,7 +253,7 @@ class FeedForwardV13NoRot(nn.Module):
             "sigmoid": torch.sigmoid,
         }
         if hidden_act not in act_map:
-            raise ValueError(f"Unsupported hidden_act '{hidden_act}' in pswrecv13withoutphaserot_wof.")
+            raise ValueError(f"Unsupported hidden_act '{hidden_act}' in pswrecv1111_wof.")
         self.act_fn = act_map[hidden_act]
         self.dense_2 = nn.Linear(inner_size, hidden_size)
         self.layer_norm = nn.LayerNorm(hidden_size, eps=layer_norm_eps)
@@ -281,8 +268,8 @@ class FeedForwardV13NoRot(nn.Module):
         return self.layer_norm(x + residual)
 
 
-class PSWBlockV13NoRot(nn.Module):
-    """Single layer: AM residual phase bias attention + FFN."""
+class ResidualDynamicPSWBlock(nn.Module):
+    """Single layer: Residual dynamic AM phase attention + FFN."""
 
     def __init__(
         self,
@@ -297,7 +284,7 @@ class PSWBlockV13NoRot(nn.Module):
         layer_norm_eps: float,
     ):
         super().__init__()
-        self.attn = AMResidualPhaseBiasAttentionV13NoRot(
+        self.attn = ResidualDynamicAMPhaseAttention(
             n_heads=n_heads,
             hidden_size=hidden_size,
             n_bands=n_bands,
@@ -326,8 +313,8 @@ class PSWBlockV13NoRot(nn.Module):
         return self.ffn(hidden_states)
 
 
-class PSWEncoderV13NoRot(nn.Module):
-    """Stack of PSWBlockV13NoRot layers."""
+class ResidualDynamicPSWEncoder(nn.Module):
+    """Stack of ResidualDynamicPSWBlock layers."""
 
     def __init__(
         self,
@@ -344,7 +331,7 @@ class PSWEncoderV13NoRot(nn.Module):
     ):
         super().__init__()
         self.layers = nn.ModuleList([
-            PSWBlockV13NoRot(
+            ResidualDynamicPSWBlock(
                 n_heads=n_heads,
                 hidden_size=hidden_size,
                 n_bands=n_bands,
@@ -378,12 +365,12 @@ class PSWEncoderV13NoRot(nn.Module):
 
 
 # ---------------------------------------------------------------------------
-# 4. WOF model shell
+# 4. WOF model shell (V1111: Residual Dynamic, no phase_aux)
 # ---------------------------------------------------------------------------
-class PSWRecV13withoutphaserotWOFModel(SequentialRecModel):
+class ResidualDynamicPSWRecWOFModel(SequentialRecModel):
     """
-    PSWRecV13withoutphaserot on WEARec Official Framework.
-    num_attention_heads and n_bands are independent (e.g. num_attention_heads=2, n_bands=4).
+    RD-PSWRec: residual hyperpersonalization (base V13 + context nudges) and
+    V-AM (transient burst scales Values only). Starts training as V13.
     """
 
     def __init__(self, args):
@@ -396,27 +383,20 @@ class PSWRecV13withoutphaserotWOFModel(SequentialRecModel):
         self.attn_dropout_prob = args.attention_probs_dropout_prob
         self.hidden_act = args.hidden_act
         self.layer_norm_eps = 1e-12
-        self.initializer_range = args.initializer_range
         band_kernel_sizes = getattr(args, "band_kernel_sizes", [3, 7, 15, 31])
         band_dilations = getattr(args, "band_dilations", [1, 2, 4, 8])
         self.n_bands = getattr(args, "n_bands", len(band_kernel_sizes))
         self.phase_bias_init = getattr(args, "phase_bias_init", -5.0)
-        self.phase_aux = getattr(args, "phase_aux", False)
-        self.phase_aux_weight = getattr(args, "phase_aux_weight", 0.0)
-        self._last_phase_reg: Optional[torch.Tensor] = None
 
         self.LayerNorm = nn.LayerNorm(self.hidden_size, eps=self.layer_norm_eps)
         self.dropout = nn.Dropout(self.hidden_dropout_prob)
+
         self.phase_filter = LocalPhaseFilterBankV13NoRot(
             hidden_size=self.hidden_size,
             kernel_sizes=band_kernel_sizes,
             dilations=band_dilations,
-            mag_tau=getattr(args, "mag_tau", 0.5),
-            mag_temp=getattr(args, "mag_temp", 0.5),
-            mag_gate_mode=getattr(args, "mag_gate_mode", "mean"),
-            mag_eps=getattr(args, "mag_eps", 1e-8),
         )
-        self.encoder = PSWEncoderV13NoRot(
+        self.encoder = ResidualDynamicPSWEncoder(
             n_layers=self.n_layers,
             n_heads=self.n_heads,
             hidden_size=self.hidden_size,
@@ -434,16 +414,12 @@ class PSWRecV13withoutphaserotWOFModel(SequentialRecModel):
         sequence_emb = self.add_position_embedding(input_ids)
         sequence_emb = self.LayerNorm(sequence_emb)
         sequence_emb = self.dropout(sequence_emb)
+
         cos_phi, sin_phi, mag = self.phase_filter(sequence_emb)
         cos_phi = cos_phi[:, : self.n_bands, :]
         sin_phi = sin_phi[:, : self.n_bands, :]
         mag = mag[:, : self.n_bands, :]
-        if self.phase_aux:
-            cos_diff = cos_phi[:, :, 1:] - cos_phi[:, :, :-1]
-            sin_diff = sin_phi[:, :, 1:] - sin_phi[:, :, :-1]
-            self._last_phase_reg = (cos_diff.pow(2) + sin_diff.pow(2)).mean()
-        else:
-            self._last_phase_reg = None
+
         extended_attention_mask = self.get_attention_mask(input_ids)
         encoder_outputs = self.encoder(
             sequence_emb,
@@ -463,9 +439,11 @@ class PSWRecV13withoutphaserotWOFModel(SequentialRecModel):
         item_emb = self.item_embeddings.weight
         logits = torch.matmul(seq_output, item_emb.transpose(0, 1))
         loss = nn.CrossEntropyLoss()(logits, answers)
-        if self.phase_aux and self._last_phase_reg is not None:
-            loss = loss + self.phase_aux_weight * self._last_phase_reg
         return loss
 
     def predict(self, input_ids, user_ids=None, all_sequence_output=False):
         return self.forward(input_ids, user_ids, all_sequence_output)
+
+
+# Alias for main.py registration (model_type pswrecv1111)
+HyperpersonalizedPSWRecWOFModel = ResidualDynamicPSWRecWOFModel

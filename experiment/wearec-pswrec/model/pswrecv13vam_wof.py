@@ -1,20 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-PSWRecV13withoutphaserot adapted for the WEARec Official Framework (WOF).
+PSWRecV13 VAM (Value Amplitude Modulation) — WEARec Official Framework (WOF).
 
-V13withoutphaserot:
-1) Head band gamma specialization for amplitude modulation of Q and K
-   Scale per head per token: 1 + sum_s softplus(gamma[h,s]) * mag_s(t)
-
-2) Small additive residual phase bias (no phase rotation)
-   Attention scores: (Q' K') / sqrt(d) + eps_h * PhaseAlign_h(i,j)
-
-No RoPE phase rotation is applied.
-
-n_heads and n_bands are decoupled: each head learns a mixture over bands (via
-band_logits and gamma), so num_attention_heads can be 2, 4, 8, etc. while
-n_bands stays 4. No equality constraint.
+Same as PSWRecV13withoutphaserot except: amplitude scale is applied to Q, K, and V.
+- Router (Q, K): attention probabilities (SOTA precision/NDCG).
+- Payload (V): scale = 1.0 + 0.5 * mag_mix so high-magnitude periodic items
+  inject more energy into the output (bridges Hit Ratio gap vs WEARec).
 """
 
 import math
@@ -28,7 +20,7 @@ from model._abstract_model import SequentialRecModel
 
 
 # ---------------------------------------------------------------------------
-# 1. Filterbank: ungated cos, sin, magnitude
+# 1. Filter bank and FFN (same as V13withoutphaserot; duplicated for standalone load)
 # ---------------------------------------------------------------------------
 class LocalPhaseFilterBankV13NoRot(nn.Module):
     """Extracts ungated phase features and magnitude for residual phase bias and amplitude modulation."""
@@ -38,10 +30,6 @@ class LocalPhaseFilterBankV13NoRot(nn.Module):
         hidden_size: int,
         kernel_sizes: List[int],
         dilations: Optional[List[int]] = None,
-        mag_tau: float = 0.5,
-        mag_temp: float = 0.5,
-        mag_gate_mode: str = "mean",
-        mag_eps: float = 1e-8,
     ):
         super().__init__()
         self.hidden_size = hidden_size
@@ -54,10 +42,6 @@ class LocalPhaseFilterBankV13NoRot(nn.Module):
             )
         self.dilations = dilations
         self.n_bands = len(kernel_sizes)
-        self.mag_tau = mag_tau
-        self.mag_temp = mag_temp
-        self.mag_gate_mode = mag_gate_mode
-        self.mag_eps = mag_eps
 
         real_convs: List[nn.Conv1d] = []
         imag_convs: List[nn.Conv1d] = []
@@ -92,6 +76,7 @@ class LocalPhaseFilterBankV13NoRot(nn.Module):
         self.real_convs = nn.ModuleList(real_convs)
         self.imag_convs = nn.ModuleList(imag_convs)
         self.band_pads = pads
+        self.mag_eps = 1e-8
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         B, L, D = x.size()
@@ -110,39 +95,55 @@ class LocalPhaseFilterBankV13NoRot(nn.Module):
         U = torch.stack(us, dim=1)
         V = torch.stack(vs, dim=1)
         mag = torch.sqrt(U * U + V * V + self.mag_eps)
-        # phase
         phi = torch.atan2(V, U + 1e-8)
         cos_phi = torch.cos(phi)
         sin_phi = torch.sin(phi)
-        # soft, scale-aware gating (phase only)
-        # tau_eff is relative to batch signal magnitude so it transfers across datasets
-        if self.mag_gate_mode == "mean":
-            # mag: [B, n_bands, L]
-            mag_mean = mag.mean(dim=(1, 2), keepdim=True)  # [B, 1, 1]
-            tau_eff = self.mag_tau * mag_mean
-        else:
-            # fallback, treat mag_tau as absolute
-            tau_eff = torch.tensor(self.mag_tau, device=mag.device, dtype=mag.dtype).view(1, 1, 1)
-        # temperature is also scaled to keep gating shape stable across datasets
-        temp_eff = self.mag_temp * tau_eff + self.mag_eps
-        gate = torch.sigmoid((mag - tau_eff) / temp_eff)
-        # gate phase only (keep mag intact for AM / mixing modules)
-        cos_phi = cos_phi * gate
-        sin_phi = sin_phi * gate
         return cos_phi, sin_phi, mag
 
 
+class FeedForwardV13NoRot(nn.Module):
+    """Position-wise FFN with residual + LayerNorm."""
+
+    def __init__(
+        self,
+        hidden_size: int,
+        inner_size: int,
+        hidden_dropout_prob: float,
+        hidden_act: str,
+        layer_norm_eps: float,
+    ):
+        super().__init__()
+        self.dense_1 = nn.Linear(hidden_size, inner_size)
+        act_map = {
+            "gelu": lambda x: x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0))),
+            "relu": F.relu,
+            "swish": lambda x: x * torch.sigmoid(x),
+            "tanh": torch.tanh,
+            "sigmoid": torch.sigmoid,
+        }
+        if hidden_act not in act_map:
+            raise ValueError(f"Unsupported hidden_act '{hidden_act}' in pswrecv13vam_wof.")
+        self.act_fn = act_map[hidden_act]
+        self.dense_2 = nn.Linear(inner_size, hidden_size)
+        self.layer_norm = nn.LayerNorm(hidden_size, eps=layer_norm_eps)
+        self.dropout = nn.Dropout(hidden_dropout_prob)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        residual = x
+        x = self.dense_1(x)
+        x = self.act_fn(x)
+        x = self.dense_2(x)
+        x = self.dropout(x)
+        return self.layer_norm(x + residual)
+
+
 # ---------------------------------------------------------------------------
-# 2. Attention: amplitude modulation + residual phase bias, no phase rotation
+# 2. Attention: Q,K amplitude modulation + Value Amplitude Modulation (VAM)
 # ---------------------------------------------------------------------------
-class AMResidualPhaseBiasAttentionV13NoRot(nn.Module):
+class AMResidualPhaseBiasAttentionV13NoRotVAM(nn.Module):
     """
-    Attention with:
-    - Q,K amplitude modulation: mag_mix[b,h,l] = sum_s softplus(gamma[h,s]) * mag[b,l,s]
-    - Additive residual phase alignment: per-head weights over bands (softmax(band_logits));
-      phase_align via weighted cos/sin features (cos(Δφ) = cos_i cos_j + sin_i sin_j).
-    - No phase rotation (no RoPE).
-    n_heads and n_bands are independent; no equality required.
+    Same as AMResidualPhaseBiasAttentionV13NoRot plus Value Amplitude Modulation:
+    v = v * scale so the payload (not just the router) is scaled by wave magnitude.
     """
 
     def __init__(
@@ -215,6 +216,7 @@ class AMResidualPhaseBiasAttentionV13NoRot(nn.Module):
         scale = 1.0 + 0.5 * mag_mix.unsqueeze(-1)
         q = q * scale
         k = k * scale
+        v = v * scale  # Value Amplitude Modulation: payload energy scales with magnitude
 
         attn_scores = torch.matmul(q, k.transpose(-1, -2)) / math.sqrt(self.head_dim)
 
@@ -242,47 +244,8 @@ class AMResidualPhaseBiasAttentionV13NoRot(nn.Module):
         return hidden_states
 
 
-# ---------------------------------------------------------------------------
-# 3. Feed forward and encoder blocks
-# ---------------------------------------------------------------------------
-class FeedForwardV13NoRot(nn.Module):
-    """Position-wise FFN with residual + LayerNorm."""
-
-    def __init__(
-        self,
-        hidden_size: int,
-        inner_size: int,
-        hidden_dropout_prob: float,
-        hidden_act: str,
-        layer_norm_eps: float,
-    ):
-        super().__init__()
-        self.dense_1 = nn.Linear(hidden_size, inner_size)
-        act_map = {
-            "gelu": lambda x: x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0))),
-            "relu": F.relu,
-            "swish": lambda x: x * torch.sigmoid(x),
-            "tanh": torch.tanh,
-            "sigmoid": torch.sigmoid,
-        }
-        if hidden_act not in act_map:
-            raise ValueError(f"Unsupported hidden_act '{hidden_act}' in pswrecv13withoutphaserot_wof.")
-        self.act_fn = act_map[hidden_act]
-        self.dense_2 = nn.Linear(inner_size, hidden_size)
-        self.layer_norm = nn.LayerNorm(hidden_size, eps=layer_norm_eps)
-        self.dropout = nn.Dropout(hidden_dropout_prob)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        residual = x
-        x = self.dense_1(x)
-        x = self.act_fn(x)
-        x = self.dense_2(x)
-        x = self.dropout(x)
-        return self.layer_norm(x + residual)
-
-
-class PSWBlockV13NoRot(nn.Module):
-    """Single layer: AM residual phase bias attention + FFN."""
+class PSWBlockV13NoRotVAM(nn.Module):
+    """Single layer: VAM attention + FFN."""
 
     def __init__(
         self,
@@ -297,7 +260,7 @@ class PSWBlockV13NoRot(nn.Module):
         layer_norm_eps: float,
     ):
         super().__init__()
-        self.attn = AMResidualPhaseBiasAttentionV13NoRot(
+        self.attn = AMResidualPhaseBiasAttentionV13NoRotVAM(
             n_heads=n_heads,
             hidden_size=hidden_size,
             n_bands=n_bands,
@@ -326,8 +289,8 @@ class PSWBlockV13NoRot(nn.Module):
         return self.ffn(hidden_states)
 
 
-class PSWEncoderV13NoRot(nn.Module):
-    """Stack of PSWBlockV13NoRot layers."""
+class PSWEncoderV13NoRotVAM(nn.Module):
+    """Stack of PSWBlockV13NoRotVAM layers."""
 
     def __init__(
         self,
@@ -344,7 +307,7 @@ class PSWEncoderV13NoRot(nn.Module):
     ):
         super().__init__()
         self.layers = nn.ModuleList([
-            PSWBlockV13NoRot(
+            PSWBlockV13NoRotVAM(
                 n_heads=n_heads,
                 hidden_size=hidden_size,
                 n_bands=n_bands,
@@ -378,12 +341,12 @@ class PSWEncoderV13NoRot(nn.Module):
 
 
 # ---------------------------------------------------------------------------
-# 4. WOF model shell
+# WOF model shell
 # ---------------------------------------------------------------------------
-class PSWRecV13withoutphaserotWOFModel(SequentialRecModel):
+class PSWRecV13VAMWOFModel(SequentialRecModel):
     """
-    PSWRecV13withoutphaserot on WEARec Official Framework.
-    num_attention_heads and n_bands are independent (e.g. num_attention_heads=2, n_bands=4).
+    PSWRecV13 with Value Amplitude Modulation (Q,K,V scaled by magnitude).
+    Same hyperparameters as V13withoutphaserot; use same v13 params (n_heads=4, n_bands=4, etc.).
     """
 
     def __init__(self, args):
@@ -411,12 +374,8 @@ class PSWRecV13withoutphaserotWOFModel(SequentialRecModel):
             hidden_size=self.hidden_size,
             kernel_sizes=band_kernel_sizes,
             dilations=band_dilations,
-            mag_tau=getattr(args, "mag_tau", 0.5),
-            mag_temp=getattr(args, "mag_temp", 0.5),
-            mag_gate_mode=getattr(args, "mag_gate_mode", "mean"),
-            mag_eps=getattr(args, "mag_eps", 1e-8),
         )
-        self.encoder = PSWEncoderV13NoRot(
+        self.encoder = PSWEncoderV13NoRotVAM(
             n_layers=self.n_layers,
             n_heads=self.n_heads,
             hidden_size=self.hidden_size,

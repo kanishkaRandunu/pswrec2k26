@@ -56,6 +56,27 @@ V13withoutphaserot (v13 params) is the closest to WEARec Official (NDCG@10 gap -
 
 ---
 
+## Flip LastFM tests (Option A / B)
+
+Micro-adjustments to try to close the 0.0006 NDCG@10 gap (no model redesign).
+
+**Option A — Phase bias strength (ready to run)**  
+Same v13 params, only `phase_bias_init` changed:
+
+| Config | phase_bias_init | YAML | PBS |
+|--------|-----------------|------|-----|
+| pb4p5 | -4.5 | `configs/pswrecv13withoutphaserot_wof_lastfm_phasebias_4p5.yaml` | `pbs/pswrecv13withoutphaserot_wof_lastfm_phasebias_4p5.pbs` |
+| pb4p0 | -4.0 | `configs/pswrecv13withoutphaserot_wof_lastfm_phasebias_4p0.yaml` | `pbs/pswrecv13withoutphaserot_wof_lastfm_phasebias_4p0.pbs` |
+
+Submit from repo root:  
+`qsub experiment/wearec-pswrec/pbs/pswrecv13withoutphaserot_wof_lastfm_phasebias_4p5.pbs`  
+`qsub experiment/wearec-pswrec/pbs/pswrecv13withoutphaserot_wof_lastfm_phasebias_4p0.pbs`
+
+**Option B — Amp scale (blocked until code change)**  
+Current code uses `scale = 1.0 + 0.5 * mag_mix` (0.5 fixed). To test 0.6 and 0.7 from config, add an `amp_scale` argument to the model and to `main.py` (default 0.5), then create YAML/PBS with `amp_scale: 0.6` and `amp_scale: 0.7`.
+
+---
+
 ## Full Tuning & Micro-Sweep Results (sorted by NDCG@10)
 
 Complete table from `collect_results.sh` (Stage 1–3 + micro-sweep), as of 2026-02-15.

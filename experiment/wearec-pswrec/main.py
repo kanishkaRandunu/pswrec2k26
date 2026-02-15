@@ -38,6 +38,7 @@ python main.py --data_name Beauty --model_type pswrecv5_wof \
 
 import os
 import sys
+import time
 import argparse
 import importlib.util
 
@@ -83,7 +84,12 @@ PSWRecV17WOFModel = _load_wof_model("pswrecv17_wof.py", "PSWRecV17WOFModel")
 PSWRecV20WOFModel = _load_wof_model("pswrecv20_wof.py", "PSWRecV20WOFModel")
 PSWRecV25WOFModel = _load_wof_model("pswrecv25_wof.py", "PSWRecV25WOFModel")
 PSWRecV13withoutphaserotWOFModel = _load_wof_model("pswrecv13withoutphaserot_wof.py", "PSWRecV13withoutphaserotWOFModel")
-
+PSWRecV13VAMWOFModel = _load_wof_model("pswrecv13vam_wof.py", "PSWRecV13VAMWOFModel")
+HyperpersonalizedPSWRecWOFModel = _load_wof_model("pswrecv1111_wof.py", "HyperpersonalizedPSWRecWOFModel")
+HyperpersonalizedPMSSDModel = _load_wof_model("pswrecvmamba_wof.py", "HyperpersonalizedPMSSDModel")
+QIARecWOFModel = _load_wof_model("pswrecqia_wof.py", "QIARecWOFModel")
+QIARecImprovedWOFModel = _load_wof_model("pswrecqia_wof.py", "QIARecImprovedWOFModel")
+GaborRecWOFModel = _load_wof_model("pswrecgabor_wof.py", "GaborRecWOFModel")
 # ---------------------------------------------------------------------------
 # Register all PSWRec WOF models alongside the existing WEARec models.
 # ---------------------------------------------------------------------------
@@ -99,7 +105,12 @@ MODEL_DICT["pswrecv17_wof"] = PSWRecV17WOFModel
 MODEL_DICT["pswrecv20_wof"] = PSWRecV20WOFModel
 MODEL_DICT["pswrecv25_wof"] = PSWRecV25WOFModel
 MODEL_DICT["pswrecv13withoutphaserot"] = PSWRecV13withoutphaserotWOFModel
-
+MODEL_DICT["pswrecv13vam"] = PSWRecV13VAMWOFModel
+MODEL_DICT["pswrecv1111"] = HyperpersonalizedPSWRecWOFModel
+MODEL_DICT["vmamba"] = HyperpersonalizedPMSSDModel
+MODEL_DICT["pswrecqia"] = QIARecWOFModel
+MODEL_DICT["pswrecqia_improved"] = QIARecImprovedWOFModel
+MODEL_DICT["pswrecgabor"] = GaborRecWOFModel
 
 def _build_unified_args() -> argparse.Namespace:
     """Build a unified argument parser that includes both WEARec's base args
@@ -154,7 +165,7 @@ def _build_unified_args() -> argparse.Namespace:
         parser.add_argument("--num_heads", default=2, type=int)
         parser.add_argument("--alpha", default=0.3, type=float)
     elif temp_args.model_type.lower() in (
-        "pswrecv5_wof", "pswrecv6_wof", "pswrecv7_wof", "pswrecv8_wof", "pswrecv10_wof", "pswrecv11_wof", "pswrecv12_wof", "pswrecv13_wof", "pswrecv17_wof", "pswrecv20_wof", "pswrecv25_wof", "pswrecv13withoutphaserot",
+        "pswrecv5_wof", "pswrecv6_wof", "pswrecv7_wof", "pswrecv8_wof", "pswrecv10_wof", "pswrecv11_wof", "pswrecv12_wof", "pswrecv13_wof", "pswrecv17_wof", "pswrecv20_wof", "pswrecv25_wof", "pswrecv13withoutphaserot", "pswrecv13vam", "pswrecv1111", "vmamba",         "pswrecqia", "pswrecqia_improved", "pswrecgabor",
     ):
         # PSWRec V5-V8-V10-V11-V12-V13 share the same CLI flags (V13 ignores sync_threshold)
         parser.add_argument("--n_bands", default=4, type=int)
@@ -166,9 +177,14 @@ def _build_unified_args() -> argparse.Namespace:
         parser.add_argument("--phase_aux_weight", default=0.0, type=float)
         parser.add_argument("--phase_bias_init", default=-5.0, type=float,
                             help="V13withoutphaserot: residual phase bias init; softplus(-5)~0.007 (use -5.0 for stability)")
+        parser.add_argument("--mag_tau", type=float, default=0.5)
+        parser.add_argument("--mag_temp", type=float, default=0.5)
+        parser.add_argument("--mag_gate_mode", type=str, default="mean")
         parser.add_argument("--inner_size", default=None, type=int)
         parser.add_argument("--sync_threshold", default=-0.7, type=float,
                             help="V12 sync-gate: Beauty -0.7/-0.8; LastFM/MovieLens 0.0 (V13 ignores)")
+        parser.add_argument("--qia_init_temperature", default=1.0, type=float,
+                            help="QIA improved: initial softmax temperature for attention (default 1.0)")
     elif temp_args.model_type.lower() == "bsarec":
         parser.add_argument("--c", default=3, type=int)
         parser.add_argument("--alpha", default=0.9, type=float)
@@ -256,7 +272,15 @@ def main():
                 break
 
         logger.info("---------------Test Score---------------")
-        trainer.model.load_state_dict(torch.load(args.checkpoint_path))
+        ckpt_path = os.path.abspath(args.checkpoint_path)
+        logger.info(f"Evaluating checkpoint: {ckpt_path}")
+        if os.path.isfile(ckpt_path):
+            mtime = os.path.getmtime(ckpt_path)
+            size = os.path.getsize(ckpt_path)
+            logger.info(f"Checkpoint file mtime: {time.ctime(mtime)}, size: {size} bytes")
+        trainer.model.load_state_dict(
+            torch.load(args.checkpoint_path, map_location=trainer.device)
+        )
         scores, result_info = trainer.test(0)
 
     logger.info(args.train_name)

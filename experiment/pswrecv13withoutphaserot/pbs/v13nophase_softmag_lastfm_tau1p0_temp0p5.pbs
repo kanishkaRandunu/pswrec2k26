@@ -1,0 +1,66 @@
+#!/bin/bash
+#PBS -P up63
+#PBS -q dgxa100
+#PBS -l ncpus=16
+#PBS -l mem=16GB
+#PBS -l ngpus=1
+#PBS -l walltime=01:00:00
+#PBS -l storage=scratch/up63+gdata/up63
+#PBS -l wd
+#PBS -j oe
+#PBS -N v13sm_l_10_50
+
+# PSWRecV13withoutphaserot softmag gate: LastFM, mag_tau=1.0, mag_temp=0.5
+# Submit from repo root: qsub experiment/pswrecv13withoutphaserot/pbs/v13nophase_softmag_lastfm_tau1p0_temp0p5.pbs
+
+set -e
+cd "$PBS_O_WORKDIR"
+
+echo "=== hostname ==="
+hostname
+echo "=== PBS_JOBID ==="
+echo "$PBS_JOBID"
+
+module purge
+module load cuda/12.9.0
+
+source /scratch/up63/kd6504/venvs/hopper-cu124/bin/activate
+
+EXPERIMENT_DIR="experiment/wearec-pswrec"
+OUTPUT_DIR="experiment/pswrecv13withoutphaserot/output"
+LOG_DIR="log/pswrecv13withoutphaserot"
+mkdir -p "${OUTPUT_DIR}"
+mkdir -p "${LOG_DIR}"
+echo "$(date '+%Y-%m-%d %H:%M:%S')" > "${LOG_DIR}/.job_${PBS_JOBID}.started"
+
+LIVE_LOG="v13withoutphaserot_softmag_lastfm_tau1p0_temp0p5_live_${PBS_JOBID}.log"
+
+python -u "${EXPERIMENT_DIR}/main.py" \
+    --output_dir "${OUTPUT_DIR}" \
+    --data_name LastFM \
+    --model_type pswrecv13withoutphaserot \
+    --lr 0.001 \
+    --hidden_size 64 \
+    --num_hidden_layers 2 \
+    --num_attention_heads 4 \
+    --max_seq_length 50 \
+    --hidden_dropout_prob 0.5 \
+    --attention_probs_dropout_prob 0.5 \
+    --batch_size 256 \
+    --epochs 200 \
+    --patience 10 \
+    --seed 42 \
+    --inner_size 256 \
+    --phase_bias_init -5.0 \
+    --n_bands 4 \
+    --band_kernel_sizes 3 7 15 31 \
+    --band_dilations 1 2 4 8 \
+    --phase_aux \
+    --phase_aux_weight 0.05 \
+    --mag_tau 1.0 \
+    --mag_temp 0.5 \
+    --mag_gate_mode mean \
+    --train_name v13withoutphaserot_softmag_lastfm_tau1p0_temp0p5 \
+    2>&1 | tee "${LIVE_LOG}"
+
+echo "Job completed."

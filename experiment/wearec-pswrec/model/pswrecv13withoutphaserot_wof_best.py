@@ -38,10 +38,6 @@ class LocalPhaseFilterBankV13NoRot(nn.Module):
         hidden_size: int,
         kernel_sizes: List[int],
         dilations: Optional[List[int]] = None,
-        mag_tau: float = 0.5,
-        mag_temp: float = 0.5,
-        mag_gate_mode: str = "mean",
-        mag_eps: float = 1e-8,
     ):
         super().__init__()
         self.hidden_size = hidden_size
@@ -54,10 +50,6 @@ class LocalPhaseFilterBankV13NoRot(nn.Module):
             )
         self.dilations = dilations
         self.n_bands = len(kernel_sizes)
-        self.mag_tau = mag_tau
-        self.mag_temp = mag_temp
-        self.mag_gate_mode = mag_gate_mode
-        self.mag_eps = mag_eps
 
         real_convs: List[nn.Conv1d] = []
         imag_convs: List[nn.Conv1d] = []
@@ -92,6 +84,7 @@ class LocalPhaseFilterBankV13NoRot(nn.Module):
         self.real_convs = nn.ModuleList(real_convs)
         self.imag_convs = nn.ModuleList(imag_convs)
         self.band_pads = pads
+        self.mag_eps = 1e-8
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         B, L, D = x.size()
@@ -110,25 +103,9 @@ class LocalPhaseFilterBankV13NoRot(nn.Module):
         U = torch.stack(us, dim=1)
         V = torch.stack(vs, dim=1)
         mag = torch.sqrt(U * U + V * V + self.mag_eps)
-        # phase
         phi = torch.atan2(V, U + 1e-8)
         cos_phi = torch.cos(phi)
         sin_phi = torch.sin(phi)
-        # soft, scale-aware gating (phase only)
-        # tau_eff is relative to batch signal magnitude so it transfers across datasets
-        if self.mag_gate_mode == "mean":
-            # mag: [B, n_bands, L]
-            mag_mean = mag.mean(dim=(1, 2), keepdim=True)  # [B, 1, 1]
-            tau_eff = self.mag_tau * mag_mean
-        else:
-            # fallback, treat mag_tau as absolute
-            tau_eff = torch.tensor(self.mag_tau, device=mag.device, dtype=mag.dtype).view(1, 1, 1)
-        # temperature is also scaled to keep gating shape stable across datasets
-        temp_eff = self.mag_temp * tau_eff + self.mag_eps
-        gate = torch.sigmoid((mag - tau_eff) / temp_eff)
-        # gate phase only (keep mag intact for AM / mixing modules)
-        cos_phi = cos_phi * gate
-        sin_phi = sin_phi * gate
         return cos_phi, sin_phi, mag
 
 
@@ -411,10 +388,6 @@ class PSWRecV13withoutphaserotWOFModel(SequentialRecModel):
             hidden_size=self.hidden_size,
             kernel_sizes=band_kernel_sizes,
             dilations=band_dilations,
-            mag_tau=getattr(args, "mag_tau", 0.5),
-            mag_temp=getattr(args, "mag_temp", 0.5),
-            mag_gate_mode=getattr(args, "mag_gate_mode", "mean"),
-            mag_eps=getattr(args, "mag_eps", 1e-8),
         )
         self.encoder = PSWEncoderV13NoRot(
             n_layers=self.n_layers,
