@@ -1,0 +1,85 @@
+# ============================================================================
+# PSWRecV13 Hyperparameter Tuning Plan — LastFM (WEARec repo data)
+# ============================================================================
+#
+# Goal: Surpass WEARec Official on LastFM (max_seq_length=50).
+#   Target: NDCG@10 > 0.0440  (WEARec Official LastFM baseline)
+#   Current V13 baseline: NDCG@10 = 0.0419 (gap -4.8%)
+#
+# Reference: experiment/wearec-pswrec/lastfm_results.md
+# Selection metric: NDCG@10 (same as early stopping in main.py)
+
+# --- Fixed parameters (same for all runs) ---
+fixed:
+  model_type: pswrecv13_wof
+  data_name: LastFM
+  hidden_size: 64
+  num_hidden_layers: 2
+  max_seq_length: 50
+  batch_size: 256
+  epochs: 200
+  patience: 10
+  seed: 42
+  inner_size: 256              # overridden in stage 3 if used
+  band_kernel_sizes: [3, 7, 15, 31]
+  band_dilations: [1, 2, 4, 8]
+  phase_bias_scale: 0.1
+  phase_gate_scale: 1.0
+  phase_aux: true
+  phase_aux_weight: 0.05       # overridden in stage 3 if used
+
+# --- Stage 1: Learning-rate sweep ---
+# Rationale: V5 Beauty improved with lower lr (0.0003). Same pipeline may benefit on LastFM.
+stage1:
+  sweep_param: lr
+  values: [0.0002, 0.0003, 0.0005, 0.001]
+  fixed_overrides:
+    hidden_dropout_prob: 0.5
+    attention_probs_dropout_prob: 0.5
+    num_attention_heads: 4
+    n_bands: 4
+  jobs: 4
+  naming: "v13lastfm_s1_lr{value}"
+  selection_metric: NDCG@10
+
+# --- Stage 2: Dropout × n_heads (n_bands = num_attention_heads for V13) ---
+stage2:
+  sweep_params:
+    hidden_dropout_prob: [0.4, 0.5]   # same as attention_probs_dropout_prob
+    num_attention_heads: [2, 4]       # n_bands set equal
+  fixed_overrides:
+    lr: "${BEST_LR_FROM_STAGE1}"
+  jobs: 4
+  naming: "v13lastfm_s2_d{dropout}_h{nheads}"
+  selection_metric: NDCG@10
+
+# --- Stage 3 (optional): inner_size × phase_aux_weight ---
+# Run after setting BEST_LR, BEST_DROPOUT, BEST_NHEADS from stage 2.
+stage3:
+  sweep_params:
+    inner_size: [256, 512]
+    phase_aux_weight: [0.0, 0.05]
+  fixed_overrides:
+    lr: "${BEST_LR}"
+    hidden_dropout_prob: "${BEST_DROPOUT}"
+    attention_probs_dropout_prob: "${BEST_DROPOUT}"
+    num_attention_heads: "${BEST_NHEADS}"
+    n_bands: "${BEST_NHEADS}"
+  jobs: 4
+  naming: "v13lastfm_s3_in{inner}_paw{phase_aux_weight}"
+  selection_metric: NDCG@10
+
+# --- WEARec Official LastFM baseline (to beat) ---
+wearec_baseline:
+  NDCG@10: 0.0440
+  HR@5: 0.0541
+  HR@10: 0.0817
+  HR@20: 0.1202
+  NDCG@20: 0.0537
+
+# --- How to run (from repo root) ---
+# Stage 1:   bash experiment/wearec-pswrec/tuning_v13_lastfm/submit_tuning.sh stage1
+# Collect:   bash experiment/wearec-pswrec/tuning_v13_lastfm/collect_results.sh
+# Set BEST_LR (and after stage 2: BEST_DROPOUT, BEST_NHEADS) in submit_tuning.sh, then:
+# Stage 2:   bash experiment/wearec-pswrec/tuning_v13_lastfm/submit_tuning.sh stage2
+# Stage 3:   bash experiment/wearec-pswrec/tuning_v13_lastfm/submit_tuning.sh stage3  # optional

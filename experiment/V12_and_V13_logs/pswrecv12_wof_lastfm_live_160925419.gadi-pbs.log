@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/home/572/kd6504/TRACT/experiment/wearec-pswrec/main.py", line 80, in <module>
+    PSWRecV12WOFModel = _load_wof_model("pswrecv12_wof.py", "PSWRecV12WOFModel")
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/572/kd6504/TRACT/experiment/wearec-pswrec/main.py", line 71, in _load_wof_model
+    spec.loader.exec_module(mod)
+  File "<frozen importlib._bootstrap_external>", line 936, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1074, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1004, in source_to_code
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/572/kd6504/TRACT/experiment/wearec-pswrec/model/pswrecv12_wof.py", line 63
+    r"""Multi-band quadrature filterbank over the sequence axis."""
+    ^
+IndentationError: expected an indented block after class definition on line 61

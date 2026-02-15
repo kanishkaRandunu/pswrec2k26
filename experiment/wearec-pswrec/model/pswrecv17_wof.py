@@ -1,65 +1,31 @@
 #!/usr/bin/env python
-
 # -*- coding: utf-8 -*-
-
-
-
 """
+PSWRecV17 — Additive Wave Physics (SOTA Killer).
 
-PSWRecV12 adapted for the WEARec Official Framework (WOF).
+Decouples semantic and physics scores, then adds them before softmax:
+  Score(i,j) = (Q·K/sqrt(d)) + γ * (mag_i * mag_j) * cos(Φ_i - Φ_j)
 
-
-
-Integrates B-RoPE from experiment/B-RoPE-Code:
-
-- Identity mapping for phase: no nn.Linear on wavelet_phases; (B, L, 4) maps to num_heads=4.
-
-- Only Q and K are rotated by apply_behavioral_rope; V stays pure (semantic integrity).
-
-- Sync-gate: cos(Δφ) < sync_threshold -> -1e9 before softmax (hard filter on behavioral noise).
-
-
-
-For Beauty (short/sparse) use sync_threshold=-0.7 or -0.8; for LastFM/MovieLens use 0.0.
-
+- Semantic: standard dot-product attention.
+- Physics: independent resonance term; when mag≈0 it degrades to pure Transformer.
+- γ initialized at 0.1 so the physics engine starts with a pulse.
 """
-
-
 
 import math
-
 from typing import List, Optional, Tuple
 
-
-
 import torch
-
 from torch import nn
-
 import torch.nn.functional as F
-
-
-
-# WEARec base class -- imported at runtime via sys.path set in main.py
 
 from model._abstract_model import SequentialRecModel
 
 
-
-
-
 # ---------------------------------------------------------------------------
-
-# Architecture components (filterbank shared with V5/V11)
-
+# 1. Reuse V13 filterbank (ungated phase and magnitude)
 # ---------------------------------------------------------------------------
-
-
-
-
-
-class LocalPhaseFilterBankV5(nn.Module):
-    r"""Multi-band quadrature filterbank over the sequence axis."""
+class LocalPhaseFilterBankV13(nn.Module):
+    r"""Extracts un-gated Phase and Magnitude (same as V13)."""
 
     def __init__(
         self,
@@ -74,8 +40,7 @@ class LocalPhaseFilterBankV5(nn.Module):
             dilations = [1 for _ in kernel_sizes]
         if len(dilations) != len(kernel_sizes):
             raise ValueError(
-                f"band_dilations length {len(dilations)} "
-                f"must match band_kernel_sizes length {len(kernel_sizes)}"
+                f"band_dilations length {len(dilations)} must match band_kernel_sizes length {len(kernel_sizes)}"
             )
         self.dilations = dilations
         self.n_bands = len(kernel_sizes)
@@ -94,75 +59,38 @@ class LocalPhaseFilterBankV5(nn.Module):
                 nn.Conv1d(hidden_size, hidden_size, kernel_size=k,
                           dilation=d, padding=0, groups=hidden_size, bias=False)
             )
-
         self.real_convs = nn.ModuleList(real_convs)
         self.imag_convs = nn.ModuleList(imag_convs)
         self.band_pads = pads
-
         self.mag_eps = 1e-8
-        self.mag_tau = 1e-3
 
     def forward(
         self, x: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         B, L, D = x.size()
-        x_t = x.transpose(1, 2)  # [B, D, L]
-
+        x_t = x.transpose(1, 2)
         us: List[torch.Tensor] = []
         vs: List[torch.Tensor] = []
-
-        for pad, conv_r, conv_i in zip(
-            self.band_pads, self.real_convs, self.imag_convs
-        ):
+        for pad, conv_r, conv_i in zip(self.band_pads, self.real_convs, self.imag_convs):
             x_padded = F.pad(x_t, (pad, 0))
-            u = conv_r(x_padded)
-            v = conv_i(x_padded)
-            u_band = u.mean(dim=1)
-            v_band = v.mean(dim=1)
-            us.append(u_band)
-            vs.append(v_band)
-
+            u = conv_r(x_padded).mean(dim=1)
+            v = conv_i(x_padded).mean(dim=1)
+            us.append(u)
+            vs.append(v)
         U = torch.stack(us, dim=1)
         V = torch.stack(vs, dim=1)
-
         mag = torch.sqrt(U * U + V * V + self.mag_eps)
-        # Compute phi safely (U + 1e-8 avoids atan2(0,0) and division-by-zero in backward)
         phi = torch.atan2(V, U + 1e-8)
-        gate = (mag > self.mag_tau).float()
-        phi = phi * gate
         cos_phi = torch.cos(phi)
         sin_phi = torch.sin(phi)
-
         return phi, cos_phi, sin_phi, mag
 
 
-def rotate_half(x: torch.Tensor) -> torch.Tensor:
-    """Rotate last dimension by 90 degrees in complex plane (for RoPE)."""
-    x1, x2 = x.chunk(2, dim=-1)
-    return torch.cat((-x2, x1), dim=-1)
-
-
-
-
-
-def apply_behavioral_rope(q: torch.Tensor, k: torch.Tensor, phase: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-    """
-    Applies the Behavioral Rotary Position Embedding.
-    Only Q and K are rotated by wavelet phase; V is never passed in (semantic integrity).
-    """
-    phase = torch.cat([phase, phase], dim=-1)
-    sin_phase = torch.sin(phase)
-    cos_phase = torch.cos(phase)
-    q_rotated = (q * cos_phase) + (rotate_half(q) * sin_phase)
-    k_rotated = (k * cos_phase) + (rotate_half(k) * sin_phase)
-    return q_rotated, k_rotated
-
-
-
-
-
-class BehavioralRotaryAttentionV12(nn.Module):
-    """B-RoPE with identity phase mapping and sync-gate. Only Q and K rotated; V untouched."""
+# ---------------------------------------------------------------------------
+# 2. Additive Resonance Attention (semantic + physics, then add)
+# ---------------------------------------------------------------------------
+class AdditiveResonanceAttentionV17(nn.Module):
+    """Score = Semantic (Q·K/sqrt(d)) + γ * (mag_i * mag_j) * cos(Φ_i - Φ_j)."""
 
     def __init__(
         self,
@@ -172,11 +100,10 @@ class BehavioralRotaryAttentionV12(nn.Module):
         hidden_dropout_prob: float,
         attn_dropout_prob: float,
         layer_norm_eps: float,
-        sync_threshold: float = -0.7,
     ):
         super().__init__()
         assert n_heads == n_bands, (
-            f"V12 requires n_heads == n_bands for identity phase mapping (got n_heads={n_heads}, n_bands={n_bands})"
+            f"V17 requires n_heads == n_bands (got n_heads={n_heads}, n_bands={n_bands})"
         )
         if hidden_size % n_heads != 0:
             raise ValueError(
@@ -185,12 +112,9 @@ class BehavioralRotaryAttentionV12(nn.Module):
         self.n_heads = n_heads
         self.hidden_size = hidden_size
         self.head_dim = hidden_size // n_heads
-        if self.head_dim % 2 != 0:
-            raise ValueError(
-                f"head_dim {self.head_dim} must be even for rotary splitting."
-            )
         self.n_bands = n_bands
-        self.sync_threshold = sync_threshold
+        # Physics engine starts with a pulse (0.1)
+        self.gamma = nn.Parameter(torch.ones(1, self.n_heads, 1, 1) * 0.1)
         self.query = nn.Linear(hidden_size, hidden_size)
         self.key = nn.Linear(hidden_size, hidden_size)
         self.value = nn.Linear(hidden_size, hidden_size)
@@ -202,49 +126,59 @@ class BehavioralRotaryAttentionV12(nn.Module):
     def _shape(self, x: torch.Tensor) -> torch.Tensor:
         B, L, D = x.size()
         x = x.view(B, L, self.n_heads, self.head_dim)
-        return x.permute(0, 2, 1, 3)  # [B, H, L, d]
+        return x.permute(0, 2, 1, 3)
 
     def forward(
         self,
         hidden_states: torch.Tensor,
         attention_mask: torch.Tensor,
         phi: torch.Tensor,
+        mag: torch.Tensor,
     ) -> torch.Tensor:
         B, L, D = hidden_states.size()
         residual = hidden_states
-        q = self._shape(self.query(hidden_states))  # [B, H, L, d]
+
+        # 1. Standard semantic projections
+        q = self._shape(self.query(hidden_states))
         k = self._shape(self.key(hidden_states))
         v = self._shape(self.value(hidden_states))
-        phase_head = phi.transpose(1, 2).unsqueeze(-1)  # [B, n_bands, L, 1] -> [B, H, L, 1]
-        phase_rope = phase_head.expand(-1, -1, -1, self.head_dim // 2)  # [B, H, L, d/2]
-        q_rot, k_rot = apply_behavioral_rope(q, k, phase_rope)
-        attn_scores = torch.matmul(q_rot, k_rot.transpose(-2, -1)) / math.sqrt(self.head_dim)
-        phi_i = phase_head
-        phi_j = phase_head.transpose(-2, -1)  # [B, H, 1, L]
-        delta_phi = phi_i - phi_j
+
+        # 2. Pure semantic score
+        semantic_scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.head_dim)
+
+        # 3. Pure physics score (phi, mag: [B, n_bands, L])
+        delta_phi = phi.unsqueeze(-1) - phi.unsqueeze(-2)
         cos_delta_phi = torch.cos(delta_phi)
-        sync_mask = cos_delta_phi < self.sync_threshold
-        eye = torch.eye(L, dtype=torch.bool, device=hidden_states.device).view(1, 1, L, L)
-        sync_mask = sync_mask.masked_fill(eye, False)
-        attn_scores = attn_scores.masked_fill(sync_mask, -1e9)
+        mag_product = mag.unsqueeze(-1) * mag.unsqueeze(-2)
+        physics_scores = self.gamma * (mag_product * cos_delta_phi)
+
+        # 4. Additive resonance
+        attn_scores = semantic_scores + physics_scores
+
+        # 5. Masking & routing
         if attention_mask is not None:
             attn_scores = attn_scores + attention_mask
-        row_max = attn_scores.max(dim=-1, keepdim=True)[0]
-        all_masked = row_max <= -1e8
-        attn_scores = torch.where(all_masked & eye, torch.zeros_like(attn_scores), attn_scores)
-        attn_probs = F.softmax(attn_scores, dim=-1)
-        attn_probs = self.attn_dropout(attn_probs)
+
+        eye = torch.eye(L, dtype=torch.bool, device=hidden_states.device).view(1, 1, L, L)
+        attn_scores = torch.where(
+            attn_scores.max(dim=-1, keepdim=True)[0] <= -1e8,
+            torch.where(eye, torch.zeros_like(attn_scores), attn_scores),
+            attn_scores,
+        )
+
+        attn_probs = self.attn_dropout(F.softmax(attn_scores, dim=-1))
         context = torch.matmul(attn_probs, v)
-        context = context.permute(0, 2, 1, 3).contiguous()
-        context = context.view(B, L, self.hidden_size)
+        context = context.permute(0, 2, 1, 3).contiguous().view(B, L, self.hidden_size)
         hidden_states = self.out_proj(context)
         hidden_states = self.out_dropout(hidden_states)
-        hidden_states = self.layer_norm(hidden_states + residual)
-        return hidden_states
+        return self.layer_norm(hidden_states + residual)
 
 
-class FeedForwardV11(nn.Module):
-    """Position-wise feed-forward with residual + LayerNorm (same as V5/V11)."""
+# ---------------------------------------------------------------------------
+# 3. Feed-forward (reuse V13)
+# ---------------------------------------------------------------------------
+class FeedForwardV13(nn.Module):
+    """Position-wise FFN with residual + LayerNorm."""
 
     def __init__(
         self,
@@ -257,26 +191,18 @@ class FeedForwardV11(nn.Module):
         super().__init__()
         self.dense_1 = nn.Linear(hidden_size, inner_size)
         act_map = {
-            "gelu": self.gelu,
-            "relu": nn.functional.relu,
-            "swish": self.swish,
+            "gelu": lambda x: x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0))),
+            "relu": F.relu,
+            "swish": lambda x: x * torch.sigmoid(x),
             "tanh": torch.tanh,
             "sigmoid": torch.sigmoid,
         }
         if hidden_act not in act_map:
-            raise ValueError(f"Unsupported hidden_act '{hidden_act}' in pswrecv12_wof.")
+            raise ValueError(f"Unsupported hidden_act '{hidden_act}' in pswrecv17_wof.")
         self.act_fn = act_map[hidden_act]
         self.dense_2 = nn.Linear(inner_size, hidden_size)
         self.layer_norm = nn.LayerNorm(hidden_size, eps=layer_norm_eps)
         self.dropout = nn.Dropout(hidden_dropout_prob)
-
-    @staticmethod
-    def gelu(x: torch.Tensor) -> torch.Tensor:
-        return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
-
-    @staticmethod
-    def swish(x: torch.Tensor) -> torch.Tensor:
-        return x * torch.sigmoid(x)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         residual = x
@@ -284,12 +210,11 @@ class FeedForwardV11(nn.Module):
         x = self.act_fn(x)
         x = self.dense_2(x)
         x = self.dropout(x)
-        x = self.layer_norm(x + residual)
-        return x
+        return self.layer_norm(x + residual)
 
 
-class PSWBlockV12(nn.Module):
-    """Single transformer-style layer: BehavioralRotaryAttentionV12 + FFN."""
+class PSWBlockV17(nn.Module):
+    """Single layer: Additive Resonance attention + FFN."""
 
     def __init__(
         self,
@@ -301,19 +226,17 @@ class PSWBlockV12(nn.Module):
         attn_dropout_prob: float,
         hidden_act: str,
         layer_norm_eps: float,
-        sync_threshold: float,
     ):
         super().__init__()
-        self.attn = BehavioralRotaryAttentionV12(
+        self.attn = AdditiveResonanceAttentionV17(
             n_heads=n_heads,
             hidden_size=hidden_size,
             n_bands=n_bands,
             hidden_dropout_prob=hidden_dropout_prob,
             attn_dropout_prob=attn_dropout_prob,
             layer_norm_eps=layer_norm_eps,
-            sync_threshold=sync_threshold,
         )
-        self.ffn = FeedForwardV11(
+        self.ffn = FeedForwardV13(
             hidden_size=hidden_size,
             inner_size=inner_size,
             hidden_dropout_prob=hidden_dropout_prob,
@@ -326,14 +249,14 @@ class PSWBlockV12(nn.Module):
         hidden_states: torch.Tensor,
         attention_mask: torch.Tensor,
         phi: torch.Tensor,
+        mag: torch.Tensor,
     ) -> torch.Tensor:
-        hidden_states = self.attn(hidden_states, attention_mask, phi)
-        hidden_states = self.ffn(hidden_states)
-        return hidden_states
+        hidden_states = self.attn(hidden_states, attention_mask, phi, mag)
+        return self.ffn(hidden_states)
 
 
-class PSWEncoderV12(nn.Module):
-    """Stack of PSWBlockV12 layers."""
+class PSWEncoderV17(nn.Module):
+    """Stack of PSWBlockV17 layers."""
 
     def __init__(
         self,
@@ -346,12 +269,10 @@ class PSWEncoderV12(nn.Module):
         attn_dropout_prob: float,
         hidden_act: str,
         layer_norm_eps: float,
-        sync_threshold: float,
     ):
         super().__init__()
-        self.n_layers = n_layers
         self.layers = nn.ModuleList([
-            PSWBlockV12(
+            PSWBlockV17(
                 n_heads=n_heads,
                 hidden_size=hidden_size,
                 n_bands=n_bands,
@@ -360,7 +281,6 @@ class PSWEncoderV12(nn.Module):
                 attn_dropout_prob=attn_dropout_prob,
                 hidden_act=hidden_act,
                 layer_norm_eps=layer_norm_eps,
-                sync_threshold=sync_threshold,
             )
             for _ in range(n_layers)
         ])
@@ -370,11 +290,12 @@ class PSWEncoderV12(nn.Module):
         hidden_states: torch.Tensor,
         attention_mask: torch.Tensor,
         phi: torch.Tensor,
+        mag: torch.Tensor,
         output_all_encoded_layers: bool = True,
     ) -> List[torch.Tensor]:
         all_layers: List[torch.Tensor] = []
         for layer in self.layers:
-            hidden_states = layer(hidden_states, attention_mask, phi)
+            hidden_states = layer(hidden_states, attention_mask, phi, mag)
             if output_all_encoded_layers:
                 all_layers.append(hidden_states)
         if not output_all_encoded_layers:
@@ -382,23 +303,11 @@ class PSWEncoderV12(nn.Module):
         return all_layers
 
 
-
-
-
 # ---------------------------------------------------------------------------
-
-# WOF model shell -- adapts PSWRecV12 to WEARec's SequentialRecModel interface
-
+# 4. WOF model shell
 # ---------------------------------------------------------------------------
-
-
-
-
-
-class PSWRecV12WOFModel(SequentialRecModel):
-    r"""PSWRecV12 on WEARec Official Framework.
-    B-RoPE with identity phase mapping and sync-gate. For Beauty use sync_threshold=-0.7/-0.8.
-    """
+class PSWRecV17WOFModel(SequentialRecModel):
+    r"""PSWRecV17: Additive Wave Physics — semantic + physics scores added before softmax."""
 
     def __init__(self, args):
         super().__init__(args)
@@ -417,20 +326,19 @@ class PSWRecV12WOFModel(SequentialRecModel):
         self.phase_aux = getattr(args, "phase_aux", False)
         self.phase_aux_weight = getattr(args, "phase_aux_weight", 0.0)
         self._last_phase_reg: Optional[torch.Tensor] = None
-        self.sync_threshold = getattr(args, "sync_threshold", -0.7)
         if self.n_heads != self.n_bands:
             raise ValueError(
-                f"PSWRecV12 requires num_attention_heads == n_bands (identity mapping). "
+                f"PSWRecV17 requires num_attention_heads == n_bands. "
                 f"Got num_attention_heads={self.n_heads}, n_bands={self.n_bands}."
             )
         self.LayerNorm = nn.LayerNorm(self.hidden_size, eps=self.layer_norm_eps)
         self.dropout = nn.Dropout(self.hidden_dropout_prob)
-        self.phase_filter = LocalPhaseFilterBankV5(
+        self.phase_filter = LocalPhaseFilterBankV13(
             hidden_size=self.hidden_size,
             kernel_sizes=band_kernel_sizes,
             dilations=band_dilations,
         )
-        self.encoder = PSWEncoderV12(
+        self.encoder = PSWEncoderV17(
             n_layers=self.n_layers,
             n_heads=self.n_heads,
             hidden_size=self.hidden_size,
@@ -440,7 +348,6 @@ class PSWRecV12WOFModel(SequentialRecModel):
             attn_dropout_prob=self.attn_dropout_prob,
             hidden_act=self.hidden_act,
             layer_norm_eps=self.layer_norm_eps,
-            sync_threshold=self.sync_threshold,
         )
         self.apply(self.init_weights)
 
@@ -449,19 +356,22 @@ class PSWRecV12WOFModel(SequentialRecModel):
         sequence_emb = self.LayerNorm(sequence_emb)
         sequence_emb = self.dropout(sequence_emb)
         phi, cos_phi, sin_phi, mag = self.phase_filter(sequence_emb)
+        phi = phi[:, : self.n_bands, :]
+        cos_phi = cos_phi[:, : self.n_bands, :]
+        sin_phi = sin_phi[:, : self.n_bands, :]
+        mag = mag[:, : self.n_bands, :]
         if self.phase_aux:
             cos_diff = cos_phi[:, :, 1:] - cos_phi[:, :, :-1]
             sin_diff = sin_phi[:, :, 1:] - sin_phi[:, :, :-1]
-            phase_reg = (cos_diff.pow(2) + sin_diff.pow(2)).mean()
-            self._last_phase_reg = phase_reg
+            self._last_phase_reg = (cos_diff.pow(2) + sin_diff.pow(2)).mean()
         else:
             self._last_phase_reg = None
-        phi_pl = phi.permute(0, 2, 1).contiguous()
         extended_attention_mask = self.get_attention_mask(input_ids)
         encoder_outputs = self.encoder(
             sequence_emb,
             extended_attention_mask,
-            phi_pl,
+            phi,
+            mag,
             output_all_encoded_layers=True,
         )
         if all_sequence_output:

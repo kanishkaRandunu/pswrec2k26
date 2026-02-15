@@ -1,0 +1,78 @@
+#!/bin/bash
+#PBS -P up63
+#PBS -q dgxa100
+#PBS -l ncpus=16
+#PBS -l mem=16GB
+#PBS -l ngpus=1
+#PBS -l walltime=01:00:00
+#PBS -l storage=scratch/up63+gdata/up63
+#PBS -l wd
+#PBS -j oe
+
+# ============================================================================
+# PSWRecV13 (AM-B-RoPE) Hyperparameter Tuning — LastFM (WEARec repo data)
+# ============================================================================
+# Parameterised PBS template. All tuneable values come from environment
+# variables set by the launcher script (submit_tuning.sh).
+#
+# Required env vars (with defaults for safety):
+#   TUNE_LR             -- learning rate          (default: 0.001)
+#   TUNE_DROPOUT        -- hidden & attn dropout  (default: 0.5)
+#   TUNE_NHEADS         -- num_attention_heads = n_bands (default: 4)
+#   TUNE_RUN_NAME       -- unique run identifier   (default: v13lastfm_tune)
+# Optional (for stage 3):
+#   TUNE_INNER_SIZE     -- FFN inner size         (default: 256)
+#   TUNE_PHASE_AUX_W    -- phase_aux_weight       (default: 0.05)
+# ============================================================================
+
+set -e
+cd "$PBS_O_WORKDIR"
+
+echo "=== hostname ==="
+hostname
+echo "=== PBS_JOBID ==="
+echo "$PBS_JOBID"
+echo "=== Tuning params ==="
+echo "LR=${TUNE_LR:=0.001}  DROPOUT=${TUNE_DROPOUT:=0.5}  NHEADS=${TUNE_NHEADS:=4}  RUN=${TUNE_RUN_NAME:=v13lastfm_tune}  INNER=${TUNE_INNER_SIZE:=256}  PAW=${TUNE_PHASE_AUX_W:=0.05}"
+
+module purge
+module load cuda/12.9.0
+
+source /scratch/up63/kd6504/venvs/hopper-cu124/bin/activate
+
+EXPERIMENT_DIR="experiment/wearec-pswrec"
+OUTPUT_DIR="experiment/wearec-pswrec/tuning_v13_lastfm/output"
+LOG_DIR="log/pswrecv13_tune_lastfm"
+mkdir -p "${OUTPUT_DIR}"
+mkdir -p "${LOG_DIR}"
+echo "$(date '+%Y-%m-%d %H:%M:%S')" > "${LOG_DIR}/.job_${PBS_JOBID}.started"
+
+LIVE_LOG="${TUNE_RUN_NAME}_live_${PBS_JOBID}.log"
+
+python -u "${EXPERIMENT_DIR}/main.py" \
+    --data_name LastFM \
+    --model_type pswrecv13_wof \
+    --output_dir "${OUTPUT_DIR}" \
+    --train_name "${TUNE_RUN_NAME}" \
+    --lr "${TUNE_LR}" \
+    --hidden_size 64 \
+    --num_hidden_layers 2 \
+    --num_attention_heads "${TUNE_NHEADS}" \
+    --max_seq_length 50 \
+    --hidden_dropout_prob "${TUNE_DROPOUT}" \
+    --attention_probs_dropout_prob "${TUNE_DROPOUT}" \
+    --batch_size 256 \
+    --epochs 200 \
+    --patience 10 \
+    --seed 42 \
+    --inner_size "${TUNE_INNER_SIZE}" \
+    --n_bands "${TUNE_NHEADS}" \
+    --band_kernel_sizes 3 7 15 31 \
+    --band_dilations 1 2 4 8 \
+    --phase_bias_scale 0.1 \
+    --phase_gate_scale 1.0 \
+    --phase_aux \
+    --phase_aux_weight "${TUNE_PHASE_AUX_W}" \
+    2>&1 | tee "${LIVE_LOG}"
+
+echo "Job completed: ${TUNE_RUN_NAME}"

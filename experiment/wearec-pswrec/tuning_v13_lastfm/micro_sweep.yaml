@@ -1,0 +1,57 @@
+# ============================================================================
+# PSWRecV13 LastFM — Micro-sweep to break WEARec ceiling (HR@10 0.0817 / NDCG@10 0.0440)
+# ============================================================================
+#
+# Rationale: Optimal LR (0.001) and phase_aux (paw=0.05) are proven; push dropout
+# lower (let geometry regularize) and phase_aux_weight higher (purer behavioral
+# rhythms from Daubechies filters).
+#
+# Locked (do not change):
+#   learning_rate: 0.001
+#   inner_size: 256
+#   num_attention_heads: 4  (n_bands: 4)
+#
+# Sweep 1 — Aggressive dropout reduction:
+#   hidden_dropout_prob, attention_probs_dropout_prob ∈ {0.1, 0.2}
+#
+# Sweep 2 — Push phase constraint:
+#   phase_aux_weight ∈ {0.1, 0.2}
+#
+# Grid: 2 × 2 = 4 jobs
+# Run names: v13lastfm_micro_d0p1_paw0p1, v13lastfm_micro_d0p1_paw0p2,
+#            v13lastfm_micro_d0p2_paw0p1, v13lastfm_micro_d0p2_paw0p2
+# ============================================================================
+
+# --- locked ---
+lr: 0.001
+inner_size: 256
+num_attention_heads: 4
+n_bands: 4
+data_name: LastFM
+model_type: pswrecv13_wof
+hidden_size: 64
+num_hidden_layers: 2
+max_seq_length: 50
+batch_size: 256
+epochs: 200
+patience: 10
+seed: 42
+band_kernel_sizes: [3, 7, 15, 31]
+band_dilations: [1, 2, 4, 8]
+phase_bias_scale: 0.1
+phase_gate_scale: 1.0
+phase_aux: true
+
+# --- sweep (passed via PBS env) ---
+# hidden_dropout_prob, attention_probs_dropout_prob: [0.1, 0.2]
+# phase_aux_weight: [0.1, 0.2]
+
+sweep:
+  hidden_dropout_prob: [0.1, 0.2]
+  attention_probs_dropout_prob: [0.1, 0.2]   # same value as hidden_dropout_prob
+  phase_aux_weight: [0.1, 0.2]
+
+jobs: 4
+naming: "v13lastfm_micro_d{dropout}_paw{phase_aux_weight}"
+wearec_ceiling_hr10: 0.0817
+wearec_ceiling_ndcg10: 0.0440

@@ -1,0 +1,41 @@
+# ============================================================================
+# PSWRecV17 LastFM — Additive Wave Physics, s3_in256_paw0p05 (seq length 50)
+# ============================================================================
+#
+# V17: Score = Semantic(Q·K/sqrt(d)) + γ * (mag_i * mag_j) * cos(Φ_i - Φ_j).
+# Same training params as v13lastfm_s3_in256_paw0p05 for fair comparison.
+# WEARec repo LastFM data, max_seq_length=50.
+# ============================================================================
+
+# --- model ---
+model_type: pswrecv17_wof
+hidden_size: 64
+num_hidden_layers: 2
+num_attention_heads: 4
+inner_size: 256
+hidden_act: gelu
+hidden_dropout_prob: 0.1
+attention_probs_dropout_prob: 0.2
+initializer_range: 0.02
+max_seq_length: 50
+
+# --- PSWRec bands (same as V13) ---
+n_bands: 4
+band_kernel_sizes: [3, 7, 15, 31]
+band_dilations: [1, 2, 4, 8]
+phase_aux: true
+phase_aux_weight: 0.05
+
+# --- training ---
+lr: 0.001
+batch_size: 256
+epochs: 200
+patience: 10
+weight_decay: 0.0
+adam_beta1: 0.9
+adam_beta2: 0.999
+seed: 42
+
+# --- data ---
+data_name: LastFM
+data_dir: ../../WEARec/src/data/

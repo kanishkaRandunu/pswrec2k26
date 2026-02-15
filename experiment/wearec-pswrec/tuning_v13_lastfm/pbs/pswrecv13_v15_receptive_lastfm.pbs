@@ -1,0 +1,80 @@
+#!/bin/bash
+#PBS -P up63
+#PBS -q dgxa100
+#PBS -l ncpus=16
+#PBS -l mem=16GB
+#PBS -l ngpus=1
+#PBS -l walltime=01:00:00
+#PBS -l storage=scratch/up63+gdata/up63
+#PBS -l wd
+#PBS -j oe
+
+# ============================================================================
+# V15 Receptive-Field Tuning — LastFM (V13 only; kernel/dilation overrides)
+# ============================================================================
+# Locked: lr=0.001, hidden_dropout=0.1, attn_dropout=0.2, phase_aux, inner=256.
+# Env vars from submit_v15_receptive.sh:
+#   TUNE_RUN_NAME   -- e.g. v15lastfm_tight_paw0p05
+#   TUNE_KERNELS    -- space-separated, e.g. "3 5 7" or "3 7"
+#   TUNE_DILATIONS -- space-separated, e.g. "1 2 4" or "1 2"
+#   TUNE_NHEADS    -- 3 or 2 (must match number of kernels; also n_bands)
+#   TUNE_PAW       -- 0.05 or 0.1
+# ============================================================================
+
+set -e
+cd "$PBS_O_WORKDIR"
+
+echo "=== hostname ==="
+hostname
+echo "=== PBS_JOBID ==="
+echo "$PBS_JOBID"
+echo "=== V15 receptive-field (kernels=${TUNE_KERNELS}, dilations=${TUNE_DILATIONS}, n_heads=${TUNE_NHEADS}, paw=${TUNE_PAW}) ==="
+echo "RUN=${TUNE_RUN_NAME}"
+
+# PBS -v cannot pass spaces; use comma-separated and convert to space-separated for python
+KERNELS_SPACED="${TUNE_KERNELS//,/ }"
+DILATIONS_SPACED="${TUNE_DILATIONS//,/ }"
+# n_heads=3 requires hidden_size divisible by 3; use 66 for tight config (64 for 2 or 4 heads)
+TUNE_HIDDEN_SIZE="${TUNE_HIDDEN_SIZE:-64}"
+
+module purge
+module load cuda/12.9.0
+
+source /scratch/up63/kd6504/venvs/hopper-cu124/bin/activate
+
+EXPERIMENT_DIR="experiment/wearec-pswrec"
+OUTPUT_DIR="experiment/wearec-pswrec/tuning_v13_lastfm/output"
+LOG_DIR="log/pswrecv13_tune_lastfm"
+mkdir -p "${OUTPUT_DIR}"
+mkdir -p "${LOG_DIR}"
+echo "$(date '+%Y-%m-%d %H:%M:%S')" > "${LOG_DIR}/.job_${PBS_JOBID}.started"
+
+LIVE_LOG="${TUNE_RUN_NAME}_live_${PBS_JOBID}.log"
+
+python -u "${EXPERIMENT_DIR}/main.py" \
+    --data_name LastFM \
+    --model_type pswrecv13_wof \
+    --output_dir "${OUTPUT_DIR}" \
+    --train_name "${TUNE_RUN_NAME}" \
+    --lr 0.001 \
+    --hidden_size ${TUNE_HIDDEN_SIZE} \
+    --num_hidden_layers 2 \
+    --num_attention_heads ${TUNE_NHEADS} \
+    --max_seq_length 50 \
+    --hidden_dropout_prob 0.1 \
+    --attention_probs_dropout_prob 0.2 \
+    --batch_size 256 \
+    --epochs 200 \
+    --patience 10 \
+    --seed 42 \
+    --inner_size 256 \
+    --n_bands ${TUNE_NHEADS} \
+    --band_kernel_sizes ${KERNELS_SPACED} \
+    --band_dilations ${DILATIONS_SPACED} \
+    --phase_bias_scale 0.1 \
+    --phase_gate_scale 1.0 \
+    --phase_aux \
+    --phase_aux_weight ${TUNE_PAW} \
+    2>&1 | tee "${LIVE_LOG}"
+
+echo "Job completed: ${TUNE_RUN_NAME}"

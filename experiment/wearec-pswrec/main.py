@@ -78,6 +78,11 @@ PSWRecV8WOFModel = _load_wof_model("pswrecv8_wof.py", "PSWRecV8WOFModel")
 PSWRecV10WOFModel = _load_wof_model("pswrecv10_wof.py", "PSWRecV10WOFModel")
 PSWRecV11WOFModel = _load_wof_model("pswrecv11_wof.py", "PSWRecV11WOFModel")
 PSWRecV12WOFModel = _load_wof_model("pswrecv12_wof.py", "PSWRecV12WOFModel")
+PSWRecV13WOFModel = _load_wof_model("pswrecv13_wof.py", "PSWRecV13WOFModel")
+PSWRecV17WOFModel = _load_wof_model("pswrecv17_wof.py", "PSWRecV17WOFModel")
+PSWRecV20WOFModel = _load_wof_model("pswrecv20_wof.py", "PSWRecV20WOFModel")
+PSWRecV25WOFModel = _load_wof_model("pswrecv25_wof.py", "PSWRecV25WOFModel")
+PSWRecV13withoutphaserotWOFModel = _load_wof_model("pswrecv13withoutphaserot_wof.py", "PSWRecV13withoutphaserotWOFModel")
 
 # ---------------------------------------------------------------------------
 # Register all PSWRec WOF models alongside the existing WEARec models.
@@ -89,6 +94,11 @@ MODEL_DICT["pswrecv8_wof"] = PSWRecV8WOFModel
 MODEL_DICT["pswrecv10_wof"] = PSWRecV10WOFModel
 MODEL_DICT["pswrecv11_wof"] = PSWRecV11WOFModel
 MODEL_DICT["pswrecv12_wof"] = PSWRecV12WOFModel
+MODEL_DICT["pswrecv13_wof"] = PSWRecV13WOFModel
+MODEL_DICT["pswrecv17_wof"] = PSWRecV17WOFModel
+MODEL_DICT["pswrecv20_wof"] = PSWRecV20WOFModel
+MODEL_DICT["pswrecv25_wof"] = PSWRecV25WOFModel
+MODEL_DICT["pswrecv13withoutphaserot"] = PSWRecV13withoutphaserotWOFModel
 
 
 def _build_unified_args() -> argparse.Namespace:
@@ -144,9 +154,9 @@ def _build_unified_args() -> argparse.Namespace:
         parser.add_argument("--num_heads", default=2, type=int)
         parser.add_argument("--alpha", default=0.3, type=float)
     elif temp_args.model_type.lower() in (
-        "pswrecv5_wof", "pswrecv6_wof", "pswrecv7_wof", "pswrecv8_wof", "pswrecv10_wof", "pswrecv11_wof", "pswrecv12_wof",
+        "pswrecv5_wof", "pswrecv6_wof", "pswrecv7_wof", "pswrecv8_wof", "pswrecv10_wof", "pswrecv11_wof", "pswrecv12_wof", "pswrecv13_wof", "pswrecv17_wof", "pswrecv20_wof", "pswrecv25_wof", "pswrecv13withoutphaserot",
     ):
-        # PSWRec V5-V8-V10-V11-V12 share the same CLI flags
+        # PSWRec V5-V8-V10-V11-V12-V13 share the same CLI flags (V13 ignores sync_threshold)
         parser.add_argument("--n_bands", default=4, type=int)
         parser.add_argument("--band_kernel_sizes", nargs="+", default=[3, 7, 15, 31], type=int)
         parser.add_argument("--band_dilations", nargs="+", default=[1, 2, 4, 8], type=int)
@@ -154,9 +164,11 @@ def _build_unified_args() -> argparse.Namespace:
         parser.add_argument("--phase_gate_scale", default=1.0, type=float)
         parser.add_argument("--phase_aux", action="store_true", default=False)
         parser.add_argument("--phase_aux_weight", default=0.0, type=float)
+        parser.add_argument("--phase_bias_init", default=-5.0, type=float,
+                            help="V13withoutphaserot: residual phase bias init; softplus(-5)~0.007 (use -5.0 for stability)")
         parser.add_argument("--inner_size", default=None, type=int)
         parser.add_argument("--sync_threshold", default=-0.7, type=float,
-                            help="V12 sync-gate: Beauty -0.7/-0.8; LastFM/MovieLens 0.0")
+                            help="V12 sync-gate: Beauty -0.7/-0.8; LastFM/MovieLens 0.0 (V13 ignores)")
     elif temp_args.model_type.lower() == "bsarec":
         parser.add_argument("--c", default=3, type=int)
         parser.add_argument("--alpha", default=0.9, type=float)
